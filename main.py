@@ -12,30 +12,28 @@ nbsr = non_blocking_stream.NonBlockingStreamReader(p.stdout)
 for name in functionsNameList:
     p.stdin.write('b ' + name + '\n')
 
-q = Queue()
-def checkVarible(str):
-    varName = ""
-    for i in str:
-        if i == " ":
-            break
-        varName += i
-    writeToGdb("p &"+varName)
-    address = gdbOutput("varAddress")
-    lastIndex =  address.rfind(" ")
-    if lastIndex != -1:
+varHash = {}
+def getVaribleAddress(var_name):
+    writeToGdb("p &"+var_name)
+    address = praseGdbOutput("varAddress")
+    last_index =  address.rfind(" ")
+    if last_index != -1:
         address = address[lastIndex+1:]
-    #print "varible name : " + varName
-    #print "varible address : " + address
+    return address
+def updateVariableleHash(var_name):
 
-def checkScope(str):
-    temp = ""
-    q = Queue()
-    for i in str:
-        if (i == "\n"):
-            checkVarible(temp)
-            temp = ""
-        else:
-            temp += i
+    var_address = getVaribleAddress(var_name)
+    varHash[var_name] = [] if not exists varHash{var_name};
+    varHash[var_name].append(var_address)
+
+def checkScope(gdb_output):
+
+    lastIndex = 0
+    info_local_lines = gdb_output.split("\n")
+    #print str
+    for i in range(0,len(info_local_lines)):
+        var_name = info_local_lines[i].split(':').first.strip()
+        var_adcheckVarible(var_name)
 
 def readGdbOutput():
     temp = ""
@@ -46,7 +44,7 @@ def readGdbOutput():
         temp += output
     return temp
 
-def gdbOutput(query):
+def praseGdbOutput(query):
     temp = readGdbOutput()
     #print "out : " + temp
     if query == "print":
@@ -63,13 +61,13 @@ def writeToGdb(command):
         return
     p.stdin.write(command + '\n')
 
-
+varHash = {}
 writeToGdb("run")
-gdbOutput("print")
+praseGdbOutput("print")
 while True:
     command = raw_input()
     writeToGdb(command)
-    gdbOutput("print")
+    praseGdbOutput("print")
     command = "info locals"
     writeToGdb(command)
-    gdbOutput("scope")
+    praseGdbOutput("scope")
