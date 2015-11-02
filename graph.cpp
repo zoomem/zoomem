@@ -3,11 +3,27 @@
 #include <vector>
 #include <map>
 using namespace std;
+
+class node;
+class edge;
 map<string,node*>get_node;
+
+class edge
+{
+public:
+  string name;
+  node* to;
+  edge(string Name,node* To)
+  {
+    Name = name;
+    to = To;
+  }
+};
+
 class node
 {
   public:
-    vector<edge*> children;
+    vector<edge> children;
     string address;
     string type;
     string value;
@@ -20,22 +36,11 @@ class node
       flags = Flags;
     }
     ~node() {
-      for(int i = 0 ; i < children[i].size();i++)
-        delete children[i];
+      for(int i = 0 ; i < children.size();i++)
+        delete children[i].to;
     }
 };
 
-class edge
-{
-public:
-  string name;
-  node*to;
-  edge(string Name,node* To)
-  {
-    Name = name;
-    to = To;
-  }
-};
 
 class graph
 {
@@ -43,12 +48,12 @@ class graph
 public:
   vector<node*>graph_nodes;
 
-  node* addNode(string address,string type,string name,string value)
+  node* addNode(string address,string type,string value)
   {
     if(get_node.find(address) == get_node.end())
-      get_node[address] = new node(address,type,name,value);
+      get_node[address] = new node(address,type,value,0);
 
-    return get_node[adress];
+    return get_node[address];
   }
 
   void addChildren(node* parent,node *child,string name)
