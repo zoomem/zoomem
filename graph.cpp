@@ -13,10 +13,10 @@ class edge
 public:
   string name;
   node* to;
-  edge(string Name,node* To)
+  edge(string _name,node* _to)
   {
-    Name = name;
-    to = To;
+    name = _name;
+    to = _to;
   }
 };
 
@@ -28,12 +28,12 @@ class node
     string type;
     string value;
     int flags;
-    node(string Address,string Type,string Value,int Flags)
+    node(string _address,string _type,string _value,int _flags)
     {
-      address = Address;
-      type = Type;
-      value = Value;
-      flags = Flags;
+      address = _address;
+      type = _type;
+      value = _value;
+      flags = _flags;
     }
     ~node() {
       for(int i = 0 ; i < children.size();i++)
