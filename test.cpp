@@ -19,5 +19,6 @@ int main(){
 	int c[5] = {0,1,2,3,4};
 	unsigned long long cc = 45464;
 	a b;
+	a *ccc = &b;
 	return 0;
 }

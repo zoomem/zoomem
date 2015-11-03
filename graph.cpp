@@ -73,5 +73,12 @@ public:
 
 int main()
 {
+  string command = "";
+  while(true)
+  {
+    getline(cin,command);
+    if(command == "end")
+      break;
+  }
   return 0;
 }
