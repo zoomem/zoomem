@@ -40,15 +40,24 @@ def getLocalVariablesName():
     return var_names
 
 def isAPointer(var_name):
-    return var_name[var_name.rfind(" ") + 1:][0] == "*"
+    try:
+        return var_name[var_name.rfind(" ") + 1:][0] == "*"
+    except Exception:
+        return False
 
 def isAObject(var_name):
-    return var_name[0:var_name.find(" ")] == "class" and not isAPointer(var_name)
+    try:
+        return var_name[0:var_name.find(" ")] == "class" and not isAPointer(var_name)
+    except Exception:
+        return False
 
 def isAArray(var_name):
-    return var_name[var_name.rfind(" ") + 1:][0] == "["
+    try:
+        return var_name[var_name.rfind(" ") + 1:][0] == "["
+    except Exception:
+        return False
 
-def checkScope():
+def updateScope():
     var_names = getLocalVariablesName()
     for var_name in var_names:
         addVarNameToDic(var_name)
@@ -70,7 +79,7 @@ def praseGdbOutput(query = ""):
 def readProcessOutput(nbsr):
     output_lines = ""
     while True:
-        output = nbsr.readline(0.2)
+        output = nbsr.readline(0.1)
         if not output:
             break
         output_lines += output
@@ -86,6 +95,7 @@ def bulidGraph():
 
 def analyzeVar(var_name):
     var_type = getVarType(var_name)
+
     if isAArray(var_type):
         parseArrayVar(var_name)
     elif isAPointer(var_type):
@@ -94,6 +104,7 @@ def analyzeVar(var_name):
         parseObjectVar(var_name)
     else:
         parsePrimitiveVar(var_name)
+
     print getVarHash(var_name)
 
 def parseArrayVar(var_name):
