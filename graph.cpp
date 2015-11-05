@@ -72,13 +72,9 @@ public:
 };
 
 int main()
-{
+{	
   string command = "";
-  while(true)
-  {
-    getline(cin,command);
-    if(command == "end")
-      break;
-  }
+  while(getline(cin,command))
+    cout << command << endl;
   return 0;
 }

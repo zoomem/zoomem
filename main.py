@@ -4,6 +4,8 @@ import hashlib
 import non_blocking_stream
 import source_parsing
 import time
+import string
+import random
 
 address_dict = {}
 
@@ -12,8 +14,13 @@ PRIMITIVES_TYPES = ['short', 'short int', 'signed short', 'signed short int', 'u
 gdb_process = Popen('gdb test -q',stdin = PIPE, stdout = PIPE, stderr = PIPE, shell = True)
 gdb_process_nbsr = non_blocking_stream.NonBlockingStreamReader(gdb_process.stdout)
 
-graph_process = Popen('graph',stdin = PIPE, stdout = PIPE, stderr = PIPE,shell = True)
+graph_process = Popen('./graph',stdin = PIPE, stdout = PIPE, stderr = PIPE,shell = True)
 graph_process_nbsr = non_blocking_stream.NonBlockingStreamReader(graph_process.stdout)
+
+POINTER_FLAG = '1'
+ARRAY_FLAG = '2'
+OBJECT_FLAG = '3'
+PRIMITIVE_FLAG = '4'
 
 def getVarAddress(var_name):
     writeToProcess(gdb_process,"p &" + var_name)
@@ -29,6 +36,9 @@ def getVarType(var_name):
     return var_type
 
 def getVarValue(var_name):
+    if not isPrimitive(getVarType(var_name)):
+        return ""
+
     writeToProcess(gdb_process,"print "+ var_name)
     var_val = praseGdbOutput()
     return var_val[var_val.find("=") + 1:]
@@ -36,7 +46,7 @@ def getVarValue(var_name):
 def getVarSize(var_name):
     writeToProcess(gdb_process ,"print sizeof(" + var_name + ")")
     var_size = praseGdbOutput()
-    return var_size[var_size.rfind("=") + 1:].strip()
+    var_size = var_size[var_size.rfind("=") + 1:].strip()
 
 def getLocalVariablesName():
     writeToProcess(gdb_process,"info locals")
@@ -66,26 +76,27 @@ def getLocalVariablesName():
         print "*************************************************"
     return var_names
 
-def isAPointer(var_name):
+def isAPointer(var_type):
     try:
-        return var_name[var_name.rfind(" ") + 1:][0] == "*"
+        return var_type[var_type.rfind(" ") + 1:][0] == "*"
     except Exception:
         return False
 
-def isAObject(var_name):
+def isAObject(var_type):
     try:
-        return var_name[0:var_name.find(" ")].strip() == "class" and not isAPointer(var_name)
+        return var_type[0:var_type.find(" ")].strip() == "class" and not isAPointer(var_type)
     except Exception:
         return False
 
-def isAArray(var_name):
+def isAArray(var_type):
     try:
-        return var_name[var_name.rfind(" ") + 1:][0] == "["
+        return var_type[var_type.rfind(" ") + 1:][0] == "["
     except Exception:
         return False
-def isPrimitive(var_name):
+
+def isPrimitive(var_type):
     try:
-        return var_name[var_name.find("=") + 1:].strip() in PRIMITIVES_TYPES
+        return var_type[var_type.find("=") + 1:].strip() in PRIMITIVES_TYPES
     except Exception:
         return False
 
@@ -127,7 +138,6 @@ def bulidGraph():
 
 def analyzeVar(var_name):
     var_type = getVarType(var_name)
-    var_hash = getVarHash(var_name)
 
     if isAArray(var_type):
         parseArrayVar(var_name)
@@ -136,29 +146,53 @@ def analyzeVar(var_name):
     elif isAObject(var_type):
         parseObjectVar(var_name)
     elif isPrimitive(var_type):
-        var_hash['value'] = getVarValue(var_name)
         parsePrimitiveVar(var_name)
     else:
-        print "err"
-
+        print var_name , var_type
+        raise Exception
+        
 def parseArrayVar(var_name):
     print var_name + " array"
 
 def parsePointerVar(var_name):
     print var_name + " pointer"
+    addVarCommand(var_name,POINTER_FLAG)
+
+    child_var_name = genrateTempVarName("*" + var_name)
+    analyzeVar(child_var_name)
+    addChildCommand(var_name,child_var_name)
 
 def parseObjectVar(var_name):
     print var_name + " object"
 
 def parsePrimitiveVar(var_name):
-    print  var_name + " prem"
+    print var_name + " premitave"
+    addVarCommand(var_name,PRIMITIVE_FLAG)
+
+def genrateTempVarName(parent_var):
+    temp_var_name = "$a" + str(int(random.random() * 10000))
+    writeToProcess(gdb_process,("set " + temp_var_name + " = " + parent_var))
+    return temp_var_name
+
+def addVarCommand(var_name,flags):
+    var_hash = getVarHash(var_name)
+    writeToProcess(graph_process,('1,' + var_hash['var_address'] + ',' + var_hash['var_type'] + ',' + var_hash['var_value'] + ',' + flags))
+
+    print "graph out : " + readProcessOutput(graph_process_nbsr)
+
+def addChildCommand(parent_var_name, child_var_name):
+    parent_var_address = getVarAddress(parent_var_name)
+    child_var_address = getVarAddress(child_var_name)
+    print parent_var_name,child_var_name
+    writeToProcess(graph_process,"2," + parent_var_address + "," + child_var_address)
+    print "graph out : " + readProcessOutput(graph_process_nbsr)
 
 def getVarHash(var_name):
     var_hash = {}
     var_hash['var_type'] = getVarType(var_name)
     var_hash['var_address'] = getVarAddress(var_name)
     var_hash['var_size'] = getVarSize(var_name)
-
+    var_hash['var_value'] = getVarValue(var_name)
     return var_hash
 
 def main():
@@ -167,7 +201,13 @@ def main():
         writeToProcess(gdb_process,('b ' + function_name + '\n'))
 
     writeToProcess(gdb_process,"run")
-    time.sleep(1)
+    while True:
+        writeToProcess(gdb_process,"n")
+        x = readProcessOutput(gdb_process_nbsr)
+        if "return 0;" in x:
+            break
+
+    time.sleep(0.3)
     praseGdbOutput()
 
     bulidGraph()
