@@ -31,7 +31,7 @@ def getVarType(var_name):
 def getVarValue(var_name):
     writeToProcess(gdb_process,"print "+ var_name)
     var_val = praseGdbOutput()
-    return var_val[var_val.rfind("=") + 1:].strip()
+    return var_val[var_val.find("=") + 1:]
 
 def getVarSize(var_name):
     writeToProcess(gdb_process ,"print sizeof(" + var_name + ")")
@@ -42,9 +42,28 @@ def getLocalVariablesName():
     writeToProcess(gdb_process,"info locals")
     var_names = []
     info_local_lines = readProcessOutput(gdb_process_nbsr).split("\n")
+    full_var_value = ""
+    rem = 0
     for i in range(0,len(info_local_lines)):
-        var_name = info_local_lines[i].split('=')[0].strip()
-        var_names.append(var_name)
+        if rem == 0:
+            equal_index = info_local_lines[i].find("=")
+            var_name = info_local_lines[i][0:equal_index-1].strip()
+            var_value = info_local_lines[i][equal_index+1:]
+
+            var_names.append(var_name)
+            full_var_value = getVarValue(var_name)
+
+            if isAPointer(getVarType(var_name)):
+                full_var_value = full_var_value[full_var_value.find(")")+1:]
+            rem = len(full_var_value) - len(var_value) - 1
+            if full_var_value == var_value:
+                rem = 0
+        else:
+            rem -= len(info_local_lines[i])
+            if rem > 0:
+                rem -= 1
+        print rem
+        print "*************************************************"
     return var_names
 
 def isAPointer(var_name):
@@ -120,9 +139,7 @@ def analyzeVar(var_name):
         var_hash['value'] = getVarValue(var_name)
         parsePrimitiveVar(var_name)
     else:
-        raise Exception.new
-
-    print var_hash
+        print "err"
 
 def parseArrayVar(var_name):
     print var_name + " array"
