@@ -36,8 +36,6 @@ def getVarType(var_name):
     return var_type
 
 def getVarValue(var_name):
-    if not isPrimitive(getVarType(var_name)):
-        return ""
 
     writeToProcess(gdb_process,"print "+ var_name)
     var_val = praseGdbOutput()
@@ -54,6 +52,7 @@ def getLocalVariablesName():
     info_local_lines = readProcessOutput(gdb_process_nbsr).split("\n")
     full_var_value = ""
     rem = 0
+    print "new line"
     for i in range(0,len(info_local_lines)):
         if rem == 0:
             equal_index = info_local_lines[i].find("=")
@@ -72,8 +71,6 @@ def getLocalVariablesName():
             rem -= len(info_local_lines[i])
             if rem > 0:
                 rem -= 1
-        print rem
-        print "*************************************************"
     return var_names
 
 def isAPointer(var_type):
@@ -192,7 +189,10 @@ def getVarHash(var_name):
     var_hash['var_type'] = getVarType(var_name)
     var_hash['var_address'] = getVarAddress(var_name)
     var_hash['var_size'] = getVarSize(var_name)
-    var_hash['var_value'] = getVarValue(var_name)
+    if isPrimitive(getVarType(var_name)):
+        var_hash['var_value'] = getVarValue(var_name)
+    else:
+         var_hash['var_value'] = ""
     return var_hash
 
 def main():
@@ -204,6 +204,7 @@ def main():
     while True:
         writeToProcess(gdb_process,"n")
         x = readProcessOutput(gdb_process_nbsr)
+        print x
         if "return 0;" in x:
             break
 
