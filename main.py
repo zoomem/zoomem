@@ -43,7 +43,10 @@ def getVarValue(var_name):
 def getVarSize(var_name):
     writeToProcess(gdb_process ,"print sizeof(" + var_name + ")")
     var_size = praseGdbOutput()
-    var_size = var_size[var_size.rfind("=") + 1:].strip()
+    return var_size[var_size.rfind("=") + 1:].strip()
+
+def getArraySize(var_name):
+    return int(getVarSize(var_name)) / int(getVarSize("(" + var_name + ")[0]"))
 
 def getLocalVariablesName():
     writeToProcess(gdb_process,"info locals")
@@ -147,13 +150,18 @@ def analyzeVar(var_name):
 def parseArrayVar(var_name):
     print var_name + " array"
     addVarCommand(var_name,ARRAY_FLAG)
-
+    prev_node = var_name
+    for i in range(0,getArraySize(var_name)):
+        child_var_name = "(" + var_name+ ")[" + str(i) + "]"
+        analyzeVar(child_var_name)
+        addChildCommand(prev_node,child_var_name)
+        prev_node = child_var_name
 
 def parsePointerVar(var_name):
     print var_name + " pointer"
     addVarCommand(var_name,POINTER_FLAG)
 
-    child_var_name = "*" + var_name
+    child_var_name = "*(" + var_name+ ")"
     analyzeVar(child_var_name)
     addChildCommand(var_name,child_var_name)
 
@@ -187,7 +195,12 @@ def getVarHash(var_name):
     var_hash = {}
     var_hash['var_type'] = getVarType(var_name)
     var_hash['var_address'] = getVarAddress(var_name)
-    var_hash['var_size'] = getVarSize(var_name)
+
+    if isAArray(var_hash['var_type'] ):
+        var_hash['var_size'] = getArraySize(var_name)
+    else:
+        var_hash['var_size'] = getVarSize(var_name)
+
     if isPrimitive(getVarType(var_name)):
         var_hash['var_value'] = getVarValue(var_name)
     else:
