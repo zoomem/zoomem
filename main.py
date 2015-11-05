@@ -31,10 +31,9 @@ def getVarType(var_name):
     writeToProcess(gdb_process,"ptype "+ var_name)
     var_type = praseGdbOutput()
     var_type = var_type[var_type.rfind("=") + 1:].strip()
-    if isAObject(var_type):
-        return var_type[0:var_type.find("{")-1].strip()
+    if '{' in var_type:
+        return (var_type[0:var_type.find("{")-1]+var_type[var_type.find("}")+1:]).strip()
     return var_type
-
 def getVarValue(var_name):
 
     writeToProcess(gdb_process,"print "+ var_name)
@@ -52,7 +51,6 @@ def getLocalVariablesName():
     info_local_lines = readProcessOutput(gdb_process_nbsr).split("\n")
     full_var_value = ""
     rem = 0
-    print "new line"
     for i in range(0,len(info_local_lines)):
         if rem == 0:
             equal_index = info_local_lines[i].find("=")
@@ -135,7 +133,6 @@ def bulidGraph():
 
 def analyzeVar(var_name):
     var_type = getVarType(var_name)
-
     if isAArray(var_type):
         parseArrayVar(var_name)
     elif isAPointer(var_type):
@@ -145,22 +142,24 @@ def analyzeVar(var_name):
     elif isPrimitive(var_type):
         parsePrimitiveVar(var_name)
     else:
-        print var_name , var_type
         raise Exception
 
 def parseArrayVar(var_name):
     print var_name + " array"
+    addVarCommand(var_name,ARRAY_FLAG)
+
 
 def parsePointerVar(var_name):
     print var_name + " pointer"
     addVarCommand(var_name,POINTER_FLAG)
 
-    child_var_name = genrateTempVarName("*" + var_name)
+    child_var_name = "*" + var_name
     analyzeVar(child_var_name)
     addChildCommand(var_name,child_var_name)
 
 def parseObjectVar(var_name):
     print var_name + " object"
+    addVarCommand(var_name,OBJECT_FLAG)
 
 def parsePrimitiveVar(var_name):
     print var_name + " premitave"
@@ -196,15 +195,13 @@ def getVarHash(var_name):
     return var_hash
 
 def main():
-    print "kos kos"
     for function_name in source_parsing.getFunctionsNames('test.cpp'):
         writeToProcess(gdb_process,('b ' + function_name + '\n'))
-        print function_name
+
     writeToProcess(gdb_process,"run")
     while True:
         writeToProcess(gdb_process,"n")
         x = readProcessOutput(gdb_process_nbsr)
-        print x
         if "return 0;" in x:
             break
 

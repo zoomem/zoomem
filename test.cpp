@@ -6,9 +6,13 @@ class a
 {
         public:
         int c,d;
+				int cc[10];
+				int *p;
         a()
         {
                 c = d = 0;
+								cc[0] = 1;
+								p = &c;
         }
 };
 int main(){
@@ -20,5 +24,6 @@ int main(){
 	unsigned long long cc = 45464;
 	a b;
 	a *ccc = &b;
+
 	return 0;
-}    
+}
