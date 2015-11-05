@@ -150,7 +150,7 @@ def analyzeVar(var_name):
     else:
         print var_name , var_type
         raise Exception
-        
+
 def parseArrayVar(var_name):
     print var_name + " array"
 
@@ -196,10 +196,10 @@ def getVarHash(var_name):
     return var_hash
 
 def main():
-
+    print "kos kos"
     for function_name in source_parsing.getFunctionsNames('test.cpp'):
         writeToProcess(gdb_process,('b ' + function_name + '\n'))
-
+        print function_name
     writeToProcess(gdb_process,"run")
     while True:
         writeToProcess(gdb_process,"n")
