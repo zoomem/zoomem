@@ -59,7 +59,9 @@ class node
 	{
 		for(int i = 0 ; i < children.size();i++)
 		{
-			cout << "parent : " << this->address;
+			cout << "node address " << &(*children[i].to);
+			cout << " ,parent : " << this->address;
+
 			cout << " ,var name : " << children[i].name;
 			node* child = children[i].to;
 			cout << " ,Adress : " << child->address;
