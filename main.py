@@ -173,6 +173,7 @@ def parseObjectVar(var_name,root_var):
 def parsePrimitiveVar(var_name,root_var):
     print var_name + " premitave"
     addVarCommand(var_name,PRIMITIVE_FLAG)
+    addChildCommand("$root",var_name)
 
 def genrateTempVarName(parent_var):
     temp_var_name = "$a" + str(int(random.random() * 10000))
@@ -182,17 +183,12 @@ def genrateTempVarName(parent_var):
 def addVarCommand(var_name,flags):
     var_hash = getVarHash(var_name)
     command = '1,' + var_hash['var_address'] + ',' + var_hash['var_type'] + ',' + var_hash['var_value'] + ',' + str(var_hash['var_size']) +',' + flags
-    print command
     writeToProcess(graph_process,command)
-    print readProcessOutput(graph_process_nbsr)
-
 
 def addChildCommand(parent_var_name, child_var_name):
     parent_var_address = "$root" if parent_var_name == "$root" else getVarAddress(parent_var_name)
     child_var_address = getVarAddress(child_var_name)
-
     writeToProcess(graph_process,"2," + parent_var_address + "," + child_var_address +  "," + child_var_name)
-    print readProcessOutput(graph_process_nbsr)
 
 def getVarHash(var_name):
     var_hash = {}
