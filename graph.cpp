@@ -8,6 +8,25 @@ class node;
 class edge;
 map<string,node*>get_node;
 
+vector<string> split(string s,char c)
+{
+  string temp = "";
+  vector<string>v;
+  for(int i = 0 ; i < s.size();i++)
+  {
+    if(s[i] == c)
+    {
+      v.push_back(temp);
+      temp = "";
+    }
+    else
+		temp+=s[i];
+  }
+  if(temp.size())
+	v.push_back(temp);
+  return v;
+}
+
 class edge
 {
 public:
@@ -27,8 +46,8 @@ class node
     string address;
     string type;
     string value;
-    int flags;
-    node(string _address,string _type,string _value,int _flags)
+    string flags;
+    node(string _address,string _type,string _value,string _flags)
     {
       address = _address;
       type = _type;
@@ -48,16 +67,19 @@ class graph
 public:
   vector<node*>graph_nodes;
 
-  node* addNode(string address,string type,string value)
+  node* addNode(string address,string type,string value,string flag)
   {
     if(get_node.find(address) == get_node.end())
-      get_node[address] = new node(address,type,value,0);
+      get_node[address] = new node(address,type,value,flag);
 
     return get_node[address];
   }
 
-  void addChildren(node* parent,node *child,string name)
+  void addChildren(string parent_address,string child_address,string name)
   {
+	node *child = get_node[child_address];
+	node *parent = get_node[parent_address];
+	
     parent->children.push_back(edge(name,child));
   }
 
@@ -71,10 +93,21 @@ public:
 
 };
 
+
+
+graph g;
+
 int main()
-{	
-  string command = "";
-  while(getline(cin,command))
-    cout << command << endl;
+{
+  string command_str= "";
+  while(getline(cin,command_str))
+  {
+    vector<string>command = split(command_str,',');    
+     if(command[0] == "1")
+		g.addNode(command[1],command[2],command[3],command[4]);
+	else
+		g.addChildren(command[1],command[2],command[3]);
+		  
+  }
   return 0;
 }

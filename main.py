@@ -4,8 +4,7 @@ import hashlib
 import non_blocking_stream
 import source_parsing
 import time
-import string
-import random
+import subprocess
 
 address_dict = {}
 
@@ -188,7 +187,7 @@ def addChildCommand(parent_var_name, child_var_name):
     parent_var_address = getVarAddress(parent_var_name)
     child_var_address = getVarAddress(child_var_name)
     print parent_var_name,child_var_name
-    writeToProcess(graph_process,"2," + parent_var_address + "," + child_var_address)
+    writeToProcess(graph_process,"2," + parent_var_address + "," + child_var_address +  "," + child_var_name)
     print "graph out : " + readProcessOutput(graph_process_nbsr)
 
 def getVarHash(var_name):
@@ -207,7 +206,14 @@ def getVarHash(var_name):
          var_hash['var_value'] = ""
     return var_hash
 
+def compileFiles():
+    subprocess.Popen("g++ -g -o test test.cpp", shell = True)
+    subprocess.Popen("g++ -o graph graph.cpp",shell = True)
+
+
 def main():
+    compileFiles()
+
     for function_name in source_parsing.getFunctionsNames('test.cpp'):
         writeToProcess(gdb_process,('b ' + function_name + '\n'))
 
