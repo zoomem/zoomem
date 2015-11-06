@@ -11,6 +11,8 @@ string flags[5] = {"","POINTER_FLAG","ARRAY_FLAG","OBJECT_FLAG","PRIMITIVE_FLAG"
 
 map<string,node*>get_node;
 set<string> del;
+set<string>vis;
+
 vector<string> split(string s,char c)
 {
   string temp = "";
@@ -58,15 +60,19 @@ class node
 		for(int i = 0 ; i < children.size();i++)
 		{
 			cout << "parent : " << this->address;
-			cout << " var name : " << children[i].name;
+			cout << " ,var name : " << children[i].name;
 			node* child = children[i].to;
-			cout << " Adress : " << child->address;
-			cout << " Type : " << child->type;
-			cout << " Size  : " << child->size;
-			cout << " value : " << child->value;
-			cout << " Flags : " << flags[(child->flag)[0] - '0'];
-			cout << endl << endl;
-			child->print();
+			cout << " ,Adress : " << child->address;
+			cout << " ,Type : " << child->type;
+			cout << " ,Size  : " << child->size;
+			cout << " ,value : " << child->value;
+			cout << " ,Flags : " << flags[(child->flag)[0] - '0'];
+			cout << endl;
+			if(vis.find(child->address) == vis.end())
+			{
+				vis.insert(child->address);
+				child->print();
+			}
 		}
 	}
 	

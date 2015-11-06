@@ -33,8 +33,8 @@ def getVarType(var_name):
     if '{' in var_type:
         return (var_type[0:var_type.find("{")-1]+var_type[var_type.find("}")+1:]).strip()
     return var_type
-def getVarValue(var_name):
 
+def getVarValue(var_name):
     writeToProcess(gdb_process,"print "+ var_name)
     var_val = praseGdbOutput()
     return var_val[var_val.find("=") + 1:]
@@ -104,10 +104,8 @@ def updateScope():
 
 def addVarNameToDic(var_name):
     var_address = getVarAddress(var_name)
-    if not address_dict.has_key(var_name):
-        address_dict[var_name] = []
-    if not var_address in address_dict[var_name]:
-        address_dict[var_name].append(var_address)
+    if not address_dict.has_key(var_name):address_dict[var_name] = []
+    if not var_address in address_dict[var_name]:address_dict[var_name].append(var_address)
 
 def praseGdbOutput(query = ""):
     output = readProcessOutput(gdb_process_nbsr)
@@ -131,6 +129,7 @@ def writeToProcess(process,command):
 def bulidGraph():
     var_names = getLocalVariablesName()
     for var_name in var_names:
+        print var_name
         analyzeVar(var_name,True)
 
 def analyzeVar(var_name,root_var = False):
@@ -150,30 +149,36 @@ def analyzeVar(var_name,root_var = False):
 def parseArrayVar(var_name,root_var):
     print var_name + " array"
     addVarCommand(var_name,ARRAY_FLAG)
-    prev_node = "$root" if root_var else var_name
+    if root_var: addChildCommand("$root",var_name)
+    prev_node = var_name
 
     for i in range(0,getArraySize(var_name)):
-        child_var_name = "(" + var_name+ ")[" + str(i) + "]"
+        child_var_name = "(" + var_name+ "[" + str(i) + "])"
         analyzeVar(child_var_name)
         addChildCommand(prev_node,child_var_name)
+        print prev_node,child_var_name
         prev_node = child_var_name
 
 def parsePointerVar(var_name,root_var):
     print var_name + " pointer"
     addVarCommand(var_name,POINTER_FLAG)
-    prev_node = "$root" if root_var else var_name
+    if root_var : addChildCommand("$root",var_name)
+
     child_var_name = "*(" + var_name+ ")"
     analyzeVar(child_var_name)
-    addChildCommand(prev_node,child_var_name)
+    addChildCommand(var_name,child_var_name)
 
 def parseObjectVar(var_name,root_var):
     print var_name + " object"
     addVarCommand(var_name,OBJECT_FLAG)
+    if root_var : addChildCommand("$root",var_name)
+
 
 def parsePrimitiveVar(var_name,root_var):
     print var_name + " premitave"
     addVarCommand(var_name,PRIMITIVE_FLAG)
-    if root_var : addChildCommand("$root",var_name) 
+    if root_var : addChildCommand("$root",var_name)
+
 
 def genrateTempVarName(parent_var):
     temp_var_name = "$a" + str(int(random.random() * 10000))
