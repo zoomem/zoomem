@@ -44,7 +44,8 @@ public:
   }
 };
 
-int x = 0;
+string hash_node(node* _node);
+
 class node
 {
   public:
@@ -54,7 +55,7 @@ class node
     string size;
     string value;
     string flag;
-
+	
 	void print()
 	{
 		for(int i = 0 ; i < children.size();i++)
@@ -70,9 +71,9 @@ class node
 			cout << " ,value : " << child->value;
 			cout << " ,Flags : " << flags[(child->flag)[0] - '0'];
 			cout << endl;
-			if(vis.find(child->address) == vis.end())
+			if(vis.find(hash_node(child)) == vis.end())
 			{
-				vis.insert(child->address);
+				vis.insert(hash_node(child));
 				child->print();
 			}
 		}
@@ -88,19 +89,24 @@ class node
     }
 
     ~node() {
-	  x++;
       for(int i = 0 ; i < children.size();i++)
 		if(children[i].to)
-		{
-			if(del.find(children[i].to->address) == del.end())
+		{	
+			node* child = children[i].to;
+			if(del.find(hash_node(child)) == del.end())
 			{
-				del.insert(children[i].to->address);
-				delete children[i].to;
+				del.insert(hash_node(child));
 			}
+			else
+				cout <<"kos kos";
 		}
     }
 };
 
+string hash_node(node* _node)
+{
+	return (_node->address + "_" + _node->type);
+}
 
 class graph
 {
@@ -117,16 +123,17 @@ public:
 
   node* addNode(string &address,string &type,string &value,string &size,string &flag)
   {
-    if(get_node.find(address) == get_node.end())
-      get_node[address] = new node(address,type,value,size,flag);
-    node* new_node = get_node[address];
+    if(get_node.find(address + "_" + type) == get_node.end())
+      get_node[(address + "_" + type)] = new node(address,type,value,size,flag);
+    node* new_node = get_node[(address + "_" + type)];
     return new_node;
   }
 
-  void addChildren(string &parent_address,string &child_address,string &name)
+  void addChildren(string &parent_address,string &parent_type,string &child_address,string child_type,string &name)
   {
-	node *child = get_node[child_address];
-	node *parent = get_node[parent_address];
+	node *child = get_node[(child_address + "_" + child_type)];
+	node *parent = get_node[parent_address + "_" + parent_type];
+	
     parent->children.push_back(edge(name,child));
   }
 
@@ -157,7 +164,7 @@ int main()
 		g.addNode(command[1],command[2],command[3],command[4],command[5]);
 
 	else if(command[0] == "2")
-		g.addChildren(command[1],command[2],command[3]);
+		g.addChildren(command[1],command[2],command[3],command[4],command[5]);
   }
   g.print_graph();
   return 0;

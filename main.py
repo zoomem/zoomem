@@ -199,8 +199,12 @@ def addVarCommand(var_name,flags):
 
 def addChildCommand(parent_var_name, child_var_name):
     parent_var_address = "$root" if parent_var_name == "$root" else getVarAddress(parent_var_name)
+    parent_var_type = "$root" if parent_var_name == "$root" else getVarType(parent_var_name)
+
     child_var_address = getVarAddress(child_var_name)
-    command = "2," + parent_var_address + "," + child_var_address +  "," + child_var_name
+    child_var_type = getVarType(child_var_name)
+
+    command = "2," + parent_var_address + "," + parent_var_type + "," + child_var_address + "," + child_var_type + "," + child_var_name
     print command
     writeToProcess(graph_process,command)
 
