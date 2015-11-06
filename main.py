@@ -173,7 +173,7 @@ def parseObjectVar(var_name,root_var):
 def parsePrimitiveVar(var_name,root_var):
     print var_name + " premitave"
     addVarCommand(var_name,PRIMITIVE_FLAG)
-    addChildCommand("$root",var_name)
+    if root_var : addChildCommand("$root",var_name) 
 
 def genrateTempVarName(parent_var):
     temp_var_name = "$a" + str(int(random.random() * 10000))
