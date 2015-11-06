@@ -7,6 +7,7 @@ using namespace std;
 
 class node;
 class edge;
+string flags[5] = {"","POINTER_FLAG","ARRAY_FLAG","OBJECT_FLAG","PRIMITIVE_FLAG"};
 
 map<string,node*>get_node;
 set<string> del;
@@ -40,6 +41,7 @@ public:
     to = _to;
   }
 };
+
 int x = 0;
 class node
 {
@@ -49,7 +51,8 @@ class node
     string type;
     string size;
     string value;
-    string flags;
+    string flag;
+    
 	void print()
 	{
 		for(int i = 0 ; i < children.size();i++)
@@ -61,19 +64,21 @@ class node
 			cout << " Type : " << child->type;
 			cout << " Size  : " << child->size;
 			cout << " value : " << child->value;
-			cout << " Flags : " << child->flags;
-			cout << endl;
+			cout << " Flags : " << flags[(child->flag)[0] - '0'];
+			cout << endl << endl;
 			child->print();
 		}
 	}
-    node(string &_address,string &_type,string &_value,string &_size,string &_flags)
+	
+    node(string &_address,string &_type,string &_value,string &_size,string &_flag)
     {
       address = _address;
       type = _type;
       value = _value;
-      flags = _flags;
+      flag = _flag;
       size = _size;
     }
+    
     ~node() {
 	  x++;
       for(int i = 0 ; i < children.size();i++)
@@ -95,6 +100,7 @@ class graph
 public:
 
   node *root_node;
+  
   graph()
   {
 	  string name = "$root";
@@ -105,18 +111,14 @@ public:
   {
     if(get_node.find(address) == get_node.end())
       get_node[address] = new node(address,type,value,size,flag);
-
     node* new_node = get_node[address];
-
     return new_node;
-
   }
   
   void addChildren(string &parent_address,string &child_address,string &name)
   {
 	node *child = get_node[child_address];
 	node *parent = get_node[parent_address];
-
     parent->children.push_back(edge(name,child));
   }
 
@@ -124,13 +126,13 @@ public:
   {
     root_node->print();
   }
+  
   ~graph()
   {
     delete root_node;
   }
 
 };
-
 
 int main()
 {
