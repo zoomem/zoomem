@@ -54,7 +54,7 @@ class node
     string size;
     string value;
     string flag;
-    
+
 	void print()
 	{
 		for(int i = 0 ; i < children.size();i++)
@@ -75,7 +75,7 @@ class node
 			}
 		}
 	}
-	
+
     node(string &_address,string &_type,string &_value,string &_size,string &_flag)
     {
       address = _address;
@@ -84,7 +84,7 @@ class node
       flag = _flag;
       size = _size;
     }
-    
+
     ~node() {
 	  x++;
       for(int i = 0 ; i < children.size();i++)
@@ -106,7 +106,7 @@ class graph
 public:
 
   node *root_node;
-  
+
   graph()
   {
 	  string name = "$root";
@@ -120,7 +120,7 @@ public:
     node* new_node = get_node[address];
     return new_node;
   }
-  
+
   void addChildren(string &parent_address,string &child_address,string &name)
   {
 	node *child = get_node[child_address];
@@ -132,7 +132,7 @@ public:
   {
     root_node->print();
   }
-  
+
   ~graph()
   {
     delete root_node;
@@ -149,7 +149,7 @@ int main()
   {
 	if(command_str == "end")
 		break;
-		
+
     vector<string>command = split(command_str,',');
     if(command[0] == "1")
 		g.addNode(command[1],command[2],command[3],command[4],command[5]);

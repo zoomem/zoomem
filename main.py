@@ -129,7 +129,6 @@ def writeToProcess(process,command):
 def bulidGraph():
     var_names = getLocalVariablesName()
     for var_name in var_names:
-        print var_name
         analyzeVar(var_name,True)
 
 def analyzeVar(var_name,root_var = False):
@@ -147,7 +146,6 @@ def analyzeVar(var_name,root_var = False):
         raise Exception
 
 def parseArrayVar(var_name,root_var):
-    print var_name + " array"
     addVarCommand(var_name,ARRAY_FLAG)
     if root_var: addChildCommand("$root",var_name)
     prev_node = var_name
@@ -156,26 +154,34 @@ def parseArrayVar(var_name,root_var):
         child_var_name = "(" + var_name+ "[" + str(i) + "])"
         analyzeVar(child_var_name)
         addChildCommand(prev_node,child_var_name)
-        print prev_node,child_var_name
         prev_node = child_var_name
 
 def parsePointerVar(var_name,root_var):
-    print var_name + " pointer"
     addVarCommand(var_name,POINTER_FLAG)
     if root_var : addChildCommand("$root",var_name)
 
-    child_var_name = "*(" + var_name+ ")"
+    child_var_name = "(*" + var_name+ ")"
     analyzeVar(child_var_name)
     addChildCommand(var_name,child_var_name)
 
 def parseObjectVar(var_name,root_var):
-    print var_name + " object"
     addVarCommand(var_name,OBJECT_FLAG)
     if root_var : addChildCommand("$root",var_name)
 
+    object_value = getVarValue(var_name)
+    next_member_start = object_value.find("{")+1
+    next_member_end = object_value.find("=")-1
+    while True:
+        if next_member_start <= 0:
+            break;
+        member_name = "(" + var_name + ")" + "." + object_value[next_member_start:next_member_end].strip()
+        member_value_length = len(getVarValue(member_name))
+        analyzeVar(member_name)
+        addChildCommand(var_name,member_name)
+        next_member_start = object_value.find(",",member_value_length + next_member_end)+1
+        next_member_end = object_value.find("=",next_member_start)-1
 
 def parsePrimitiveVar(var_name,root_var):
-    print var_name + " premitave"
     addVarCommand(var_name,PRIMITIVE_FLAG)
     if root_var : addChildCommand("$root",var_name)
 
@@ -188,12 +194,15 @@ def genrateTempVarName(parent_var):
 def addVarCommand(var_name,flags):
     var_hash = getVarHash(var_name)
     command = '1,' + var_hash['var_address'] + ',' + var_hash['var_type'] + ',' + var_hash['var_value'] + ',' + str(var_hash['var_size']) +',' + flags
+    print command
     writeToProcess(graph_process,command)
 
 def addChildCommand(parent_var_name, child_var_name):
     parent_var_address = "$root" if parent_var_name == "$root" else getVarAddress(parent_var_name)
     child_var_address = getVarAddress(child_var_name)
-    writeToProcess(graph_process,"2," + parent_var_address + "," + child_var_address +  "," + child_var_name)
+    command = "2," + parent_var_address + "," + child_var_address +  "," + child_var_name
+    print command
+    writeToProcess(graph_process,command)
 
 def getVarHash(var_name):
     var_hash = {}

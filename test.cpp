@@ -6,7 +6,7 @@ class a
 {
         public:
         int c,d;
-				int cc[10];
+				int cc[3];
 				int *p;
         a()
         {
@@ -15,12 +15,26 @@ class a
 								p = &c;
         }
 };
+class type1{
+	public:
+	int x , y;
+	type1(){
+		x = y = 1;
+	}
+};
+class type2{
+	public:
+	type1 s,t;
+	type2(){
+		s = t = type1();
+	}
+};
 int main(){
-
+	type2 tt;
 	int x = 5;
 	int *p = &x;
 	int **pp = &p;
-	int c[5] = {0,1,2,3,4};
+	int c[3] = {0,1,2};
 	unsigned long long cc = 45464;
 	a b;
 	a *ccc = &b;
