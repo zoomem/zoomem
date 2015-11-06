@@ -131,44 +131,46 @@ def writeToProcess(process,command):
 def bulidGraph():
     var_names = getLocalVariablesName()
     for var_name in var_names:
-        analyzeVar(var_name)
+        analyzeVar(var_name,True)
 
-def analyzeVar(var_name):
+def analyzeVar(var_name,root_var = False):
     var_type = getVarType(var_name)
+
     if isAArray(var_type):
-        parseArrayVar(var_name)
+        parseArrayVar(var_name,root_var)
     elif isAPointer(var_type):
-        parsePointerVar(var_name)
+        parsePointerVar(var_name,root_var)
     elif isAObject(var_type):
-        parseObjectVar(var_name)
+        parseObjectVar(var_name,root_var)
     elif isPrimitive(var_type):
-        parsePrimitiveVar(var_name)
+        parsePrimitiveVar(var_name,root_var)
     else:
         raise Exception
 
-def parseArrayVar(var_name):
+def parseArrayVar(var_name,root_var):
     print var_name + " array"
     addVarCommand(var_name,ARRAY_FLAG)
-    prev_node = var_name
+    prev_node = "$root" if root_var else var_name
+
     for i in range(0,getArraySize(var_name)):
         child_var_name = "(" + var_name+ ")[" + str(i) + "]"
         analyzeVar(child_var_name)
         addChildCommand(prev_node,child_var_name)
         prev_node = child_var_name
 
-def parsePointerVar(var_name):
+def parsePointerVar(var_name,root_var):
     print var_name + " pointer"
     addVarCommand(var_name,POINTER_FLAG)
-
+    prev_node = "$root" if root_var else var_name
     child_var_name = "*(" + var_name+ ")"
     analyzeVar(child_var_name)
-    addChildCommand(var_name,child_var_name)
+    addChildCommand(prev_node,child_var_name)
 
-def parseObjectVar(var_name):
+def parseObjectVar(var_name,root_var):
     print var_name + " object"
     addVarCommand(var_name,OBJECT_FLAG)
 
-def parsePrimitiveVar(var_name):
+def parsePrimitiveVar(var_name,root_var):
     print var_name + " premitave"
     addVarCommand(var_name,PRIMITIVE_FLAG)
 
@@ -179,37 +181,31 @@ def genrateTempVarName(parent_var):
 
 def addVarCommand(var_name,flags):
     var_hash = getVarHash(var_name)
-    writeToProcess(graph_process,('1,' + var_hash['var_address'] + ',' + var_hash['var_type'] + ',' + var_hash['var_value'] + ',' + flags))
+    command = '1,' + var_hash['var_address'] + ',' + var_hash['var_type'] + ',' + var_hash['var_value'] + ',' + str(var_hash['var_size']) +',' + flags
+    print command
+    writeToProcess(graph_process,command)
+    print readProcessOutput(graph_process_nbsr)
 
-    print "graph out : " + readProcessOutput(graph_process_nbsr)
 
 def addChildCommand(parent_var_name, child_var_name):
-    parent_var_address = getVarAddress(parent_var_name)
+    parent_var_address = "$root" if parent_var_name == "$root" else getVarAddress(parent_var_name)
     child_var_address = getVarAddress(child_var_name)
-    print parent_var_name,child_var_name
+
     writeToProcess(graph_process,"2," + parent_var_address + "," + child_var_address +  "," + child_var_name)
-    print "graph out : " + readProcessOutput(graph_process_nbsr)
+    print readProcessOutput(graph_process_nbsr)
 
 def getVarHash(var_name):
     var_hash = {}
     var_hash['var_type'] = getVarType(var_name)
     var_hash['var_address'] = getVarAddress(var_name)
+    var_hash['var_size'] = (getArraySize(var_name) if isAArray(var_hash['var_type']) else getVarSize(var_name))
+    var_hash['var_value'] = (getVarValue(var_name) if isPrimitive(var_hash['var_type']) else  "none")
 
-    if isAArray(var_hash['var_type'] ):
-        var_hash['var_size'] = getArraySize(var_name)
-    else:
-        var_hash['var_size'] = getVarSize(var_name)
-
-    if isPrimitive(getVarType(var_name)):
-        var_hash['var_value'] = getVarValue(var_name)
-    else:
-         var_hash['var_value'] = ""
     return var_hash
 
 def compileFiles():
     subprocess.Popen("g++ -g -o test test.cpp", shell = True)
     subprocess.Popen("g++ -o graph graph.cpp",shell = True)
-
 
 def main():
     compileFiles()
@@ -226,7 +222,9 @@ def main():
 
     time.sleep(0.3)
     praseGdbOutput()
-
     bulidGraph()
-
+    writeToProcess(graph_process,"end")
+    writeToProcess(graph_process,"print")
+    time.sleep(1)
+    print readProcessOutput(graph_process_nbsr)
 main()
