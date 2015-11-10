@@ -16,6 +16,7 @@ gdb_process_nbsr = non_blocking_stream.NonBlockingStreamReader(gdb_process.stdou
 graph_process = Popen('./graph',stdin = PIPE, stdout = PIPE, stderr = PIPE,shell = True)
 graph_process_nbsr = non_blocking_stream.NonBlockingStreamReader(graph_process.stdout)
 
+
 POINTER_FLAG = '1'
 ARRAY_FLAG = '2'
 OBJECT_FLAG = '3'
@@ -212,7 +213,7 @@ def getVarHash(var_name):
     var_hash = {}
     var_hash['var_type'] = getVarType(var_name)
     var_hash['var_address'] = getVarAddress(var_name)
-    var_hash['var_size'] = (getArraySize(var_name) if isAArray(var_hash['var_type']) else getVarSize(var_name))
+    var_hash['var_size'] = getVarSize(var_name)
     var_hash['var_value'] = (getVarValue(var_name) if isPrimitive(var_hash['var_type']) else  "none")
 
     return var_hash
@@ -234,7 +235,7 @@ def main():
         if "return 0;" in x:
             break
 
-    time.sleep(0.3)
+    time.sleep(0.1)
     praseGdbOutput()
     bulidGraph()
     writeToProcess(graph_process,"end")

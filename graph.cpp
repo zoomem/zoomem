@@ -12,6 +12,15 @@ string flags[5] = {"","POINTER_FLAG","ARRAY_FLAG","OBJECT_FLAG","PRIMITIVE_FLAG"
 map<string,node*>get_node;
 set<string> del;
 set<string>vis;
+map<node *,int>node_id;
+int id = 0;
+
+int get_id(node *n)
+{
+  if(node_id.find(n) == node_id.end())
+    node_id[n]= ++id;
+  return node_id[n];
+}
 
 vector<string> split(string s,char c)
 {
@@ -55,12 +64,12 @@ class node
     string size;
     string value;
     string flag;
-	
+
 	void print()
 	{
 		for(int i = 0 ; i < children.size();i++)
 		{
-			cout << "node address " << &(*children[i].to);
+			cout << "node_iden : " << get_id(children[i].to);
 			cout << " ,parent : " << this->address;
 
 			cout << " ,var name : " << children[i].name;
@@ -91,7 +100,7 @@ class node
     ~node() {
       for(int i = 0 ; i < children.size();i++)
 		if(children[i].to)
-		{	
+		{
 			node* child = children[i].to;
 			if(del.find(hash_node(child)) == del.end())
 			{
@@ -133,7 +142,7 @@ public:
   {
 	node *child = get_node[(child_address + "_" + child_type)];
 	node *parent = get_node[parent_address + "_" + parent_type];
-	
+
     parent->children.push_back(edge(name,child));
   }
 
