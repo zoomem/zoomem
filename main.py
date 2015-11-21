@@ -18,7 +18,7 @@ def readProcess(process):
             break
         print output
 
-def readProcessOutput(nbsr,timeout = 0.2):
+def readProcessOutput(nbsr,timeout = 0.3):
     output_lines = ""
     while True:
         output = nbsr.readline(timeout)
@@ -48,13 +48,10 @@ def main():
         writeToProcess(gdb_process,('b ' + function_name + '\n'))
 
     writeToProcess(gdb_process,"run")
-    while True:
-        writeToProcess(gdb_process,"n")
-        x = readProcessOutput(gdb_process_nbsr)
-        if "return 0;" in x:
-            break
+    readProcessOutput(gdb_process_nbsr)
 
     writeToProcess(gdb_process,"python bulidGraph()")
+    
     time.sleep(1)
     commands = readProcessOutputTill(gdb_process_nbsr,"done")
     for command in commands:

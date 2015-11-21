@@ -59,12 +59,8 @@ class node
 {
   public:
     vector<edge> children;
-    string address;
-    string type;
-    string size;
-    string value;
-    string flag;
-
+    string address,type,size,value,flag;
+    
 	void print()
 	{
 		for(int i = 0 ; i < children.size();i++)
@@ -131,7 +127,6 @@ public:
 	  string name = "$root";
 	  root_node = addNode(name,name,name,name,name);
     get_id(root_node);
-
   }
 
   node* addNode(string &address,string &type,string &value,string &size,string &flag)
@@ -145,8 +140,7 @@ public:
   void addChildren(string &parent_address,string &parent_type,string &child_address,string child_type,string &name)
   {
 	node *child = get_node[(child_address + "_" + child_type)];
-	node *parent = get_node[parent_address + "_" + parent_type];
-
+    node *parent = get_node[parent_address + "_" + parent_type];
     parent->children.push_back(edge(name,child));
   }
 
@@ -168,7 +162,7 @@ int main()
   string command_str= "";
   while(getline(cin,command_str))
   {
-    
+
 	if(command_str == "end")
 		break;
 
