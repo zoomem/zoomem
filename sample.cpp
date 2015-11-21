@@ -2,10 +2,8 @@
 using namespace std;
 int main()
 {
-	int x = 5;
-	int y = 6;
-	int *p = &x;
-	int **pp = &p;
-	auto c = 5;
+	int a = 5, b = 3;
+	int c[10] = {0};
+	cout << a << b << endl;
 	return 0;
 }

@@ -12,12 +12,9 @@ class NonBlockingStreamReader:
             while True:
                 line = stream.readline()
                 if line:
-                    lastIndex = line.rfind("(gdb) ")
-                    #print "new line"
-                    #print line + "  " + str(lastIndex)
+                    lastIndex = line.find("(gdb) ")
                     if lastIndex != -1:
                         line = line[lastIndex+6:]
-                    #print line
                     queue.put(line)
                 else:
                     break

@@ -69,8 +69,14 @@ class node
 	{
 		for(int i = 0 ; i < children.size();i++)
 		{
-			cout << "node_iden : " << get_id(children[i].to);
-			cout << " ,parent : " << this->address;
+			cout << "parent : ";
+			int parent = get_id(this);
+			if(parent == 1)
+				cout << "root";
+			else
+				cout << parent;
+
+			cout << " ,node : " << get_id(children[i].to);
 
 			cout << " ,var name : " << children[i].name;
 			node* child = children[i].to;
@@ -97,18 +103,15 @@ class node
       size = _size;
     }
 
-    ~node() {
+    ~node()
+    {
       for(int i = 0 ; i < children.size();i++)
-		if(children[i].to)
-		{
-			node* child = children[i].to;
-			if(del.find(hash_node(child)) == del.end())
-			{
-				del.insert(hash_node(child));
-			}
-			else
-				cout <<"kos kos";
-		}
+  		if(children[i].to)
+  		{
+  			node* child = children[i].to;
+  			if(del.find(hash_node(child)) == del.end())
+  				del.insert(hash_node(child));
+  		}
     }
 };
 
@@ -123,11 +126,12 @@ class graph
 public:
 
   node *root_node;
-
   graph()
   {
 	  string name = "$root";
 	  root_node = addNode(name,name,name,name,name);
+    get_id(root_node);
+
   }
 
   node* addNode(string &address,string &type,string &value,string &size,string &flag)
@@ -161,10 +165,10 @@ public:
 int main()
 {
   graph g;
-  //reopen("in.txt","r",stdin);
   string command_str= "";
   while(getline(cin,command_str))
   {
+    
 	if(command_str == "end")
 		break;
 
@@ -176,5 +180,6 @@ int main()
 		g.addChildren(command[1],command[2],command[3],command[4],command[5]);
   }
   g.print_graph();
+  cout << "done\n";
   return 0;
 }
