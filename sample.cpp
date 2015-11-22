@@ -16,7 +16,7 @@ class a
 };
 int main()
 {
-	a data2[4];
+	int data2[100];
 	int data[6] = {1,2,3,4,5};
 	a temp(2,3);
 	cout << "hey you";

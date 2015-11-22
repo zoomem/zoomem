@@ -50,7 +50,6 @@ def getLocalVariablesName():
             var_value = info_local_lines[i][equal_index+1:]
             var_names.append(var_name)
             full_var_value = getVarValue(var_name)
-
             if isAPointer(getVarType(var_name)):
                 full_var_value = full_var_value[full_var_value.find(")")+1:]
             rem = len(full_var_value) - len(var_value) - 1
@@ -125,7 +124,7 @@ def parseArrayVar(var_name,root_var):
     if root_var: addChildCommand("$root",var_name)
     prev_node = var_name
     for i in range(0,getNumberOfArrayElements(var_name)):
-        child_var_name = "(" + var_name+ "[" + str(i) + "])"
+        child_var_name = var_name+ "[" + str(i) + "]"
         analyzeVar(child_var_name)
         addChildCommand(var_name,child_var_name)
         prev_node = child_var_name
@@ -147,7 +146,7 @@ def parseObjectVar(var_name,root_var):
     while True:
         if next_member_start <= 0:
             break;
-        member_name = "(" + var_name + ")" + "." + object_value[next_member_start:next_member_end].strip()
+        member_name = var_name + "." + object_value[next_member_start:next_member_end].strip()
         member_value_length = len(getVarValue(member_name))
         analyzeVar(member_name)
         addChildCommand(var_name,member_name)
