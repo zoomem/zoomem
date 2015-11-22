@@ -99,6 +99,7 @@ def executeGdbCommand(command):
     return (gdb.execute(command,True,True)).strip()
 
 def bulidGraph():
+    executeGdbCommand("set print pretty on")
     var_names = getLocalVariablesName()
     for var_name in var_names:
         analyzeVar(var_name,True)
@@ -140,18 +141,13 @@ def parsePointerVar(var_name,root_var):
 def parseObjectVar(var_name,root_var):
     addVarCommand(var_name,OBJECT_FLAG)
     if root_var : addChildCommand("$root",var_name)
-    object_value = getVarValue(var_name)
-    next_member_start = object_value.find("{")+1
-    next_member_end = object_value.find("=")-1
-    while True:
-        if next_member_start <= 0:
-            break;
-        member_name = var_name + "." + object_value[next_member_start:next_member_end].strip()
-        member_value_length = len(getVarValue(member_name))
-        analyzeVar(member_name)
-        addChildCommand(var_name,member_name)
-        next_member_start = object_value.find(",",member_value_length + next_member_end)+1
-        next_member_end = object_value.find("=",next_member_start)-1
+    object_varibals = (getVarValue(var_name)).split("\n")
+    for member in object_varibals:
+        member_var = (member[0:member.find("=")]).strip()
+        if member_var!= "":
+            member_var = "(" + var_name + ")." + member_var
+            analyzeVar(member_var)
+            addChildCommand(var_name,member_var)
 
 def parsePrimitiveVar(var_name,root_var):
     addVarCommand(var_name,PRIMITIVE_FLAG)

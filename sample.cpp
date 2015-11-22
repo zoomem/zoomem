@@ -13,13 +13,16 @@ class a
 	{
 		x = y = 3;
 	}
+	void print()
+	{
+		cout << x << " "<< y << endl;
+	}
+
 };
 int main()
 {
-	int data2[100];
-	int data[6] = {1,2,3,4,5};
-	a temp(2,3);
-	cout << "hey you";
-	
+	a v1(2,3);
+	v1.print();
+	int a[3] = {0};
 	return 0;
 }

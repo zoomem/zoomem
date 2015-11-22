@@ -32,7 +32,8 @@ def readProcessOutputTill(nbsr,end = ""):
     while True:
         output = nbsr.readline(0)
         if output == None:
-            break
+            time.sleep(0.1)
+            continue;
         output = output.strip()
         if output == end:
             break
@@ -46,19 +47,16 @@ def writeToProcess(process,command):
 def main():
     for function_name in source_code_parsing.getFunctionsNames('sample.cpp'):
         writeToProcess(gdb_process,('b ' + function_name + '\n'))
-
     writeToProcess(gdb_process,"run")
     readProcessOutput(gdb_process_nbsr)
 
     writeToProcess(gdb_process,"python bulidGraph()")
-    
-    time.sleep(1)
+
     commands = readProcessOutputTill(gdb_process_nbsr,"done")
     for command in commands:
         writeToProcess(graph_process,command)
 
     writeToProcess(graph_process,"end")
-    time.sleep(1)
     graph_list = readProcessOutputTill(graph_process_nbsr,"done")
     print "\n".join(graph_list)
 

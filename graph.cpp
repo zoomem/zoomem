@@ -174,6 +174,6 @@ int main()
 		g.addChildren(command[1],command[2],command[3],command[4],command[5]);
   }
   g.print_graph();
-  cout << "done\n";
+  cout << "\ndone\n";
   return 0;
 }
