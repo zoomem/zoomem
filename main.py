@@ -18,7 +18,7 @@ def readProcess(process):
             break
         print output
 
-def readProcessOutput(nbsr,timeout = 0.3):
+def readProcessOutput(nbsr,timeout = 0.1):
     output_lines = ""
     while True:
         output = nbsr.readline(timeout)
@@ -30,10 +30,11 @@ def readProcessOutput(nbsr,timeout = 0.3):
 def readProcessOutputTill(nbsr,end = ""):
     output_lines = []
     while True:
-        output = nbsr.readline(0)
+        output = nbsr.readline(0.1)
         if output == None:
             time.sleep(0.1)
             continue;
+
         output = output.strip()
         if output == end:
             break
@@ -48,16 +49,32 @@ def main():
     for function_name in source_code_parsing.getFunctionsNames('sample.cpp'):
         writeToProcess(gdb_process,('b ' + function_name + '\n'))
     writeToProcess(gdb_process,"run")
-    readProcessOutput(gdb_process_nbsr)
+    current_line = ""
 
-    writeToProcess(gdb_process,"python bulidGraph()")
+    while True:
+        task = raw_input()
+        if task == "run":
+            start_time = time.time()
+            readProcessOutput(gdb_process_nbsr)
+            writeToProcess(gdb_process,"python bulidGraph()")
+            commands = readProcessOutputTill(gdb_process_nbsr,"done")
 
-    commands = readProcessOutputTill(gdb_process_nbsr,"done")
-    for command in commands:
-        writeToProcess(graph_process,command)
+            for command in commands:
+                writeToProcess(graph_process,command)
 
-    writeToProcess(graph_process,"end")
-    graph_list = readProcessOutputTill(graph_process_nbsr,"done")
-    print "\n".join(graph_list)
+            writeToProcess(graph_process,"end")
+            graph_list = readProcessOutputTill(graph_process_nbsr,"done")
+            print "\n".join(graph_list)
+            print "end of program", time.time() - start_time
+
+            if "return 0;" in current_line:
+                writeToProcess(graph_process,"quit")
+                return
+        elif task == "end":
+            writeToProcess(graph_process,"quit")
+            return
+        writeToProcess(gdb_process,"n")
+        current_line = readProcessOutput(gdb_process_nbsr)
+
 
 main()

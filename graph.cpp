@@ -13,6 +13,7 @@ map<string,node*>get_node;
 set<string> del;
 set<string>vis;
 map<node *,int>node_id;
+
 int id = 0;
 
 int get_id(node *n)
@@ -60,7 +61,7 @@ class node
   public:
     vector<edge> children;
     string address,type,size,value,flag;
-    
+
 	void print()
 	{
 		for(int i = 0 ; i < children.size();i++)
@@ -73,7 +74,6 @@ class node
 				cout << parent;
 
 			cout << " ,node : " << get_id(children[i].to);
-
 			cout << " ,var name : " << children[i].name;
 			node* child = children[i].to;
 			cout << " ,Adress : " << child->address;
@@ -126,7 +126,7 @@ public:
   {
 	  string name = "$root";
 	  root_node = addNode(name,name,name,name,name);
-    get_id(root_node);
+	  get_id(root_node);
   }
 
   node* addNode(string &address,string &type,string &value,string &size,string &flag)
@@ -156,24 +156,38 @@ public:
 
 };
 
+void initGraph()
+{
+  get_node.clear();
+  del.clear();
+  vis.clear();
+  node_id.clear();
+}
+
 int main()
 {
-  graph g;
-  string command_str= "";
-  while(getline(cin,command_str))
+
+  while(true)
   {
+    string command_str= "";
+    initGraph();
+    graph g;
+    while(getline(cin,command_str))
+    {
+	
+  	if(command_str == "end")
+  		break;
+	if(command_str == "quit")
+  		return 0 ;
+      vector<string>command = split(command_str,',');
+      if(command[0] == "1")
+  		g.addNode(command[1],command[2],command[3],command[4],command[5]);
 
-	if(command_str == "end")
-		break;
-
-    vector<string>command = split(command_str,',');
-    if(command[0] == "1")
-		g.addNode(command[1],command[2],command[3],command[4],command[5]);
-
-	else if(command[0] == "2")
-		g.addChildren(command[1],command[2],command[3],command[4],command[5]);
+  	else if(command[0] == "2")
+  		g.addChildren(command[1],command[2],command[3],command[4],command[5]);
+    }
+    g.print_graph();
+    cout << "\ndone\n";
   }
-  g.print_graph();
-  cout << "\ndone\n";
   return 0;
 }

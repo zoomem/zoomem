@@ -1,28 +1,26 @@
 #include <iostream>
 using namespace std;
-class a
+class oo
 {
 	public:
 	int x,y;
-	a(int X ,int Y)
+	int a[100];
+	oo()
 	{
-		x = X;
-		y = Y;
-	}
-	a()
-	{
-		x = y = 3;
+		x = y= 6;
+		for(int i = 0 ; i < 100 ; i++)
+			a[i] = i;
 	}
 	void print()
 	{
-		cout << x << " "<< y << endl;
+		cout << "Fw";
 	}
-
 };
+
 int main()
 {
-	a v1(2,3);
-	v1.print();
-	int a[3] = {0};
+	int x = 5,y = 6;
+	oo bob;
+	bob.print();
 	return 0;
 }

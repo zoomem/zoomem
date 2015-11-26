@@ -3,8 +3,6 @@ import hashlib
 import time
 import subprocess
 
-address_dict = {}
-
 PRIMITIVES_TYPES = ['short', 'short int', 'signed short', 'signed short int', 'unsigned short', 'unsigned short int', 'int', 'signed', 'signed int', 'unsigned', 'unsigned int', 'long', 'long int', 'signed long', 'signed long int', 'unsigned long', 'unsigned long int', 'long long', 'long long int', 'signed long long', 'signed long long int', 'unsigned long long', 'unsigned long long int', 'float', 'double', 'long double ', 'signed char', 'unsigned char', 'char', 'wchar_t', 'char16_t', 'char32_t', 'bool']
 
 graph_process = Popen('./graph',stdin = PIPE, stdout = PIPE, stderr = PIPE,shell = True)
@@ -13,8 +11,6 @@ POINTER_FLAG = '1'
 ARRAY_FLAG = '2'
 OBJECT_FLAG = '3'
 PRIMITIVE_FLAG = '4'
-
-graph_commands = []
 
 def getVarAddress(var_name):
     var_address = executeGdbCommand("p &" + var_name)
@@ -29,7 +25,7 @@ def getVarType(var_name):
 
 def getVarValue(var_name):
     var_val = executeGdbCommand("print " + var_name)
-    return var_val[var_val.find("=") + 1:]
+    return (var_val[var_val.find("=") + 1:])
 
 def getVarSize(var_name):
     var_size =  executeGdbCommand("print sizeof(" + var_name + ")")
@@ -99,44 +95,44 @@ def executeGdbCommand(command):
     return (gdb.execute(command,True,True)).strip()
 
 def bulidGraph():
+    start_time = time.time();
     executeGdbCommand("set print pretty on")
     var_names = getLocalVariablesName()
     for var_name in var_names:
-        analyzeVar(var_name,True)
-    for command in graph_commands:
-        print(command)
+        analyseVar(var_name,True)
     print("done")
 
-def analyzeVar(var_name,root_var = False):
-    var_type = getVarType(var_name)
-    if isAArray(var_type):
+def analyseVar(var_name,root_var = False,Type = ""):
+    var_type = getVarType(var_name) if Type == "" else Type
+    if isPrimitive(var_type):
+        parsePrimitiveVar(var_name,root_var)
+    elif isAArray(var_type):
         parseArrayVar(var_name,root_var)
     elif isAPointer(var_type):
         parsePointerVar(var_name,root_var)
     elif isAObject(var_type):
         parseObjectVar(var_name,root_var)
-    elif isPrimitive(var_type):
-        parsePrimitiveVar(var_name,root_var)
-    else:
-        raise Exception
 
-def parseArrayVar(var_name,root_var):
+def parseArrayVar(var_name,root_var,_start = 0,_end = 0):
     addVarCommand(var_name,ARRAY_FLAG)
     if root_var: addChildCommand("$root",var_name)
     prev_node = var_name
-    for i in range(0,getNumberOfArrayElements(var_name)):
+    child_type = getVarType(var_name + "[0]")
+    _end = getNumberOfArrayElements(var_name)
+    for i in range(_start,_end):
         child_var_name = var_name+ "[" + str(i) + "]"
-        analyzeVar(child_var_name)
+        analyseVar(child_var_name,False,child_type)
         addChildCommand(var_name,child_var_name)
-        prev_node = child_var_name
 
 def parsePointerVar(var_name,root_var):
     addVarCommand(var_name,POINTER_FLAG)
     if root_var : addChildCommand("$root",var_name)
-
     child_var_name = "(*" + var_name+ ")"
-    analyzeVar(child_var_name)
-    addChildCommand(var_name,child_var_name)
+    try:
+        analyseVar(child_var_name)
+        addChildCommand(var_name,child_var_name)
+    except Exception:
+        return
 
 def parseObjectVar(var_name,root_var):
     addVarCommand(var_name,OBJECT_FLAG)
@@ -145,8 +141,8 @@ def parseObjectVar(var_name,root_var):
     for member in object_varibals:
         member_var = (member[0:member.find("=")]).strip()
         if member_var!= "":
-            member_var = "(" + var_name + ")." + member_var
-            analyzeVar(member_var)
+            member_var = var_name + "." + member_var
+            analyseVar(member_var,False)
             addChildCommand(var_name,member_var)
 
 def parsePrimitiveVar(var_name,root_var):
@@ -156,7 +152,7 @@ def parsePrimitiveVar(var_name,root_var):
 def addVarCommand(var_name,flags):
     var_hash = getVarHash(var_name)
     command = '1,' + var_hash['var_address'] + ',' + var_hash['var_type'] + ',' + var_hash['var_value'] + ',' + str(var_hash['var_size']) +',' + flags
-    graph_commands.append(command)
+    print(command)
 
 def addChildCommand(parent_var_name, child_var_name):
     parent_var_address = "$root" if parent_var_name == "$root" else getVarAddress(parent_var_name)
@@ -164,14 +160,17 @@ def addChildCommand(parent_var_name, child_var_name):
     child_var_address = getVarAddress(child_var_name)
     child_var_type = getVarType(child_var_name)
     command = "2," + parent_var_address + "," + parent_var_type + "," + child_var_address + "," + child_var_type + "," + child_var_name
-    graph_commands.append(command)
+    print(command)
 
 def getVarHash(var_name):
     var_hash = {}
     var_hash['var_type'] = getVarType(var_name)
     var_hash['var_address'] = getVarAddress(var_name)
     var_hash['var_size'] = getVarSize(var_name)
-    var_hash['var_value'] = (getVarValue(var_name) if isPrimitive(var_hash['var_type']) else  "none")
+    if isAArray(var_hash['var_type']):
+        var_hash['var_value'] = str(getNumberOfArrayElements(var_name))
+    else:
+        var_hash['var_value'] = (getVarValue(var_name) if isPrimitive(var_hash['var_type']) else  "none")
     return var_hash
 
 def compileFiles():
