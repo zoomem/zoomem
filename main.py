@@ -3,12 +3,10 @@ import non_blocking_stream
 import time
 import subprocess
 import source_code_parsing
+import graph
 
 gdb_process = Popen('gdb sample -q',stdin = PIPE, stdout = PIPE, stderr = PIPE, shell = True)
 gdb_process_nbsr = non_blocking_stream.NonBlockingStreamReader(gdb_process.stdout)
-
-graph_process = Popen('./graph',stdin = PIPE, stdout = PIPE, stderr = PIPE,shell = True)
-graph_process_nbsr = non_blocking_stream.NonBlockingStreamReader(graph_process.stdout)
 
 def readProcess(process):
     output_lines = ""
@@ -18,7 +16,7 @@ def readProcess(process):
             break
         print output
 
-def readProcessOutput(nbsr,timeout = 0.1):
+def readProcessOutput(nbsr,timeout = 0.5):
     output_lines = ""
     while True:
         output = nbsr.readline(timeout)
@@ -30,7 +28,7 @@ def readProcessOutput(nbsr,timeout = 0.1):
 def readProcessOutputTill(nbsr,end = ""):
     output_lines = []
     while True:
-        output = nbsr.readline(0.1)
+        output = nbsr.readline()
         if output == None:
             time.sleep(0.1)
             continue;
@@ -46,7 +44,6 @@ def writeToProcess(process,command):
     process.stdin.write(command.encode())
 
 def main():
-
     for function_name in source_code_parsing.getFunctionsNames('sample.cpp'):
         writeToProcess(gdb_process,('b ' + function_name + '\n'))
     writeToProcess(gdb_process,"run")
@@ -59,19 +56,20 @@ def main():
             readProcessOutput(gdb_process_nbsr)
             writeToProcess(gdb_process,"python bulidGraph()")
             commands = readProcessOutputTill(gdb_process_nbsr,"done")
-
+            print commands
+            g = graph.gdbGraph()
             for command in commands:
-                writeToProcess(graph_process,command)
-            writeToProcess(graph_process,"end")
-            graph_list = readProcessOutputTill(graph_process_nbsr,"done")
-            print "\n".join(graph_list)
-            print "end of program", time.time() - start_time
+                attributes = command.split(',')
+                if attributes[0] == '1':
+                    g.addNode(attributes[1],attributes[2],attributes[3],attributes[4],attributes[5])
+                else:
+                    g.addChildren(attributes[1],attributes[2],attributes[3],attributes[4],attributes[5])
+            g.printGraph()
 
+            print "end of program", time.time() - start_time
             if "return 0;" in current_line:
-                writeToProcess(graph_process,"quit")
                 return
         elif task == "end":
-            writeToProcess(graph_process,"quit")
             return
         writeToProcess(gdb_process,"n")
         current_line = readProcessOutput(gdb_process_nbsr)
