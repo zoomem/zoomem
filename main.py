@@ -46,6 +46,7 @@ def writeToProcess(process,command):
     process.stdin.write(command.encode())
 
 def main():
+
     for function_name in source_code_parsing.getFunctionsNames('sample.cpp'):
         writeToProcess(gdb_process,('b ' + function_name + '\n'))
     writeToProcess(gdb_process,"run")
@@ -61,7 +62,6 @@ def main():
 
             for command in commands:
                 writeToProcess(graph_process,command)
-
             writeToProcess(graph_process,"end")
             graph_list = readProcessOutputTill(graph_process_nbsr,"done")
             print "\n".join(graph_list)
