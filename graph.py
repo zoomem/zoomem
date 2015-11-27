@@ -25,7 +25,7 @@ class node(object):
             command +=  " ,Size  : " + child_node.size +  " ,value : "  + child_node.value  + " ,Flag : " + flags[int(child_node.flag)]
             print command
             if(not child_node.id in vs):
-                #vs[child_node.id] = True
+                vs[child_node.id] = True
                 child_node.printNode(vs);
 
 class Edge:
