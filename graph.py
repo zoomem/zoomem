@@ -11,8 +11,7 @@ class node(object):
         self.children = []
         self.id = id
 
-    def printNode(self, vs = {}):
-
+    def printNode(self, vs):
         for child_edge in self.children:
             child_node = child_edge.to
             parent_id = self.id
@@ -21,13 +20,12 @@ class node(object):
                 command+= "root"
             else:
                 command += str(parent_id)
-
             command += " ,node " + str(child_node.id) + ", var name : " + child_edge.name
             command +=  " ,Adress : "  +  child_node.address +  " ,Type : " + child_node.type
             command +=  " ,Size  : " + child_node.size +  " ,value : "  + child_node.value  + " ,Flag : " + flags[int(child_node.flag)]
             print command
             if(not child_node.id in vs):
-                vs[child_node.id] = True
+                #vs[child_node.id] = True
                 child_node.printNode(vs);
 
 class Edge:
@@ -54,4 +52,4 @@ class gdbGraph:
         parent.children.append(Edge(name,child));
 
     def printGraph(self):
-        self.root.printNode()
+        self.root.printNode({})

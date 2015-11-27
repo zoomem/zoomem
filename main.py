@@ -56,7 +56,7 @@ def main():
             readProcessOutput(gdb_process_nbsr)
             writeToProcess(gdb_process,"python bulidGraph()")
             commands = readProcessOutputTill(gdb_process_nbsr,"done")
-            print commands
+            print "\n".join(commands)
             g = graph.gdbGraph()
             for command in commands:
                 attributes = command.split(',')

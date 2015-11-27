@@ -4,6 +4,6 @@ using namespace std;
 int main()
 {
 	int x = 5;
-	int *p = &x;
+	int a[10] = {0};
 	return 0;
 }
