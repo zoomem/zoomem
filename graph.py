@@ -11,7 +11,7 @@ class node(object):
         self.children = []
         self.id = id
 
-    def print_node(self, vs):
+    def printNode(self, vs = {}):
 
         for child_edge in self.children:
             child_node = child_edge.to
@@ -28,14 +28,14 @@ class node(object):
             print command
             if(not child_node.id in vs):
                 vs[child_node.id] = True
-                child_node.print_node(vs);
+                child_node.printNode(vs);
 
 class Edge:
     def __init__(self, name ,to):
         self.name = name
         self.to = to
 
-class Graph:
+class gdbGraph:
     def __init__(self):
         self.root = node("$root", "$root" ,"$root" , "$root" ,"$root",1)
         self.id_cnt = 2
@@ -53,13 +53,5 @@ class Graph:
         parent = self.node_hash[parent_address + "_" + parent_type];
         parent.children.append(Edge(name,child));
 
-def main():
-        g = Graph()
-        g.addNode("0x7fffffffddf4","int","32767","4","4")
-        g.addChildren("$root","$root",'0x7fffffffddf4','int',"x")
-        g.addNode('0x7fffffffddf8',"int *",'none','8','1')
-        g.addChildren("$root","$root","0x7fffffffddf8","int *",'p')
-        vs = {}
-        g.root.print_node(vs)
-
-main()
+    def printGraph(self):
+        self.root.printNode()

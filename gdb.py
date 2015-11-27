@@ -103,7 +103,6 @@ def bulidGraph():
     print("done")
 
 def analyseVar(var_name,root_var = False,Type = ""):
-    print(var_name)
     var_type = getVarType(var_name) if Type == "" else Type
     if isPrimitive(var_type):
         parsePrimitiveVar(var_name,root_var)
