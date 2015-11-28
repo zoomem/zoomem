@@ -1,7 +1,6 @@
 import hashlib
 flags = ["","POINTER_FLAG","ARRAY_FLAG","OBJECT_FLAG","PRIMITIVE_FLAG"]
 class node(object):
-
     def __init__(self, address, type, value, size, flag, id):
         self.address = address
         self.type = type
@@ -28,10 +27,12 @@ class node(object):
                 vs[child_node.id] = True
                 child_node.printNode(vs);
 
+
 class Edge:
     def __init__(self, name ,to):
         self.name = name
         self.to = to
+
 
 class gdbGraph:
     def __init__(self):
