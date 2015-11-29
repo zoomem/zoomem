@@ -94,34 +94,40 @@ def addVarNameToDic(var_name):
 def executeGdbCommand(command):
     return (gdb.execute(command,True,True)).strip()
 
-def bulidGraph():
+def bulidGraph(var_name = ""):
     start_time = time.time();
     executeGdbCommand("set print pretty on")
-    var_names = getLocalVariablesName()
-    for var_name in var_names:
-        analyseVar(var_name,True)
+    if var_name == "":
+        var_names = getLocalVariablesName()
+        for var_name in var_names:
+            analyseVar(var_name,True)
+    else:
+        analyseVar(var_name,True,"",True)
+
     print("done")
 
-def analyseVar(var_name,root_var = False,Type = ""):
+def analyseVar(var_name,root_var = False,Type = "",depth = False):
     var_type = getVarType(var_name) if Type == "" else Type
     if isPrimitive(var_type):
         parsePrimitiveVar(var_name,root_var)
     elif isAArray(var_type):
-        parseArrayVar(var_name,root_var)
+        parseArrayVar(var_name,root_var,depth)
     elif isAPointer(var_type):
         parsePointerVar(var_name,root_var)
     elif isAObject(var_type):
         parseObjectVar(var_name,root_var)
 
-def parseArrayVar(var_name,root_var,_start = 0,_end = 0):
+def parseArrayVar(var_name,root_var,depth,_start = 0,_end = 0):
     addVarCommand(var_name,ARRAY_FLAG)
     if root_var: addChildCommand("$root",var_name)
     prev_node = var_name
     child_type = getVarType(var_name + "[0]")
-    _end = getNumberOfArrayElements(var_name)
+    if depth == True:
+        _end = getNumberOfArrayElements(var_name)
+
     for i in range(_start,_end):
         child_var_name = var_name+ "[" + str(i) + "]"
-        analyseVar(child_var_name,False,child_type)
+        analyseVar(child_var_name,False,child_type,depth)
         addChildCommand(var_name,child_var_name)
 
 def parsePointerVar(var_name,root_var):
