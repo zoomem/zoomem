@@ -103,7 +103,6 @@ def bulidGraph(var_name = ""):
             analyseVar(var_name,True)
     else:
         analyseVar(var_name,True,"",True)
-
     print("done")
 
 def analyseVar(var_name,root_var = False,Type = "",depth = False):
@@ -117,18 +116,16 @@ def analyseVar(var_name,root_var = False,Type = "",depth = False):
     elif isAObject(var_type):
         parseObjectVar(var_name,root_var)
 
-def parseArrayVar(var_name,root_var,depth,_start = 0,_end = 0):
+def parseArrayVar(var_name,root_var,depth):
     addVarCommand(var_name,ARRAY_FLAG)
     if root_var: addChildCommand("$root",var_name)
     prev_node = var_name
     child_type = getVarType(var_name + "[0]")
     if depth == True:
-        _end = getNumberOfArrayElements(var_name)
-
-    for i in range(_start,_end):
-        child_var_name = var_name+ "[" + str(i) + "]"
-        analyseVar(child_var_name,False,child_type,depth)
-        addChildCommand(var_name,child_var_name)
+        for i in range(0,getNumberOfArrayElements(var_name)):
+            child_var_name = var_name+ "[" + str(i) + "]"
+            analyseVar(child_var_name,False,child_type,depth)
+            addChildCommand(var_name,child_var_name)
 
 def parsePointerVar(var_name,root_var):
     addVarCommand(var_name,POINTER_FLAG)
