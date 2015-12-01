@@ -24,6 +24,7 @@ class GdbAdapter:
             self.gdb_process.write("b " + function)
 
         self.gdb_process.write("run < " + input_file_name)
+        self.gdb_process.write("target record-full")
         self.gdb_process.clean()
 
     def next(self):
