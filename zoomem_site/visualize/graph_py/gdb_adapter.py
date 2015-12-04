@@ -45,7 +45,7 @@ class GdbAdapter:
         for edge in edges:
             attributes = edge.split(',')
             if attributes[0] == '1':
-                g.addNode(attributes[1],attributes[2],attributes[3],attributes[4],attributes[5])
+                g.addNode(attributes[1],attributes[2],attributes[3],attributes[4],attributes[5],attributes[6])
             else:
                 g.addChildren(attributes[1],attributes[2],attributes[3],attributes[4],attributes[5])
         return g
@@ -55,6 +55,5 @@ class GdbAdapter:
         return self.gdb_process.read()
 
 g = GdbAdapter("sample","in.txt")
-edges =  g.getGraphEdegs()
-gr = g.bulidGraph(edges)
+gr = g.bulidGraph("")
 gr.printGraph()

@@ -100,61 +100,60 @@ def bulidGraph(var_name = ""):
     if var_name == "":
         var_names = getLocalVariablesName()
         for var_name in var_names:
-            analyseVar(var_name,True)
+            analyseVar(var_name,var_name,True)
     else:
-        analyseVar(var_name,True,"",True)
+        analyseVar(var_name,var_name,True,"",True)
     print("done")
 
-def analyseVar(var_name,root_var = False,Type = "",depth = False):
+def analyseVar(var_short_name,var_name,root_var = False,Type = "",depth = False):
     var_type = getVarType(var_name) if Type == "" else Type
     if isPrimitive(var_type):
-        parsePrimitiveVar(var_name,root_var)
+        parsePrimitiveVar(var_short_name,var_name,root_var)
     elif isAArray(var_type):
-        parseArrayVar(var_name,root_var,depth)
+        parseArrayVar(var_short_name,var_name,root_var,depth)
     elif isAPointer(var_type):
-        parsePointerVar(var_name,root_var)
+        parsePointerVar(var_short_name,var_name,root_var)
     elif isAObject(var_type):
-        parseObjectVar(var_name,root_var)
+        parseObjectVar(var_short_name,var_name,root_var)
 
-def parseArrayVar(var_name,root_var,depth):
-    addVarCommand(var_name,ARRAY_FLAG)
+def parseArrayVar(var_short_name,var_name,root_var,depth):
+    addVarCommand(var_short_name,var_name,ARRAY_FLAG)
     if root_var: addChildCommand("$root",var_name)
     prev_node = var_name
     child_type = getVarType(var_name + "[0]")
     if depth == True:
         for i in range(0,getNumberOfArrayElements(var_name)):
             child_var_name = var_name+ "[" + str(i) + "]"
-            analyseVar(child_var_name,False,child_type,depth)
+            analyseVar(var_short_name+"[" + str(i) + "]",child_var_name,False,child_type,depth)
             addChildCommand(var_name,child_var_name)
 
-def parsePointerVar(var_name,root_var):
-    addVarCommand(var_name,POINTER_FLAG)
+def parsePointerVar(var_short_name,var_name,root_var):
+    addVarCommand(var_short_name,var_name,POINTER_FLAG)
     if root_var : addChildCommand("$root",var_name)
     child_var_name = "(*" + var_name+ ")"
     try:
-        analyseVar(child_var_name)
+        analyseVar("DA",child_var_name)
         addChildCommand(var_name,child_var_name)
     except Exception:
         return
 
-def parseObjectVar(var_name,root_var):
-    addVarCommand(var_name,OBJECT_FLAG)
+def parseObjectVar(var_short_name,var_name,root_var):
+    addVarCommand(var_short_name,var_name,OBJECT_FLAG)
     if root_var : addChildCommand("$root",var_name)
     object_varibals = (getVarValue(var_name)).split("\n")
     for member in object_varibals:
         member_var = (member[0:member.find("=")]).strip()
         if member_var!= "":
-            member_var = var_name + "." + member_var
-            analyseVar(member_var,False)
-            addChildCommand(var_name,member_var)
+            analyseVar(member_var,var_name + "." + member_var,False)
+            addChildCommand(var_name,var_name + "." + member_var)
 
-def parsePrimitiveVar(var_name,root_var):
-    addVarCommand(var_name,PRIMITIVE_FLAG)
+def parsePrimitiveVar(var_short_name,var_name,root_var):
+    addVarCommand(var_short_name,var_name,PRIMITIVE_FLAG)
     if root_var : addChildCommand("$root",var_name)
 
-def addVarCommand(var_name,flags):
+def addVarCommand(var_short_name,var_name,flags):
     var_hash = getVarHash(var_name)
-    command = '1,' + var_hash['var_address'] + ',' + var_hash['var_type'] + ',' + var_hash['var_value'] + ',' + str(var_hash['var_size']) +',' + flags
+    command = '1,' + var_hash['var_address'] + ',' + var_hash['var_type'] + ',' + var_hash['var_value'] + ',' + str(var_hash['var_size']) +',' + flags + ',' + var_short_name
     print(command)
 
 def addChildCommand(parent_var_name, child_var_name):
