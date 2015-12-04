@@ -14,7 +14,6 @@ class node(object):
         self.name = name
 
     def printNode(self, vs):
-        print self.name + "  " + self.address
         for child_edge in self.children:
             child_node = child_edge.to
             parent_id = self.id

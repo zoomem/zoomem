@@ -8,7 +8,7 @@ class nbsr_process:
         self.proc = Popen(name,stdin = PIPE, stdout = PIPE, stderr = PIPE, shell = True)
         self.proc_nbsr = non_blocking_stream.NonBlockingStreamReader(self.proc.stdout)
 
-    def read(self, timeout = 1):
+    def read(self, timeout = 0.5):
         output_lines = ""
         while True:
             output = self.proc_nbsr.readline(timeout)
