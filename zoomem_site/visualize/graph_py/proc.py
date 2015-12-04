@@ -14,6 +14,9 @@ class nbsr_process:
             output = self.proc_nbsr.readline(timeout)
             if output == None:
                 break
+            idx = output.find("(gdb)")
+            if idx != -1:
+                output = output[idx + len("(gdb)"):]
             output_lines += output
         return output_lines.strip()
 
@@ -24,6 +27,9 @@ class nbsr_process:
             if output == None:
                 time.sleep(0.1)
                 continue;
+            idx = output.find("(gdb)")
+            if idx != -1:
+                output = output[idx + len("(gdb)"):]
             output = output.strip()
             if output == end:
                 break
