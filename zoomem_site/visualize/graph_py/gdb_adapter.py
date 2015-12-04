@@ -55,5 +55,6 @@ class GdbAdapter:
         return self.gdb_process.read()
 
 g = GdbAdapter("sample","in.txt")
-gr = g.bulidGraph("")
+edges =  g.getGraphEdegs()
+gr = g.bulidGraph(edges)
 gr.printGraph()
