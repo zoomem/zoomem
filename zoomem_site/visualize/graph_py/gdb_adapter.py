@@ -53,8 +53,3 @@ class GdbAdapter:
     def send_command(command):
         self.gdb_process.write(command + "\n")
         return self.gdb_process.read()
-
-g = GdbAdapter("sample","in.txt")
-edges =  g.getGraphEdegs()
-gr = g.bulidGraph(edges)
-gr.printGraph()
