@@ -8,14 +8,18 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
+    <script type="text/javascript" src={% static "jquery/jquery-1.11.3.min.js" %}></script>
+
+    <script type="text/javascript" src={% static "bootstrap/js/bootstrap.min.js" %}></script>
     <link href={% static "bootstrap/css/bootstrap.min.css" %} rel="stylesheet">
 
-    <script type="text/javascript" src={% static "graph_vis/js/jquery-1.4.2.min.js" %}></script>
     <script type="text/javascript" src={% static "graph_vis/js/raphael-min.js" %}></script>
     <script type="text/javascript" src={% static "graph_vis/js/dracula_graffle.js" %}></script>
     <script type="text/javascript" src={% static "graph_vis/js/dracula_graph.js" %}></script>
     <script type="text/javascript" src={% static "graph_vis/js/dracula_algorithms.js" %}></script>
-    <script type="text/javascript" src={% static "graph_vis/examples/algorithms.js" %}></script>
+
+    <script type="text/javascript" src={% static "visualize/js/graph_bulider.js" %}></script>
+
 
   </head>
   <body>
@@ -32,6 +36,5 @@
       {% endfor %}
 
     </div>
-    <script src={% static "bootstrap/css/bootstrap.min.css" %}</script>
   </body>
 </html>
