@@ -54,7 +54,7 @@ class GdbAdapter:
         self.gdb_process.write(command + "\n")
         return self.gdb_process.read()
 
-g = GdbAdapter("/home/tk/git_workplace/zoomem/zoomem_site/visualize/graph_py/sample","in.txt")
+g = GdbAdapter("sample","in.txt")
 edges =  g.getGraphEdegs()
 gr = g.bulidGraph(edges)
 gr.printGraph()
