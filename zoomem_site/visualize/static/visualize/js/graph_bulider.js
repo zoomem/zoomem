@@ -20,9 +20,8 @@ function drawGraph(edges) {
     	return e;
     }
     for(var i = 0; i < edges.length; ++i){
-      var temp = edges[i].split(',');
-      var src = temp[2].substr(temp[2].indexOf(":") + 1);
-      var tar = temp[3].substr(temp[3].indexOf(":") + 1);
+      var src = edges[i][1]
+      var tar = edges[i][2]
       if(src == 1 || tar == 1){
         g.addNode(Math.max(src,tar),{render:render});
       }

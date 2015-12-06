@@ -16,5 +16,7 @@ def index(request):
     g_gdb = gdbGraph()
     g_gdb = g_adapter.bulidGraph(edges)
     context = {}
-    context["graph"] = g_gdb.printGraph()
+    edges = g_gdb.getGraphEdges()
+    context["edges"] = edges
+    print edges
     return render(request, 'visualize/index.html',context)

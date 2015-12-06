@@ -24,16 +24,20 @@
   <body>
     <div id="drawArea"></div>
     <script>
-      var list = [];
-      {% for edge in graph %}
-        var str = "";
-        {% for char in edge %}
-          str += "{{char}}";
+    var ed = []
+    {% for edge in edges %}
+      ed.push([])
+      {% for command in edge %}
+        var s = ""
+        {% for char in command %}
+          s+= "{{char}}"
         {% endfor %}
-        list.push(str);
+        ed[ed.length-1].push(s)
       {% endfor %}
-      drawGraph(list);
+    {% endfor %}
+    drawGraph(ed)
     </script>
+
     <!--<button id="redraw" onclick="redraw();">redraw</button>-->
   </body>
 </html>

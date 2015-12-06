@@ -13,26 +13,26 @@ class node(object):
         self.id = id
         self.name = name
 
-    def printForView(self,vs):
+    def calcGraphEdges(self,vs,edges):
         for child_edge in self.children:
             child_node = child_edge.to
-            edge =  "parent_node_name:"+self.name
-            edge += ",child_node_name:"+child_node.name
-            edge += ",parent_node_id:"+str(self.id)
-            edge += ",child_node_id:"+str(child_node.id)
-            edge += ",parent_node_address:"+self.address
-            edge += ",child_node_address:"+child_node.address
-            edge += ",parent_node_type:"+self.type
-            edge += ",child_node_type:"+child_node.type
-            edge += ",parent_node_size:"+self.size
-            edge += ",child_node_size:"+child_node.size
-            edge += ",parent_node_value:"+self.value
-            edge += ",child_node_value:"+child_node.value
-            edge += ",child_flag:"+flags[int(child_node.flag)]
-            edges_list.append(edge)
+            command = []
+            command.append(child_node.name)
+            command.append(str(self.id))
+            command.append(str(child_node.id))
+            command.append(self.address)
+            command.append(child_node.address)
+            command.append(self.type)
+            command.append(child_node.type)
+            command.append(self.size)
+            command.append(child_node.size)
+            command.append(self.value)
+            command.append(child_node.value)
+            command.append(flags[int(child_node.flag)])
+            edges.append(command)
             if not child_node.id in vs :
                 vs[child_node.id] = True
-                child_node.printForView(vs)
+                child_node.calcGraphEdges(vs,edges)
 
     def printNode(self, vs):
         for child_edge in self.children:
@@ -77,7 +77,7 @@ class gdbGraph:
         parent = self.node_hash[parent_address + "_" + parent_type];
         parent.children.append(Edge(name,child));
 
-    def printGraph(self):
-        del edges_list[:]
-        self.root.printForView({})
-        return edges_list
+    def getGraphEdges(self):
+        edges = []
+        self.root.calcGraphEdges({},edges)
+        return edges
