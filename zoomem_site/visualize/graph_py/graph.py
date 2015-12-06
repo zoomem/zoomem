@@ -17,16 +17,12 @@ class node(object):
         for child_edge in self.children:
             child_node = child_edge.to
             command = []
-            command.append(child_node.name)
             command.append(str(self.id))
             command.append(str(child_node.id))
-            command.append(self.address)
+            command.append(child_node.name)
             command.append(child_node.address)
-            command.append(self.type)
             command.append(child_node.type)
-            command.append(self.size)
             command.append(child_node.size)
-            command.append(self.value)
             command.append(child_node.value)
             command.append(flags[int(child_node.flag)])
             edges.append(command)

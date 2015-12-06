@@ -6,8 +6,8 @@ function drawGraph(edges) {
     height /= 1.5;
     var render = function(r, n) {
             var set = r.set().push(
-                r.rect(n.point[0]-30, n.point[1]-13, 60, 44).attr({"fill": "#feb", r : "12px", "stroke-width" : n.distance == 0 ? "3px" : "1px" })).push(
-                r.text(n.point[0], n.point[1] + 10, (n.label || n.id) + "\n"));
+                r.rect(n.point[0]-30, n.point[1]-13, 60, 60).attr({ })).push(
+                r.text(n.point[0], n.point[1] + 15,n.id + "\n" + n.name + "\n" + n.type + "\n" + n.value + "\n"));
             return set;
         };
 
@@ -19,15 +19,19 @@ function drawGraph(edges) {
     	e.target = target;
     	return e;
     }
+
     for(var i = 0; i < edges.length; ++i){
-      var src = edges[i][1]
-      var tar = edges[i][2]
-      if(src == 1 || tar == 1){
-        g.addNode(Math.max(src,tar),{render:render});
-      }
-      else {
-        g.addEdge(src,tar);
-      }
+      var src = edges[i][0]
+      var tar = edges[i][1]
+      var node = g.addNode(tar,{render:render});
+      node.name = edges[i][2];
+      node.address = edges[i][3]
+      node.type = edges[i][4]
+      node.size = edges[i][5]
+      node.value = edges[i][6]
+      node.flags =  edges[i][7]
+      if(src != 1)
+        edge = g.addEdge(src,tar);
     }
 
     var layouter = new Graph.Layout.Spring(g);
