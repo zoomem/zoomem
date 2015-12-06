@@ -1,6 +1,6 @@
 import hashlib
 
-
+edges_list = []
 flags = ["","POINTER_FLAG","ARRAY_FLAG","OBJECT_FLAG","PRIMITIVE_FLAG"]
 class node(object):
     def __init__(self, address, type, value, size, flag, id,name):
@@ -12,6 +12,27 @@ class node(object):
         self.children = []
         self.id = id
         self.name = name
+
+    def printForView(self,vs):
+        for child_edge in self.children:
+            child_node = child_edge.to
+            edge =  "parent_node_name:"+self.name
+            edge += ",child_node_name:"+child_node.name
+            edge += ",parent_node_id:"+str(self.id)
+            edge += ",child_node_id:"+str(child_node.id)
+            edge += ",parent_node_address:"+self.address
+            edge += ",child_node_address:"+child_node.address
+            edge += ",parent_node_type:"+self.type
+            edge += ",child_node_type:"+child_node.type
+            edge += ",parent_node_size:"+self.size
+            edge += ",child_node_size:"+child_node.size
+            edge += ",parent_node_value:"+self.value
+            edge += ",child_node_value:"+child_node.value
+            edge += ",child_flag:"+flags[int(child_node.flag)]
+            edges_list.append(edge)
+            if not child_node.id in vs :
+                vs[child_node.id] = True
+                child_node.printForView(vs)
 
     def printNode(self, vs):
         for child_edge in self.children:
@@ -57,4 +78,6 @@ class gdbGraph:
         parent.children.append(Edge(name,child));
 
     def printGraph(self):
-        self.root.printNode({})
+        del edges_list[:]
+        self.root.printForView({})
+        return edges_list

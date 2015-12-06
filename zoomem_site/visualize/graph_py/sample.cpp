@@ -1,6 +1,9 @@
 #include <iostream>
 using namespace std;
-
+class a{
+	public:
+		int x , y;
+};
 int main()
 {
 	int x = 5;

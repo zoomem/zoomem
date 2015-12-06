@@ -1,4 +1,3 @@
-<p>wtf</p>
 {% load staticfiles %}
 
 <!DOCTYPE html>
@@ -23,18 +22,18 @@
 
   </head>
   <body>
-    <div id="canvas"></div>
-    Looks ugly? Hit <button id="redraw" onclick="redraw();">redraw</button>!<br>
-
-    <div>
-      {% for item in edges %}
-          <div>
-            <p>
-              {{ item }}
-            </p>
-          <div>
+    <div id="drawArea"></div>
+    <script>
+      var list = [];
+      {% for edge in graph %}
+        var str = "";
+        {% for char in edge %}
+          str += "{{char}}";
+        {% endfor %}
+        list.push(str);
       {% endfor %}
-
-    </div>
+      drawGraph(list);
+    </script>
+    <!--<button id="redraw" onclick="redraw();">redraw</button>-->
   </body>
 </html>
