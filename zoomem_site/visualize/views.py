@@ -5,27 +5,39 @@ import sys
 sys.path.append("/home/tk/git_workplace/zoomem/zoomem_site/visualize/graph_py")
 from gdb_adapter import GdbAdapter
 from graph import gdbGraph
+import random, string
+import os
+import time
 
 # Create your views here.
-def index(request):
-    path = "/home/tk/git_workplace/zoomem/zoomem_site/visualize/graph_py/"
-    g_adapter = GdbAdapter(path + "sample",path + "in.txt")
-    g_adapter.next()
-    g_adapter.next()
-    edges = g_adapter.getGraphEdegs()
-    g_gdb = gdbGraph()
-    g_gdb = g_adapter.bulidGraph(edges)
-    context = {}
-    edges = g_gdb.getGraphEdges()
-    context["edges"] = edges
-    print edges
-    return render(request, 'visualize/index.html',context)
+def index(request,file_name = None):
+    path = "visualize/graph_py/"
+    g_adapter = GdbAdapter(file_name,path + "in.txt")
+    g = g_adapter.bulidGraph(g_adapter.getGraphEdegs())
+    edges = g.getGraphEdges()
+    return render(request, 'visualize/index.html',{"edges":edges})
 
 def home(request):
     return render(request, 'visualize/home.html',{})
 
 def submit(request):
-    print "hey"
     code = request.POST['code']
-    print code
-    return render(request, 'visualize/home.html',{})
+    file_name = createFile(code)
+    time.sleep(0.5)
+    compileFile(file_name)
+    return index(request,file_name)
+
+def randomword(length):
+   return ''.join(random.choice(string.lowercase) for i in range(length))
+
+def createFile(code):
+    file_name = randomword(20)
+    f = open('visualize/static/cpp_files/' + file_name + ".cpp",'w')
+    f.write(code)
+    f.close()
+    return 'visualize/static/cpp_files/' + file_name
+
+def compileFile(file_name):
+    res = os.system("g++ -g -o " + file_name + " " + file_name + ".cpp")
+    if(res != 0):
+        print "error"
