@@ -22,31 +22,19 @@
     <script type="text/javascript" src={% static "graph_vis/js/dracula_algorithms.js" %}></script>
 
     <script type="text/javascript" src={% static "visualize/js/graph_bulider.js" %}></script>
+
     <link href={% static "visualize/css/visualize.css" %} rel="stylesheet" type="text/css">
-
-
   </head>
+
   <body>
-    <div id="drawArea"></div>
-    <script>
-    var ed = []
-    {% for edge in edges %}
-      ed.push([])
-      {% for command in edge %}
-        var s = ""
-        {% for char in command %}
-          s+= "{{char}}"
-        {% endfor %}
-        ed[ed.length-1].push(s)
-      {% endfor %}
-    {% endfor %}
-    drawGraph(ed)
-    </script>
-    <pre><code class="c++">
-    </code></pre>
-
-    <script>hljs.initHighlightingOnLoad();</script>
-
-    <!--<button id="redraw" onclick="redraw();">redraw</button>-->
+      <h2 style="color:#6a778f;">ZooMEM</h2>
+      <form method = "post" action =  "/visualize/submit">{% csrf_token %}
+        <pre>
+          <textarea name = "code" class = "code_area" placeholder="Paste your code here"autofocus></textarea>
+          <span>
+            <input type="submit" value="Submit Code">
+          </span>
+        </pre>
+    </form>
   </body>
 </html>

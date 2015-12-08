@@ -20,3 +20,12 @@ def index(request):
     context["edges"] = edges
     print edges
     return render(request, 'visualize/index.html',context)
+
+def home(request):
+    return render(request, 'visualize/home.html',{})
+
+def submit(request):
+    print "hey"
+    code = request.POST['code']
+    print code
+    return render(request, 'visualize/home.html',{})
