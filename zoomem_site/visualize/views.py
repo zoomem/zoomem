@@ -24,7 +24,10 @@ def submit(request):
     code = request.POST['code']
     file_name = createFile(code)
     time.sleep(0.5)
+
     compileFile(file_name)
+
+
     return index(request,file_name)
 
 def randomword(length):
@@ -40,4 +43,4 @@ def createFile(code):
 def compileFile(file_name):
     res = os.system("g++ -g -o " + file_name + " " + file_name + ".cpp")
     if(res != 0):
-        print "error"
+        raise Exception("Error Compiling file \n")
