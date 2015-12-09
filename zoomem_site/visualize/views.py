@@ -15,7 +15,7 @@ def index(request,file_name = None):
     g_adapter = GdbAdapter(file_name,path + "in.txt")
     g = g_adapter.bulidGraph(g_adapter.getGraphEdegs())
     edges = g.getGraphEdges()
-    return render(request, 'visualize/index.html',{"edges":edges})
+    return render(request, 'visualize/index.html',{"edges":edges,"code":request.POST['code'].strip()})
 
 def home(request):
     return render(request, 'visualize/home.html',{})

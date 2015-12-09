@@ -3,3 +3,9 @@
     height: 400px;
     font-size: 80%;
 }
+
+.highlighted_code {
+  resize:both;
+}
+ .graph_area {
+}

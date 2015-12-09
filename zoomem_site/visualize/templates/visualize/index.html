@@ -25,28 +25,33 @@
     <link href={% static "visualize/css/visualize.css" %} rel="stylesheet" type="text/css">
 
 
-  </head>
+</head>
   <body>
-    <div id="drawArea"></div>
+    <div id="drawArea" class = "graph_area"></div>
     <script>
-    var ed = []
-    {% for edge in edges %}
-      ed.push([])
-      {% for command in edge %}
-        var s = ""
-        {% for char in command %}
-          s+= "{{char}}"
+      var ed = []
+      {% for edge in edges %}
+        ed.push([])
+        {% for command in edge %}
+          var s = ""
+          {% for char in command %}
+            s+= "{{char}}"
+          {% endfor %}
+          ed[ed.length-1].push(s)
         {% endfor %}
-        ed[ed.length-1].push(s)
       {% endfor %}
-    {% endfor %}
-    drawGraph(ed)
+      drawGraph(ed)
     </script>
-    <pre><code class="c++">
-    </code></pre>
 
-    <script>hljs.initHighlightingOnLoad();</script>
+    <div  class = ".highlighted_code">
+      <pre>
+        <code class="c++">
+        {{code}}
+        </code>
+      </pre>
+    </div>
 
-    <!--<button id="redraw" onclick="redraw();">redraw</button>-->
+  <script>hljs.initHighlightingOnLoad();</script>
+
   </body>
 </html>
