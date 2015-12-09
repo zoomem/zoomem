@@ -23,11 +23,7 @@ def home(request):
 def submit(request):
     code = request.POST['code']
     file_name = createFile(code)
-    time.sleep(0.5)
-
     compileFile(file_name)
-
-
     return index(request,file_name)
 
 def randomword(length):
