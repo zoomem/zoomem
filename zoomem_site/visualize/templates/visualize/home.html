@@ -4,38 +4,38 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-
-
     <script type="text/javascript" src={% static "jquery/jquery-1.11.3.min.js" %}></script>
 
-    <link href={% static "highlight/styles/default.css" %} rel="stylesheet">
-    <script type="text/javascript" src={% static "highlight/highlight.pack.js" %}></script>
+    <link href={% static "codemirror/codemirror.css" %} rel="stylesheet">
+    <script type="text/javascript" src={% static "codemirror/codemirror.js" %}></script>
+    <script type="text/javascript" src={% static "codemirror/clike.js" %}></script>
 
     <script type="text/javascript" src={% static "bootstrap/js/bootstrap.min.js" %}></script>
     <link href={% static "bootstrap/css/bootstrap.min.css" %} rel="stylesheet">
 
-    <script type="text/javascript" src={% static "graph_vis/js/raphael-min.js" %}></script>
-    <script type="text/javascript" src={% static "graph_vis/js/dracula_graffle.js" %}></script>
-    <script type="text/javascript" src={% static "graph_vis/js/dracula_graph.js" %}></script>
-    <script type="text/javascript" src={% static "graph_vis/js/dracula_algorithms.js" %}></script>
-
-    <script type="text/javascript" src={% static "visualize/js/graph_bulider.js" %}></script>
 
     <link href={% static "visualize/css/visualize.css" %} rel="stylesheet" type="text/css">
   </head>
 
   <body>
-      <h2 style="color:#6a778f;">ZooMEM</h2>
+      <h1 style="color:#6a778f;">ZoomEM <small>Helping you understand c++ code!</h1>
       <form method = "post" action =  "/visualize/submit">{% csrf_token %}
         <pre>
-          <textarea name = "code" class = "code_area" placeholder="Paste your code here"autofocus></textarea>
-          <span>
-            <input type="submit" value="Submit Code">
-          </span>
+          <span class = "code_area"><textarea id="cpp-code" name = "code"></textarea></span>
+
+          <textarea name = "input" class = "input_area" placeholder="Paste your code input here"autofocus></textarea>
+          <input type="submit" value="Submit"  class="btn btn-default">
         </pre>
     </form>
     <script type="text/javascript" src={% static "visualize/js/visualize.js" %}></script>
+    <script>
+      var cppEditor = CodeMirror.fromTextArea(document.getElementById("cpp-code"), {
+        lineNumbers: true,
+        matchBrackets: true,
+        mode: "text/x-c++src"
+      });
+    </script>
+
+    </script>
   </body>
 </html>
