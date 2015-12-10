@@ -28,6 +28,10 @@
 
 </head>
   <body>
+    <style type="text/css">
+      .CodeMirror { border: 1px solid silver; }
+      .CodeMirror { readonly: true; }
+    </style>
     <div id="drawArea" class = "graph_area"></div>
     <script>
       var ed = []
@@ -45,11 +49,9 @@
     </script>
 
     <div  class = ".highlighted_code">
-      <pre>
-        <code>
-        <textarea readonly id="cpp-code">{{code}}</textarea>
-        </code>
-      </pre>
+      <code>
+      <textarea readonly id="cpp-code">{{code}}</textarea>
+      </code>
     </div>
 
   <script>
@@ -57,7 +59,7 @@
       lineNumbers: true,
       matchBrackets: true,
       mode: "text/x-c++src",
-      readonly :true
+      readOnly: true,
     });
   </script>
   </body>

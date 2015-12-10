@@ -7,8 +7,10 @@
     <script type="text/javascript" src={% static "jquery/jquery-1.11.3.min.js" %}></script>
 
     <link href={% static "codemirror/codemirror.css" %} rel="stylesheet">
+
     <script type="text/javascript" src={% static "codemirror/codemirror.js" %}></script>
     <script type="text/javascript" src={% static "codemirror/clike.js" %}></script>
+    <script type="text/javascript" src={% static "codemirror/placeholder.js" %}></script>
 
     <script type="text/javascript" src={% static "bootstrap/js/bootstrap.min.js" %}></script>
     <link href={% static "bootstrap/css/bootstrap.min.css" %} rel="stylesheet">
@@ -18,18 +20,26 @@
   </head>
 
   <body>
+
+  <style type="text/css">
+    .CodeMirror { border: 1px solid silver; }
+    .CodeMirror-empty.CodeMirror-focused { outline: none; }
+    .CodeMirror pre.CodeMirror-placeholder { color: #999; }
+    .CodeMirror {width:100%}
+    .CodeMirror{ font-size: 80%};
+  </style>
+
       <h1 style="color:#6a778f;">ZoomEM <small>Helping you understand c++ code!</h1>
       <form method = "post" action =  "/visualize/submit">{% csrf_token %}
         <pre>
-          <span class = "code_area"><textarea id="cpp-code" name = "code"></textarea></span>
-
+          <textarea id="code" name="code" placeholder="Paste your code here"></textarea>
           <textarea name = "input" class = "input_area" placeholder="Paste your code input here"autofocus></textarea>
           <input type="submit" value="Submit"  class="btn btn-default">
         </pre>
     </form>
     <script type="text/javascript" src={% static "visualize/js/visualize.js" %}></script>
     <script>
-      var cppEditor = CodeMirror.fromTextArea(document.getElementById("cpp-code"), {
+      var cppEditor = CodeMirror.fromTextArea(document.getElementById("code"), {
         lineNumbers: true,
         matchBrackets: true,
         mode: "text/x-c++src"
