@@ -9,12 +9,18 @@ import random, string
 import os
 import time
 
+g_adapter = None
+
 # Create your views here.
 def index(request,code_file_name = None,input_file_name = None):
-    g_adapter = GdbAdapter(code_file_name,input_file_name)
+    global g_adapter
+    if g_adapter == None:
+        g_adapter = GdbAdapter(code_file_name,input_file_name)
+        request.session["code"] = request.POST['code'].strip()
+
     g = g_adapter.bulidGraph(g_adapter.getGraphEdegs())
     edges = g.getGraphEdges()
-    return render(request, 'visualize/index.html',{"edges":edges,"code":request.POST['code'].strip()})
+    return render(request, 'visualize/index.html',{"edges":edges,"code":request.session["code"]})
 
 def home(request):
     return render(request, 'visualize/home.html',{})
@@ -22,12 +28,18 @@ def home(request):
 def submit(request):
     code = request.POST['code']
     inpt = request.POST['input']
+    global g_adapter
+    g_adapter = None
+
     code_file_name = createFile(code,".cpp")
     input_file_name = createFile(inpt,".txt") + ".txt"
-    print code_file_name , input_file_name
-
     compileFile(code_file_name)
     return index(request,code_file_name,input_file_name)
+
+def next(request):
+    g_adapter.next()
+    print g_adapter.getGraphEdegs()
+    return index(request)
 
 def randomword(length):
    return ''.join(random.choice(string.lowercase) for i in range(length))
