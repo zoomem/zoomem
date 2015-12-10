@@ -17,13 +17,15 @@ def getFunctionsNames(file_name):
 
 class GdbAdapter:
 
-    def __init__(self,file_name,input_file_name):
-        self.gdb_process = nbsr_process("gdb " + file_name + " -q")
-        defined_functions = getFunctionsNames(file_name + ".cpp")
+    def __init__(self,code_file_name,input_file_name,output_file_name):
+        self.gdb_process = nbsr_process("gdb " + code_file_name + " -q")
+        self.output_file_name = output_file_name
+
+        defined_functions = getFunctionsNames(code_file_name + ".cpp")
         for function in defined_functions:
             self.gdb_process.write("b " + function)
 
-        self.gdb_process.write("run < " + input_file_name)
+        self.gdb_process.write("run < " + input_file_name + "> " + output_file_name)
         self.gdb_process.write("target record-full")
         self.gdb_process.clean()
 
@@ -35,6 +37,11 @@ class GdbAdapter:
         self.gdb_process.write("reverse-next")
         self.gdb_process.clean()
 
+    def readOutput(self):
+        content = ""
+        with open(self.output_file_name, 'r') as content_file:
+            content = content_file.read()
+        return content
 
     def getGraphEdegs(self,var_name = ""):
         self.gdb_process.write("python bulidGraph(" + var_name + ")")

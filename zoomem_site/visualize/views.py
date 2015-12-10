@@ -9,36 +9,35 @@ import random, string
 import os
 import time
 
-g_adapter = None
+gdb_adapters = {}
 
 # Create your views here.
-def index(request,code_file_name = None,input_file_name = None):
-    global g_adapter
-    if g_adapter == None:
-        g_adapter = GdbAdapter(code_file_name,input_file_name)
-        request.session["code"] = request.POST['code'].strip()
-
+def index(request):
+    g_adapter = gdb_adapters[request.session.session_key]
     g = g_adapter.bulidGraph(g_adapter.getGraphEdegs())
     edges = g.getGraphEdges()
-    return render(request, 'visualize/index.html',{"edges":edges,"code":request.session["code"]})
+    return render(request, 'visualize/index.html',{"edges":edges,"code":request.session["code"],"output":request.session["output"]})
 
 def home(request):
     return render(request, 'visualize/home.html',{})
 
 def submit(request):
-    code = request.POST['code']
-    inpt = request.POST['input']
-    global g_adapter
-    g_adapter = None
-
-    code_file_name = createFile(code,".cpp")
-    input_file_name = createFile(inpt,".txt") + ".txt"
-    compileFile(code_file_name)
-    return index(request,code_file_name,input_file_name)
+    global gdb_adapters
+    gdb_adapters[request.session.session_key] = createNewGdbAdapter(request.POST['code'], request.POST['input'])
+    request.session["code"] = request.POST['code']
+    request.session["output"] = ""
+    return index(request)
 
 def next(request):
-    g_adapter.next()
-    print g_adapter.getGraphEdegs()
+    gdb_adapters[request.session.session_key].next()
+    request.session["output"] = gdb_adapters[request.session.session_key].readOutput()
+    print request.session["output"]
+    return index(request)
+
+def prev(request):
+    gdb_adapters[request.session.session_key].prev()
+    request.session["output"] = gdb_adapters[request.session.session_key].readOutput()
+    print request.session["output"]
     return index(request)
 
 def randomword(length):
@@ -46,12 +45,20 @@ def randomword(length):
 
 def createFile(txt,exten):
     file_name = randomword(20)
-    f = open('visualize/static/cpp_files/' + file_name + exten,'w')
-    f.write(txt)
-    f.close()
+    if exten != "":
+        f = open('visualize/static/cpp_files/' + file_name + exten,'w')
+        f.write(txt)
+        f.close()
     return 'visualize/static/cpp_files/' + file_name
 
 def compileFile(file_name):
     res = os.system("g++ -g -o " + file_name + " " + file_name + ".cpp")
     if(res != 0):
         raise Exception("Error Compiling file \n")
+
+def createNewGdbAdapter(code,inpt):
+    code_file_name = createFile(code,".cpp")
+    input_file_name = createFile(inpt,".txt") + ".txt"
+    output_file_name = createFile("",".txt") + ".txt"
+    compileFile(code_file_name)
+    return GdbAdapter(code_file_name,input_file_name,output_file_name)

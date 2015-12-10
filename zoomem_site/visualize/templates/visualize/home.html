@@ -17,23 +17,22 @@
 
 
     <link href={% static "visualize/css/visualize.css" %} rel="stylesheet" type="text/css">
+
+    <style type="text/css">
+      .CodeMirror { border: 1px solid silver; }
+      .CodeMirror-empty.CodeMirror-focused { outline: none; }
+      .CodeMirror pre.CodeMirror-placeholder { color: #999; }
+      .CodeMirror {width:100%}
+      .CodeMirror{ font-size: 80%};
+    </style>
   </head>
 
   <body>
-
-  <style type="text/css">
-    .CodeMirror { border: 1px solid silver; }
-    .CodeMirror-empty.CodeMirror-focused { outline: none; }
-    .CodeMirror pre.CodeMirror-placeholder { color: #999; }
-    .CodeMirror {width:100%}
-    .CodeMirror{ font-size: 80%};
-  </style>
-
       <h1 style="color:#6a778f;">ZoomEM <small>Helping you understand c++ code!</h1>
       <form method = "post" action =  "/visualize/submit">{% csrf_token %}
         <pre>
           <textarea id="code" name="code" placeholder="Paste your code here"></textarea>
-          <textarea name = "input" class = "input_area" placeholder="Paste your code input here"autofocus></textarea>
+          <textarea name = "input" class = "input_area" placeholder="Paste your code input here"></textarea>
           <input type="submit" value="Submit"  class="btn btn-default">
         </pre>
     </form>

@@ -13,6 +13,7 @@
     <link href={% static "codemirror/codemirror.css" %} rel="stylesheet">
     <script type="text/javascript" src={% static "codemirror/codemirror.js" %}></script>
     <script type="text/javascript" src={% static "codemirror/clike.js" %}></script
+    <script type="text/javascript" src={% static "codemirror/placeholder.js" %}></script>
 
     <script type="text/javascript" src={% static "bootstrap/js/bootstrap.min.js" %}></script>
     <link href={% static "bootstrap/css/bootstrap.min.css" %} rel="stylesheet">
@@ -25,13 +26,15 @@
     <script type="text/javascript" src={% static "visualize/js/graph_bulider.js" %}></script>
     <link href={% static "visualize/css/visualize.css" %} rel="stylesheet" type="text/css">
 
-
-</head>
-  <body>
     <style type="text/css">
       .CodeMirror { border: 1px solid silver; }
-      .CodeMirror { readonly: true; }
+      .CodeMirror {width:50%}
+      .CodeMirror {float:left}
+      .CodeMirror pre.CodeMirror-placeholder { color: #999; }
     </style>
+</head>
+  <body>
+
     <div id="drawArea" class = "graph_area"></div>
     <script>
       var ed = []
@@ -49,9 +52,9 @@
     </script>
 
     <div  class = ".highlighted_code">
-      <code>
       <textarea readonly id="cpp-code">{{code}}</textarea>
-      </code>
+      <textarea class ="output" placeholder="code output goes here">{{output}}</textarea>
+
     </div>
 
   <script>
