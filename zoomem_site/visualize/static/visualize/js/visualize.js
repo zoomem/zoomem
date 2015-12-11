@@ -1,15 +1,34 @@
-$(".code_area").keydown(function(e) {
-    if(e.keyCode === 9) { // tab was pressed
-        var start = this.selectionStart;
-        var end = this.selectionEnd;
+$("#next").on("click", function() {
+  $.ajax({
+    url: "/visualize/next",
+    context: document.body,
+     success: function(data) {
+       $(document.body).html(data);
+     }
+   })
+});
 
-        var $this = $(this);
-        var value = $this.val();
-        $this.val(value.substring(0, start)
-                    + "\t"
-                    + value.substring(end));
+$("#prev").on("click", function() {
+  $.ajax({
+    url: "/visualize/prev",
+    context: document.body,
+     success: function(data) {
+       $(document.body).html(data);
+     }
+   })
+});
 
-        this.selectionStart = this.selectionEnd = start + 1;
-        e.preventDefault();
-    }
+$("#first").on("click", function() {
+  alert("pressed");
+});
+
+$("#last").on("click", function() {
+  alert("pressed");
+});
+
+var cppEditor = CodeMirror.fromTextArea(document.getElementById("cpp-code"), {
+  lineNumbers: true,
+  matchBrackets: true,
+  mode: "text/x-c++src",
+  readOnly: true
 });

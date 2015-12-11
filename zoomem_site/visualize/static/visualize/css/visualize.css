@@ -23,3 +23,9 @@
   height:300px;
   width: 50%
 }
+
+#drawArea {
+   border: solid white 5px;
+   overflow: scroll;
+   height: 500px;
+}
