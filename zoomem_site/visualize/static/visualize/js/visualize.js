@@ -19,7 +19,13 @@ $("#prev").on("click", function() {
 });
 
 $("#first").on("click", function() {
-  alert("pressed");
+  $.ajax({
+    url: "/visualize/first",
+    context: document.body,
+     success: function(data) {
+       $(document.body).html(data);
+     }
+   })
 });
 
 $("#last").on("click", function() {

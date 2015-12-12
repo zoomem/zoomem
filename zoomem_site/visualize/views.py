@@ -17,7 +17,6 @@ def index(request):
     context  = {}
     context["edges"] = getEdges(gdb_adapters[request.session.session_key])
     context["line_num"] = gdb_adapters[request.session.session_key].getCurrnetLine()
-    print gdb_adapters[request.session.session_key].getCurrnetLine()
     context["code"] = request.session["code"]
     context["output"] = request.session["output"]
 
@@ -30,6 +29,12 @@ def submit(request):
     global gdb_adapters
     gdb_adapters[request.session.session_key] = createNewGdbAdapter(request.POST['code'], request.POST['input'])
     request.session["code"] = request.POST['code']
+    request.session["input"] = request.POST['input']
+    request.session["output"] = ""
+    return index(request)
+
+def first(request):
+    gdb_adapters[request.session.session_key] = createNewGdbAdapter(request.session["code"],request.session["input"])
     request.session["output"] = ""
     return index(request)
 
