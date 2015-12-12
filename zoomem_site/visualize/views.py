@@ -14,8 +14,14 @@ gdb_adapters = {}
 
 # Create your views here.
 def index(request):
-    edges = mark_safe(getEdges(gdb_adapters[request.session.session_key]))
-    return render(request, 'visualize/index.html',{"edges":edges,"code":request.session["code"],"output":request.session["output"]})
+    context  = {}
+    context["edges"] = getEdges(gdb_adapters[request.session.session_key])
+    context["line_num"] = gdb_adapters[request.session.session_key].getCurrnetLine()
+    print gdb_adapters[request.session.session_key].getCurrnetLine()
+    context["code"] = request.session["code"]
+    context["output"] = request.session["output"]
+
+    return render(request, 'visualize/index.html',context)
 
 def home(request):
     return render(request, 'visualize/home.html',{})

@@ -23,7 +23,7 @@ class node(object):
             command.append(child_node.address)
             command.append(child_node.type)
             command.append(child_node.size)
-            command.append(child_node.value)
+            command.append(str(child_node.value))
             command.append(flags[int(child_node.flag)])
             edges.append(command)
             if not child_node.id in vs :

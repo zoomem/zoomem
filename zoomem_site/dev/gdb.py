@@ -94,6 +94,11 @@ def addVarNameToDic(var_name):
 def executeGdbCommand(command):
     return (gdb.execute(command,True,True)).strip()
 
+def getCrrentLine():
+    line = executeGdbCommand("frame").split("\n")[1].split()[0]
+    print(line)
+    print ("done")
+
 def bulidGraph(var_name = ""):
     start_time = time.time();
     executeGdbCommand("set print pretty on")

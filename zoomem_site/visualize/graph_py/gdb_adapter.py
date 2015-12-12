@@ -47,6 +47,10 @@ class GdbAdapter:
         self.gdb_process.write("python bulidGraph(" + var_name + ")")
         return self.gdb_process.readTill("done")
 
+    def getCurrnetLine(self):
+        self.gdb_process.write("python getCrrentLine()")
+        return int(self.gdb_process.readTill("done")[0])
+
     def bulidGraph(self, edges):
         g = gdbGraph()
         for edge in edges:

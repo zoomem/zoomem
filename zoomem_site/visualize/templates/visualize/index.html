@@ -26,34 +26,35 @@
     <script type="text/javascript" src={% static "visualize/js/graph_bulider.js" %}></script>
 
     <link href={% static "visualize/css/visualize.css" %} rel="stylesheet" type="text/css">
-
     <style type="text/css">
       .CodeMirror { border: 1px solid silver; }
       .CodeMirror {width:50%}
       .CodeMirror {float:left}
       .CodeMirror pre.CodeMirror-placeholder { color: #999; }
     </style>
-</head>
+  </head>
+
   <body>
     <div id="drawArea" class = "graph_area"></div>
-    <script>
-      drawGraph({{edges}})
-    </script>
+      <script>
+        drawGraph({{edges|safe}})
+      </script>
+    </div>
 
     <div style="margin:1%">
       <div class="btn-group btn-group-justified" role="group" aria-label="...">
-      <div class="btn-group" role="group">
-        <button type="button" class="btn btn-default" id = "first">First</button>
-      </div>
-      <div class="btn-group" role="group">
-        <button type="button" class="btn btn-default" id = "next">Next</button>
-      </div>
-      <div class="btn-group" role="group">
-        <button type="button" class="btn btn-default" id = "prev">Prev</button>
-      </div>
-      <div class="btn-group" role="group">
-        <button type="button" class="btn btn-default" id = "last">Last</button>
-      </div>
+        <div class="btn-group" role="group">
+          <button type="button" class="btn btn-default" id = "first">First</button>
+        </div>
+        <div class="btn-group" role="group">
+          <button type="button" class="btn btn-default" id = "next">Next</button>
+        </div>
+        <div class="btn-group" role="group">
+          <button type="button" class="btn btn-default" id = "prev">Prev</button>
+        </div>
+        <div class="btn-group" role="group">
+          <button type="button" class="btn btn-default" id = "last">Last</button>
+        </div>
       </div>
     </div>
 
@@ -63,6 +64,9 @@
     </div>
 
   <script type="text/javascript" src={% static "visualize/js/visualize.js" %}></script>
+  <script>
+    highlightLine({{line_num}})
+  </script>
 
   </body>
 </html>

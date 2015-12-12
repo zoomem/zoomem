@@ -41,4 +41,4 @@ class nbsr_process:
         self.proc.stdin.write(command.encode())
 
     def clean(self):
-        self.read()
+        return self.read()
