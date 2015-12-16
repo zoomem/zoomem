@@ -48,6 +48,11 @@ def prev(request):
     request.session["output"] = gdb_adapters[request.session.session_key].readOutput()
     return index(request)
 
+def go_to(request):
+    line =  request.GET["line"]
+    gdb_adapters[request.session.session_key].goToLine(line)
+    return index(request)
+
 def randomword(length):
    return ''.join(random.choice(string.lowercase) for i in range(length))
 

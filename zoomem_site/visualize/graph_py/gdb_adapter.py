@@ -43,6 +43,11 @@ class GdbAdapter:
             content = content_file.read()
         return content
 
+    def goToLine(self,line):
+        self.gdb_process.write("until " + line)
+        print (self.gdb_process.clean())
+
+
     def getGraphEdegs(self,var_name = ""):
         self.gdb_process.write("python bulidGraph(" + var_name + ")")
         return self.gdb_process.readTill("done")

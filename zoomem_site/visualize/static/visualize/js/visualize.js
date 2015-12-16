@@ -28,6 +28,19 @@ $("#first").on("click", function() {
    })
 });
 
+$("#go_to").on("click", function() {
+  var number = $('#go_to_inpt');
+  var data = 'line=' + number.val();
+  $.ajax({
+    url: "/visualize/go_to",
+    data:data,
+    context: document.body,
+     success: function(data) {
+       $(document.body).html(data);
+     }
+   })
+});
+
 $("#last").on("click", function() {
   alert("pressed");
 });
