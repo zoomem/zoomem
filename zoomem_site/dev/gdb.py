@@ -37,6 +37,8 @@ def getNumberOfArrayElements(var_name):
 def getLocalVariablesName():
     var_names = []
     info_local_lines = (executeGdbCommand("info locals")).split("\n")
+    if info_local_lines[0] == "No locals.":
+        return []
     full_var_value = ""
     rem = 0
     for i in range(0,len(info_local_lines)):

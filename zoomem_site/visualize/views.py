@@ -18,7 +18,7 @@ def index(request):
     context["edges"] = getEdges(gdb_adapters[request.session.session_key])
     context["line_num"] = gdb_adapters[request.session.session_key].getCurrnetLine()
     context["code"] = request.session["code"]
-    context["output"] = request.session["output"]
+    context["output"] = gdb_adapters[request.session.session_key].readOutput()
 
     return render(request, 'visualize/index.html',context)
 
@@ -30,27 +30,22 @@ def submit(request):
     gdb_adapters[request.session.session_key] = createNewGdbAdapter(request.POST['code'], request.POST['input'])
     request.session["code"] = request.POST['code']
     request.session["input"] = request.POST['input']
-    request.session["output"] = ""
     return index(request)
 
 def first(request):
     gdb_adapters[request.session.session_key] = createNewGdbAdapter(request.session["code"],request.session["input"])
-    request.session["output"] = ""
     return index(request)
 
 def next(request):
     gdb_adapters[request.session.session_key].next()
-    request.session["output"] = gdb_adapters[request.session.session_key].readOutput()
     return index(request)
 
 def prev(request):
     gdb_adapters[request.session.session_key].prev()
-    request.session["output"] = gdb_adapters[request.session.session_key].readOutput()
     return index(request)
 
 def go_to(request):
-    line =  request.GET["line"]
-    gdb_adapters[request.session.session_key].goToLine(line)
+    gdb_adapters[request.session.session_key].goToLine(request.GET["line"])
     return index(request)
 
 def randomword(length):
@@ -65,7 +60,7 @@ def createFile(txt,exten):
     return 'visualize/static/cpp_files/' + file_name
 
 def compileFile(file_name):
-    res = os.system("g++ -g -o " + file_name + " " + file_name + ".cpp")
+    res = os.system("g++ -g -O0 -o " + file_name + " " + file_name + ".cpp")
     if(res != 0):
         raise Exception("Error Compiling file \n")
 
