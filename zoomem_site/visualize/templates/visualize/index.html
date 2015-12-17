@@ -28,7 +28,7 @@
     <link href={% static "visualize/css/visualize.css" %} rel="stylesheet" type="text/css">
     <style type="text/css">
       .CodeMirror { border: 1px solid silver; }
-      .CodeMirror {width:50%}
+      .CodeMirror {width:49.5%}
       .CodeMirror {float:left}
       .CodeMirror pre.CodeMirror-placeholder { color: #999; }
     </style>
@@ -41,7 +41,6 @@
       </script>
   </div>
   <div style="margin:1%;margin-bottom:5%">
-
     <div>
       <div class="col-lg-6">
         <div class="btn-group btn-group-justified" role="group" aria-label="...">
@@ -58,7 +57,6 @@
       </div>
     </div>
     <div>
-
       <div class="col-lg-6">
         <div class="input-group">
           <input type="text" class="form-control" placeholder="Enter line number here..." id="go_to_inpt">
@@ -71,10 +69,10 @@
   </div>
 
     <div  class = ".highlighted_code">
-      <textarea readonly id="cpp-code">{{code}}</textarea>
+      <textarea id="cpp-code">{{code}}</textarea>
+      <textarea readonly class ="output" placeholder="code output goes here">{{output}}</textarea>
+   </div>
 
-      <textarea class ="output" placeholder="code output goes here">{{output}}</textarea>
-    </div>
 
   <script type="text/javascript" src={% static "visualize/js/visualize.js" %}></script>
   <script>

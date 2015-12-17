@@ -4,9 +4,6 @@
     font-size: 80%;
 }
 
-.highlighted_code {
-  resize:both;
-}
  .graph_area {
 }
 
@@ -21,7 +18,8 @@
 }
 .output {
   height:300px;
-  width: 50%
+  width: 49.5%;
+  float:right;
 }
 
 #drawArea {
