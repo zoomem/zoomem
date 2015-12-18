@@ -12,6 +12,8 @@ ARRAY_FLAG = '2'
 OBJECT_FLAG = '3'
 PRIMITIVE_FLAG = '4'
 
+visted_list = {}
+
 def getVarAddress(var_name):
     var_address = executeGdbCommand("p &" + var_name)
     return var_address[var_address.rfind(" ") + 1:].strip()
@@ -110,6 +112,8 @@ def bulidGraph(var_name = ""):
             analyseVar(var_name,var_name,True)
     else:
         analyseVar(var_name,var_name,True,"",True)
+    global visted_list
+    visted_list = {}
     print("done")
 
 def analyseVar(var_short_name,var_name,root_var = False,Type = "",depth = False):
@@ -123,9 +127,19 @@ def analyseVar(var_short_name,var_name,root_var = False,Type = "",depth = False)
     elif isAObject(var_type):
         parseObjectVar(var_short_name,var_name,root_var)
 
+def check_node(var_name):
+    var_address = getVarAddress(var_name)
+    var_type = getVarType(var_name)
+    if (var_address + "_" + var_type) in visted_list:
+        return True
+    else:
+        visted_list[var_address + "_" + var_type] = True
+        return False
+
 def parseArrayVar(var_short_name,var_name,root_var,depth):
     addVarCommand(var_short_name,var_name,ARRAY_FLAG)
     if root_var: addChildCommand("$root",var_name)
+
     prev_node = var_name
     child_type = getVarType(var_name + "[0]")
     if depth == True:
@@ -137,6 +151,8 @@ def parseArrayVar(var_short_name,var_name,root_var,depth):
 def parsePointerVar(var_short_name,var_name,root_var):
     addVarCommand(var_short_name,var_name,POINTER_FLAG)
     if root_var : addChildCommand("$root",var_name)
+    if check_node(var_name):
+        return
     child_var_name = "(*" + var_name+ ")"
     try:
         analyseVar("DA",child_var_name)

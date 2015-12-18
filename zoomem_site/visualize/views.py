@@ -32,20 +32,19 @@ def submit(request):
     request.session["input"] = request.POST['input']
     return index(request)
 
-def first(request):
-    gdb_adapters[request.session.session_key] = createNewGdbAdapter(request.session["code"],request.session["input"])
-    return index(request)
 
 def next(request):
-    gdb_adapters[request.session.session_key].next()
+    step =  request.GET["step"]
+    if(step == ""):
+        step = 1
+    gdb_adapters[request.session.session_key].next(step)
     return index(request)
 
 def prev(request):
-    gdb_adapters[request.session.session_key].prev()
-    return index(request)
-
-def go_to(request):
-    gdb_adapters[request.session.session_key].goToLine(request.GET["line"])
+    step =  request.GET["step"]
+    if(step == ""):
+        step = 1
+    gdb_adapters[request.session.session_key].prev(step)
     return index(request)
 
 def randomword(length):

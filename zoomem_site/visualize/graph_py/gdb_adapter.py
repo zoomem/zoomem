@@ -29,12 +29,12 @@ class GdbAdapter:
         self.gdb_process.write("target record-full")
         self.gdb_process.clean()
 
-    def next(self):
-        self.gdb_process.write("n")
+    def next(self,number = 1):
+        self.gdb_process.write("n " + str(number))
         self.gdb_process.clean()
 
-    def prev(self):
-        self.gdb_process.write("reverse-next")
+    def prev(self,number = 1):
+        self.gdb_process.write("rn " + str(number))
         self.gdb_process.clean()
 
     def readOutput(self):

@@ -1,38 +1,8 @@
 $("#next").on("click", function() {
+  var number = $('#step');
+  var data = 'step=' + number.val();
   $.ajax({
     url: "/visualize/next",
-    context: document.body,
-     success: function(data) {
-       $(document.body).html(data);
-     }
-   })
-});
-
-$("#prev").on("click", function() {
-  $.ajax({
-    url: "/visualize/prev",
-    context: document.body,
-     success: function(data) {
-       $(document.body).html(data);
-     }
-   })
-});
-
-$("#first").on("click", function() {
-  $.ajax({
-    url: "/visualize/first",
-    context: document.body,
-     success: function(data) {
-       $(document.body).html(data);
-     }
-   })
-});
-
-$("#go_to").on("click", function() {
-  var number = $('#go_to_inpt');
-  var data = 'line=' + number.val();
-  $.ajax({
-    url: "/visualize/go_to",
     data:data,
     context: document.body,
      success: function(data) {
@@ -41,8 +11,18 @@ $("#go_to").on("click", function() {
    })
 });
 
-$("#last").on("click", function() {
-  alert("pressed");
+$("#prev").on("click", function() {
+  var number = $('#step');
+  var data = 'step=' + number.val();
+
+  $.ajax({
+    url: "/visualize/prev",
+    data:data,
+    context: document.body,
+     success: function(data) {
+       $(document.body).html(data);
+     }
+   })
 });
 
 var cppEditor = CodeMirror.fromTextArea(document.getElementById("cpp-code"), {
