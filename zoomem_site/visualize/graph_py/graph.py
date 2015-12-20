@@ -71,9 +71,13 @@ class gdbGraph:
             self.node_hash[ident].name = name
 
     def addChildren(self,parent_address, parent_type, child_address, child_type, name):
-        child = self.node_hash[child_address + "_" + child_type];
-        parent = self.node_hash[parent_address + "_" + parent_type];
-        parent.children.append(Edge(name,child));
+        try:
+            child = self.node_hash[child_address + "_" + child_type];
+            parent = self.node_hash[parent_address + "_" + parent_type];
+            parent.children.append(Edge(name,child));
+        except Exception:
+            print "erorrrrrrrr",name
+
 
     def getGraphEdges(self):
         edges = []
