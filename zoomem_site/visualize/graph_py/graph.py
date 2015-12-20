@@ -53,9 +53,10 @@ class Edge:
         self.to = to
 
 class gdbGraph:
+
     def __init__(self):
         self.root = node("$root", "$root" ,"$root" , "$root" ,"$root",1,"$root")
-        self.id_cnt = 2
+        self.id_cnt = 1
         self.node_hash = {}
         self.node_hash["$root_$root"] = self.root
 
@@ -65,6 +66,7 @@ class gdbGraph:
             self.node_hash[ident] = node(address,typ,value,size,flag,self.id_cnt,name);
             self.id_cnt+= 1
             return self.node_hash[ident];
+
         elif self.node_hash[ident].name == "DA":
             self.node_hash[ident].name = name
 

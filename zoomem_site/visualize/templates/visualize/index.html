@@ -37,7 +37,7 @@
   <body>
     <div id="drawArea" class = "graph_area"></div>
       <script>
-        drawGraph({{edges|safe}})
+        drawGraph({{edges|safe}},{{cnt}} * 60)
       </script>
   </div>
 
@@ -46,11 +46,11 @@
       <div class="col-lg-6">
         <div class="input-group">
           <span class="input-group-btn">
-            <button class="btn btn-default" type="button" id = "next">Next</button>
+            <button class="btn btn-default" type="button" id = "prev">Prev</button>
           </span>
           <input type="text" class="form-control" id = "step" placeholder="Number of steps goes here default is 1">
           <span class="input-group-btn">
-            <button class="btn btn-default" type="button" id = "prev">Prev</button>
+            <button class="btn btn-default" type="button" id = "next">Next</button>
           </span>
         </div><!-- /input-group -->
       </div><!-- /.col-lg-6 -->

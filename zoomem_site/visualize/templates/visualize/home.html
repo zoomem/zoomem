@@ -31,7 +31,14 @@
       <h1 style="color:#6a778f;">ZoomEM <small>Helping you understand c++ code!</h1>
       <form method = "post" action =  "/visualize/submit">{% csrf_token %}
         <pre>
-          <textarea id="code" name="code" placeholder="Paste your code here"></textarea>
+          <textarea id="code" name="code" placeholder="Paste your code here">
+#include <iostream>
+using namespace std;
+int main()
+{
+  return 0;
+}
+        </textarea>
           <textarea name = "input" class = "input_area" placeholder="Paste your code input here"></textarea>
           <input type="submit" value="Submit"  class="btn btn-default">
         </pre>

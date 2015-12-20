@@ -15,7 +15,10 @@ gdb_adapters = {}
 # Create your views here.
 def index(request):
     context  = {}
-    context["edges"] = getEdges(gdb_adapters[request.session.session_key])
+    g_data =  getEdges(gdb_adapters[request.session.session_key])
+    context["edges"] = g_data["edges"]
+    context["cnt"] = g_data["cnt"]
+
     context["line_num"] = gdb_adapters[request.session.session_key].getCurrnetLine()
     context["code"] = request.session["code"]
     context["output"] = gdb_adapters[request.session.session_key].readOutput()
@@ -99,4 +102,7 @@ def createNewGdbAdapter(code,inpt):
 
 def getEdges(g_adapter):
     g = g_adapter.bulidGraph(g_adapter.getGraphEdegs())
-    return g.getGraphEdges()
+    data = {}
+    data["edges"] = g.getGraphEdges()
+    data["cnt"] = g.id_cnt
+    return data
