@@ -1,7 +1,28 @@
 import re
 from graph import gdbGraph
 from proc import nbsr_process
+<<<<<<< HEAD
 import subprocess
+=======
+import commands
+
+def getStr(Str,idx):
+    res = ""
+    cnt = 0
+    goig = False
+    for char in Str:
+        if char == ' ':
+            if not going:
+                if cnt == idx:
+                    return res
+                cnt = cnt + 1
+                going = True
+                res = ""
+        else:
+            res+=char
+            going = False
+    return res
+>>>>>>> Fixed code does not go to class functions
 
 def loadTxt(file_name):
     "Load text file into a string. I let FILE exceptions to pass."
@@ -11,10 +32,13 @@ def loadTxt(file_name):
     return txt
 
 def getFunctionsNames(file_name):
-    rproc = r"((?<=[\s:~])(\w+)\s*\(([\w\s,<>\[\].=&':/*]*?)\)\s*(const)?\s*(?={))"
-    code = loadTxt(file_name)
-    cppwords = ['if', 'while', 'do', 'for', 'switch']
-    return [i[1] for i in re.findall(rproc, code)]
+    lst = (commands.getstatusoutput('ctags --c++-kinds=f -x ' + file_name))
+    lst = lst[1]
+    lst =  lst.split("\n")
+    functions = []
+    for out in lst:
+        functions.append(getStr(out,2))
+    return functions
 
 def getVariablesDef(txt):
     lines = []
@@ -90,6 +114,7 @@ class GdbAdapter:
         p = subprocess.Popen(['clang-3.5', '-Xclang' , '-ast-dump' ,'-fsyntax-only',
          code_file_name +"_parsing.cpp"],
          stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+
         out, err = p.communicate()
         self.vars_def_list = getVariablesDef(out)
 
