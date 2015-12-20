@@ -1,9 +1,7 @@
 import re
 from graph import gdbGraph
 from proc import nbsr_process
-<<<<<<< HEAD
 import subprocess
-=======
 import commands
 
 def getStr(Str,idx):
@@ -22,7 +20,6 @@ def getStr(Str,idx):
             res+=char
             going = False
     return res
->>>>>>> Fixed code does not go to class functions
 
 def loadTxt(file_name):
     "Load text file into a string. I let FILE exceptions to pass."
