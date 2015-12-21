@@ -15,7 +15,10 @@ gdb_adapters = {}
 # Create your views here.
 def index(request):
     context  = {}
-    context["edges"] = getEdges(gdb_adapters[request.session.session_key])
+    g_data =  getEdges(gdb_adapters[request.session.session_key])
+    context["edges"] = g_data["edges"]
+    context["cnt"] = g_data["cnt"]
+
     context["line_num"] = gdb_adapters[request.session.session_key].getCurrnetLine()
     context["code"] = request.session["code"]
     context["output"] = gdb_adapters[request.session.session_key].readOutput()
@@ -32,6 +35,26 @@ def submit(request):
     request.session["input"] = request.POST['input']
     return index(request)
 
+def reorder(txt):
+    code = []
+    non_include = 0
+    lines = []
+    line = ""
+    for char in txt:
+        line += char
+        if char == '\n':
+            lines.append(line)
+            line = ""
+
+    for line in lines:
+        if len(line.strip()) >= 8 and line.strip()[0:8] == "#include" and non_include == 0:
+            code.append(line)
+        else:
+            if non_include == 0:
+                non_include = 1
+                code.append("using namespace std;\n")
+            code.append(line)
+    return code
 
 def next(request):
     step =  request.GET["step"]
@@ -56,6 +79,13 @@ def createFile(txt,exten):
         f = open('visualize/static/cpp_files/' + file_name + exten,'w')
         f.write(txt)
         f.close()
+        # _parsing file to be used to get the line for each var declartion
+        if exten == ".cpp":
+            f = open('visualize/static/cpp_files/' + file_name +"_parsing"+ exten,'w')
+            new_code = reorder(txt)
+            for line in new_code:
+                f.write(line)
+            f.close()
     return 'visualize/static/cpp_files/' + file_name
 
 def compileFile(file_name):
@@ -72,4 +102,7 @@ def createNewGdbAdapter(code,inpt):
 
 def getEdges(g_adapter):
     g = g_adapter.bulidGraph(g_adapter.getGraphEdegs())
-    return g.getGraphEdges()
+    data = {}
+    data["edges"] = g.getGraphEdges()
+    data["cnt"] = g.id_cnt
+    return data

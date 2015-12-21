@@ -1,10 +1,8 @@
 var redraw;
-function drawGraph(edges) {
+function drawGraph(edges,width) {
+  
     $("#drawArea").empty();
-    var width = $(document).width();
-    var height = $(document).height() - 100;
-    width /= 1.5;
-    height /= 1;
+    var height = width;
     var render = function(r, n) {
             var set = r.set().push(
                 r.rect(n.point[0]-30, n.point[1]-13, 60, 60).attr({ })).push(

@@ -97,15 +97,28 @@ def addVarNameToDic(var_name):
 
 def executeGdbCommand(command):
     return (gdb.execute(command,True,True)).strip()
-
+line_number = 0
+def getLineNumber():
+    global line_number
+    line_number = executeGdbCommand("frame").split("\n")[1].split()[0]
 def getCrrentLine():
     line = executeGdbCommand("frame").split("\n")[1].split()[0]
     print(line)
     print ("done")
-
-def bulidGraph(var_name = ""):
+vars_def = {}
+def bulidGraph(vars_def_list = "" , var_name = "" ):
     start_time = time.time();
     executeGdbCommand("set print pretty on")
+    global vars_def
+    vars_def = {}
+    if len(vars_def_list) > 0:
+        vars_def_list = vars_def_list.split("-")
+        for defin in vars_def_list:
+            var = defin.split(" ")
+            if not var[0] in vars_def:
+                vars_def[var[0]] = []
+            vars_def[var[0]].append(var[1] + " " +  var[2] + " " + var[3])
+    getLineNumber()
     if var_name == "":
         var_names = getLocalVariablesName()
         for var_name in var_names:
@@ -117,6 +130,20 @@ def bulidGraph(var_name = ""):
     print("done")
 
 def analyseVar(var_short_name,var_name,root_var = False,Type = "",depth = False):
+    global vars_def
+    global line_number
+    line_number = int(line_number)
+    is_def = False
+    if var_short_name in vars_def:
+        for defini in vars_def[var_short_name]:
+            nums = defini.split(" ")
+            function_start = int(nums[0])
+            function_end = int(nums[1])
+            declartion_line = int(nums[2])
+            if function_start < line_number and function_end >= line_number and declartion_line < line_number:
+                is_def = True
+    if is_def == False:
+        return
     var_type = getVarType(var_name) if Type == "" else Type
     if isPrimitive(var_type):
         parsePrimitiveVar(var_short_name,var_name,root_var)

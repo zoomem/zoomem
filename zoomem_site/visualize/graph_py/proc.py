@@ -38,7 +38,7 @@ class nbsr_process:
 
     def write(self, command):
         command+="\n"
+        #print (command)
         self.proc.stdin.write(command.encode())
-
     def clean(self):
         return self.read()
