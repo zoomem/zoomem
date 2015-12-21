@@ -18,10 +18,6 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 my_app_less = os.path.join(BASE_DIR, 'my_app', 'static', 'less')
 
 # For apps outside of your project, it's simpler to import them to find their root folders
-import twitter_bootstrap
-bootstrap_less = os.path.join(os.path.dirname(twitter_bootstrap.__file__), 'static', 'less')
-
-PIPELINE_LESS_ARGUMENTS = u'--include-path={}'.format(os.pathsep.join([bootstrap_less, my_app_less]))
 SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
 
 # Quick-start development settings - unsuitable for production
@@ -45,7 +41,6 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'static_precompiler',
-    'bootstrap3',
     'visualize',
 )
 
@@ -88,7 +83,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'zoomem',
-        'USER': 'tk',
+        'USER': 'root',
         'PASSWORD': 'traqes',
         'HOST': 'localhost',
         'PORT': '',
