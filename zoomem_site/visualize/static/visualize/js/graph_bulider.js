@@ -1,6 +1,6 @@
 var redraw;
 function drawGraph(edges,width) {
-  
+
     $("#drawArea").empty();
     var height = width;
     var render = function(r, n) {
@@ -9,6 +9,20 @@ function drawGraph(edges,width) {
                 r.text(n.point[0], n.point[1] + 15,n.id + "\n" + n.name + "\n" + n.type + "\n" + n.value + "\n"));
             return set;
         };
+
+    var render = function(r, n) {
+                /* the Raphael set is obligatory, containing all you want to display */
+                var set = r.set().push(
+                    /* custom objects go here */
+                    r.rect(n.point[0]-30, n.point[1]-13, 62, 66)).push(
+                    r.text(n.point[0], n.point[1] + 15,n.name).attr({"font-size":"14px"}));
+                /* custom tooltip attached to the set */
+                set./*tooltip = Raphael.el.tooltip;*/items.forEach(function(el) {
+                  el.tooltip(r.set().push(r.text(25, 35, "type "+  n.type + "\n" + "val "+  n.value + "\n").attr({"font-size":"14px"})))});
+                
+    //            set.tooltip(r.set().push(r.rect(0, 0, 30, 30).attr({"fill": "#fec", "stroke-width": 1, r : "9px"})).hide());
+                return set;
+            };
 
     var g = new Graph();
 
