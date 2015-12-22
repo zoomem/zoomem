@@ -63,8 +63,8 @@ class gdbGraph:
     def addNode(self,address, typ, value, size, flag,name):
         ident = address + "_" + typ
         if not ident in self.node_hash:
-            self.node_hash[ident] = node(address,typ,value,size,flag,self.id_cnt,name);
             self.id_cnt+= 1
+            self.node_hash[ident] = node(address,typ,value,size,flag,self.id_cnt,name);
             return self.node_hash[ident];
 
         elif self.node_hash[ident].name == "DA":
