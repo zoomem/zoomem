@@ -16,6 +16,9 @@ visted_list = {}
 
 def getVarAddress(var_name):
     var_address = executeGdbCommand("p &" + var_name)
+    index = var_address.find("<_start")
+    if index != -1:
+        var_address = var_address[0:index-1]
     return var_address[var_address.rfind(" ") + 1:].strip()
 
 def getVarType(var_name):
@@ -39,26 +42,35 @@ def getNumberOfArrayElements(var_name):
 def getLocalVariablesName():
     var_names = []
     info_local_lines = (executeGdbCommand("info locals")).split("\n")
-    if info_local_lines[0] == "No locals.":
-        return []
     full_var_value = ""
     rem = 0
-    for i in range(0,len(info_local_lines)):
-        if rem == 0:
-            equal_index = info_local_lines[i].find("=")
-            var_name = info_local_lines[i][0:equal_index-1].strip()
-            var_value = info_local_lines[i][equal_index+1:]
-            var_names.append(var_name)
-            full_var_value = getVarValue(var_name)
-            if isAPointer(getVarType(var_name)):
-                full_var_value = full_var_value[full_var_value.find(")")+1:]
-            rem = len(full_var_value) - len(var_value) - 1
-            if full_var_value == var_value:
-                rem = 0
-        else:
-            rem -= len(info_local_lines[i])
-            if rem > 0:
-                rem -= 1
+    if info_local_lines[0] != "No locals.":
+        for i in range(0,len(info_local_lines)):
+            if rem == 0:
+                equal_index = info_local_lines[i].find("=")
+                var_name = info_local_lines[i][0:equal_index-1].strip()
+                var_value = info_local_lines[i][equal_index+1:]
+                var_names.append(var_name)
+                full_var_value = getVarValue(var_name)
+                if isAPointer(getVarType(var_name)):
+                    full_var_value = full_var_value[full_var_value.find(")")+1:]
+                rem = len(full_var_value) - len(var_value) - 1
+                if full_var_value == var_value:
+                    rem = 0
+            else:
+                rem -= len(info_local_lines[i])
+                if rem > 0:
+                    rem -= 1
+    #object_varibals = getVarValue("* this")
+
+    try :
+        object_varibals = (getVarValue("*this")).split("\n")
+        for member in object_varibals:
+            member_var = (member[0:member.find("=")]).strip()
+            if member_var!= "":
+                var_names.append(member_var)
+    except Exception:
+        error = "exception"
     return var_names
 
 def isAPointer(var_type):
@@ -97,6 +109,7 @@ def addVarNameToDic(var_name):
 
 def executeGdbCommand(command):
     return (gdb.execute(command,True,True)).strip()
+
 line_number = 0
 def getLineNumber():
     global line_number
@@ -137,13 +150,16 @@ def analyseVar(var_short_name,var_name,root_var = False,Type = "",depth = False)
     if var_short_name in vars_def:
         for defini in vars_def[var_short_name]:
             nums = defini.split(" ")
-            function_start = int(nums[0])
-            function_end = int(nums[1])
-            declartion_line = int(nums[2])
+            function_start = int(nums[0]) - 1
+            function_end = int(nums[1]) - 1
+            declartion_line = int(nums[2]) - 1
             if function_start < line_number and function_end >= line_number and declartion_line < line_number:
                 is_def = True
-    if is_def == False:
+                break
+
+    if is_def == False and root_var == True:
         return
+
     var_type = getVarType(var_name) if Type == "" else Type
     if isPrimitive(var_type):
         parsePrimitiveVar(var_short_name,var_name,root_var)

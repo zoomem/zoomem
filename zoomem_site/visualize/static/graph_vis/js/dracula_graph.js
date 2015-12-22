@@ -330,10 +330,10 @@ Graph.Layout.Spring.prototype = {
             if(y < miny) miny = y;
         }
 
-        this.graph.layoutMinX = minx;
-        this.graph.layoutMaxX = maxx;
-        this.graph.layoutMinY = miny;
-        this.graph.layoutMaxY = maxy;
+        this.graph.layoutMinX = minx + 10;
+        this.graph.layoutMaxX = maxx - 10;
+        this.graph.layoutMinY = miny + 10;
+        this.graph.layoutMaxY = maxy - 10;
     },
 
     layoutIteration: function() {
