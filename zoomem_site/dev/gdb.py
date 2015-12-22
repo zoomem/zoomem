@@ -13,7 +13,6 @@ OBJECT_FLAG = '3'
 PRIMITIVE_FLAG = '4'
 
 visted_list = {}
-
 def getVarAddress(var_name):
     var_address = executeGdbCommand("p &" + var_name)
     index = var_address.find("<_start")
@@ -23,7 +22,7 @@ def getVarAddress(var_name):
 
 def getVarType(var_name):
     var_type = executeGdbCommand("ptype " + var_name)
-    var_type = var_type[var_type.rfind("=") + 1:].strip()
+    var_type = var_type[var_type.find("=") + 1:].strip()
     if '{' in var_type:
         return (var_type[0:var_type.find("{")-1]+var_type[var_type.find("}")+1:]).strip()
     return var_type
@@ -34,7 +33,7 @@ def getVarValue(var_name):
 
 def getVarSize(var_name):
     var_size =  executeGdbCommand("print sizeof(" + var_name + ")")
-    return var_size[var_size.rfind("=") + 1:].strip()
+    return var_size[var_size.find("=") + 1:].strip()
 
 def getNumberOfArrayElements(var_name):
     return int(int(getVarSize(var_name)) / int(getVarSize("(" + var_name + ")[0]")))
@@ -114,10 +113,12 @@ line_number = 0
 def getLineNumber():
     global line_number
     line_number = executeGdbCommand("frame").split("\n")[1].split()[0]
+
 def getCrrentLine():
     line = executeGdbCommand("frame").split("\n")[1].split()[0]
     print(line)
     print ("done")
+    
 vars_def = {}
 def bulidGraph(vars_def_list = "" , var_name = "" ):
     start_time = time.time();

@@ -3,6 +3,7 @@ from graph import gdbGraph
 from proc import nbsr_process
 import subprocess
 import commands
+import time
 
 def loadTxt(file_name):
     "Load text file into a string. I let FILE exceptions to pass."
@@ -190,7 +191,6 @@ def getVariablesDef(txt):
             index = bounds.find(" ")
             class_start = bounds[:index]
             class_end = bounds[index+1:]
-    print (vars_def_list)
     return vars_def_list
 
 class GdbAdapter:
@@ -199,27 +199,24 @@ class GdbAdapter:
         self.gdb_process = nbsr_process("gdb " + code_file_name + " -q")
         self.output_file_name = output_file_name
 
-        p = subprocess.Popen(['clang-3.5', '-Xclang' , '-ast-dump' ,'-fsyntax-only',
-         code_file_name +"_parsing.cpp"],
-         stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+        p = subprocess.Popen(['clang-3.5', '-Xclang' , '-ast-dump' ,'-fsyntax-only',code_file_name +"_parsing.cpp"], stdout=subprocess.PIPE,stderr=subprocess.PIPE)
         out, err = p.communicate()
         self.vars_def_list = getVariablesDef(out)
 
         defined_functions = getFunctionsNames(code_file_name + ".cpp")
         for function in defined_functions:
-            self.gdb_process.write("b " + function)
+            self.gdb_process.write("python (executeGdbCommand('b " + function + "'))")
 
-        self.gdb_process.write("run < " + input_file_name + "> " + output_file_name)
-        self.gdb_process.write("target record-full")
-        self.gdb_process.clean()
+        self.gdb_process.write("python (executeGdbCommand('run < " + input_file_name + " > " + output_file_name + "'))")
+        self.gdb_process.write("python (executeGdbCommand('target record-full'))")
+        self.gdb_process.write("python print('end')")
+        print self.gdb_process.clean()
 
     def next(self,number = 1):
-        self.gdb_process.write("n " + str(number))
-        self.gdb_process.clean()
+        self.gdb_process.write("python executeGdbCommand('n "+ str(number) + "')")
 
     def prev(self,number = 1):
-        self.gdb_process.write("rn " + str(number))
-        self.gdb_process.clean()
+        self.gdb_process.write("python executeGdbCommand('rn "+ str(number) + "')")
 
     def readOutput(self):
         content = ""
@@ -228,9 +225,7 @@ class GdbAdapter:
         return content
 
     def goToLine(self,line):
-        self.gdb_process.write("until " + line)
-        print (self.gdb_process.clean())
-
+        self.gdb_process.write("python executeGdbCommand('until "+ str(line) + "')")
 
     def getGraphEdegs(self,var_name = ""):
         self.vars_def_list = self.vars_def_list
@@ -244,12 +239,16 @@ class GdbAdapter:
 
     def bulidGraph(self, edges):
         g = gdbGraph()
+        print edges
         for edge in edges:
+            if edge.strip() == "":
+                continue
             attributes = edge.split(',')
-            if attributes[0] == '1':
-                g.addNode(attributes[1],attributes[2],attributes[3],attributes[4],attributes[5],attributes[6])
-            else:
-                g.addChildren(attributes[1],attributes[2],attributes[3],attributes[4],attributes[5])
+            if len(attributes) > 0:
+                if attributes[0] == '1':
+                    g.addNode(attributes[1],attributes[2],attributes[3],attributes[4],attributes[5],attributes[6])
+                else:
+                    g.addChildren(attributes[1],attributes[2],attributes[3],attributes[4],attributes[5])
         return g
 
     def send_command(command):
