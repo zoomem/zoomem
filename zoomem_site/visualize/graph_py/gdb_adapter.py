@@ -11,6 +11,23 @@ def loadTxt(file_name):
     f.close()
     return txt
 
+def getStr(Str,idx):
+    res = ""
+    cnt = 0
+    goig = False
+    for char in Str:
+        if char == ' ':
+            if not going:
+                if cnt == idx:
+                    return res
+                cnt = cnt + 1
+                going = True
+                res = ""
+        else:
+            res+=char
+            going = False
+    return res
+
 def getFunctionsNames(file_name):
     lst = (commands.getstatusoutput('ctags --c++-kinds=f -x ' + file_name))
     lst = lst[1]
@@ -149,7 +166,6 @@ def getVariablesDef(txt):
             dec_line = var_info[index+1:]
             if list_empty == False:
                 vars_def_list += '-'
-            print(var_name)
             if dec_line != "-1":
                 vars_def_list += var_name +" 0 0 " + dec_line
             else:
