@@ -19,7 +19,7 @@ function drawGraph(edges,width) {
                 /* custom tooltip attached to the set */
                 set./*tooltip = Raphael.el.tooltip;*/items.forEach(function(el) {
                   el.tooltip(r.set().push(r.text(25, 35, "type "+  n.type + "\n" + "val "+  n.value + "\n").attr({"font-size":"14px"})))});
-                
+
     //            set.tooltip(r.set().push(r.rect(0, 0, 30, 30).attr({"fill": "#fec", "stroke-width": 1, r : "9px"})).hide());
                 return set;
             };
