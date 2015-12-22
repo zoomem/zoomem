@@ -52,7 +52,7 @@ def reorder(txt):
         else:
             if non_include == 0:
                 non_include = 1
-                code.append("using namespace std;\n")
+                code.append("int dummyVaribleDeclaredToBeUsedToParseClangOutput__4zoomem;\n")
             code.append(line)
     return code
 

@@ -137,12 +137,15 @@ def analyseVar(var_short_name,var_name,root_var = False,Type = "",depth = False)
     if var_short_name in vars_def:
         for defini in vars_def[var_short_name]:
             nums = defini.split(" ")
-            function_start = int(nums[0])
-            function_end = int(nums[1])
-            declartion_line = int(nums[2])
+            function_start = int(nums[0]) - 1
+            function_end = int(nums[1]) - 1
+            declartion_line = int(nums[2]) - 1
+            #print (var_short_name + " " + str(function_start) + " " + str(function_end) + " " + str(declartion_line))
             if function_start < line_number and function_end >= line_number and declartion_line < line_number:
+#                print (var_short_name + "  is True")
                 is_def = True
-    if is_def == False:
+    if is_def == False and root_var == True:
+        #print (var_short_name + "  stopped analysing")
         return
     var_type = getVarType(var_name) if Type == "" else Type
     if isPrimitive(var_type):
