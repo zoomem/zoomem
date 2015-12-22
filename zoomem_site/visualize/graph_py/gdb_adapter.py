@@ -2,6 +2,7 @@ import re
 from graph import gdbGraph
 from proc import nbsr_process
 import subprocess
+import commands
 
 def loadTxt(file_name):
     "Load text file into a string. I let FILE exceptions to pass."
@@ -11,10 +12,14 @@ def loadTxt(file_name):
     return txt
 
 def getFunctionsNames(file_name):
-    rproc = r"((?<=[\s:~])(\w+)\s*\(([\w\s,<>\[\].=&':/*]*?)\)\s*(const)?\s*(?={))"
-    code = loadTxt(file_name)
-    cppwords = ['if', 'while', 'do', 'for', 'switch']
-    return [i[1] for i in re.findall(rproc, code)]
+    lst = (commands.getstatusoutput('ctags --c++-kinds=f -x ' + file_name))
+    lst = lst[1]
+    lst =  lst.split("\n")
+    functions = []
+    for out in lst:
+        functions.append(getStr(out,2))
+    return functions
+
 
 def isDummyDeclartionLine(line):
     index = line.find("VarDecl")
