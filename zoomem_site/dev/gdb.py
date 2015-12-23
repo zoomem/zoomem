@@ -38,18 +38,8 @@ def getVarSize(var_name):
 def getNumberOfArrayElements(var_name):
     return int(int(getVarSize(var_name)) / int(getVarSize("(" + var_name + ")[0]")))
 
-def getVariablesName():
+def parseInfoLines(info_lines):
     var_names = []
-    info_local_lines = (executeGdbCommand("info locals")).split("\n")
-    info_args_lines = (executeGdbCommand("info args")).split("\n")
-    info_local_lines = info_local_lines + info_args_lines
-
-    info_lines = []
-    if info_local_lines[0] != "No locals.":
-        info_lines = info_local_lines
-    if info_args_lines[0] != "No arguments.":
-        info_lines = info_lines + info_args_lines
-
     full_var_value = ""
     rem = 0
     for i in range(0,len(info_lines)):
@@ -68,8 +58,16 @@ def getVariablesName():
             rem -= len(info_lines[i])
             if rem > 0:
                 rem -= 1
-
     return var_names
+
+def getVariablesNames(info_command,info_empty_response):
+    info_lines = (executeGdbCommand(info_command)).split("\n")
+
+    if info_lines[0] == info_empty_response:
+        return []
+
+    return parseInfoLines(info_lines)
+
 vars_def = {}
 global_vars = {}
 def getCurrentClassMembersNames():
@@ -85,17 +83,17 @@ def getCurrentClassMembersNames():
     return var_names
 
 def getAllVariablesNames():
-    var_names = []
-    local_vars = getLocalVariablesName()
-    class_members = getCurrentClassMembersNames()
-    for var in local_vars:
-        var_names.append(var)
-    for var in class_members:
-        var_names.append(var)
+    var_names = getVariablesNames("info locals","No locals.")
+    var_names += getCurrentClassMembersNames()
     global global_vars
     for key, value in global_vars.items():
         var_names.append(key)
-    return var_names
+
+    definied_vars = getVariablesNames("info args","No arguments.")
+    for var_name in var_names:
+        if isDefined(var_name):
+            definied_vars.append(var_name)
+    return definied_vars
 def isAPointer(var_type):
     try:
         return var_type[var_type.rfind(" ") + 1:][0] == "*"
@@ -194,10 +192,6 @@ def isDefined(var_short_name):
     return False
 
 def analyseVar(var_short_name,var_name,root_var = False,Type = "",depth = False):
-
-    if isDefined(var_short_name) == False and root_var == True:
-        return
-
     var_type = getVarType(var_name) if Type == "" else Type
     if isPrimitive(var_type):
         parsePrimitiveVar(var_short_name,var_name,root_var)

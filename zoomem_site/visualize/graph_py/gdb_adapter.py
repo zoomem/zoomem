@@ -191,6 +191,7 @@ def getVariablesDef(txt):
             index = bounds.find(" ")
             class_start = bounds[:index]
             class_end = bounds[index+1:]
+    print(vars_def_list)
     return vars_def_list
 
 class GdbAdapter:
