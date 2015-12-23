@@ -27,7 +27,6 @@ class nbsr_process:
             if output == None:
                 time.sleep(0.1)
                 continue;
-            print output
             idx = output.find("(gdb)")
             if idx != -1:
                 output = output[idx + len("(gdb)"):]
@@ -39,7 +38,6 @@ class nbsr_process:
 
     def write(self, command):
         command+="\n"
-        #print (command)
         self.proc.stdin.write(command.encode())
     def clean(self,t = 0.5):
         return self.read(t)

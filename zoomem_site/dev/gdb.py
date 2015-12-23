@@ -38,29 +38,37 @@ def getVarSize(var_name):
 def getNumberOfArrayElements(var_name):
     return int(int(getVarSize(var_name)) / int(getVarSize("(" + var_name + ")[0]")))
 
-def getLocalVariablesName():
+def getVariablesName():
     var_names = []
     info_local_lines = (executeGdbCommand("info locals")).split("\n")
+    info_args_lines = (executeGdbCommand("info args")).split("\n")
+    info_local_lines = info_local_lines + info_args_lines
+
+    info_lines = []
+    if info_local_lines[0] != "No locals.":
+        info_lines = info_local_lines
+    if info_args_lines[0] != "No arguments.":
+        info_lines = info_lines + info_args_lines
+
     full_var_value = ""
     rem = 0
-    if info_local_lines[0] != "No locals.":
-        for i in range(0,len(info_local_lines)):
-            if rem == 0:
-                equal_index = info_local_lines[i].find("=")
-                var_name = info_local_lines[i][0:equal_index-1].strip()
-                var_value = info_local_lines[i][equal_index+1:]
-                var_names.append(var_name)
-                full_var_value = getVarValue(var_name)
-                if isAPointer(getVarType(var_name)):
-                    full_var_value = full_var_value[full_var_value.find(")")+1:]
-                rem = len(full_var_value) - len(var_value) - 1
-                if full_var_value == var_value:
-                    rem = 0
-            else:
-                rem -= len(info_local_lines[i])
-                if rem > 0:
-                    rem -= 1
-    #object_varibals = getVarValue("* this")
+    for i in range(0,len(info_lines)):
+        if rem == 0:
+            equal_index = info_lines[i].find("=")
+            var_name = info_lines[i][0:equal_index-1].strip()
+            var_value = info_lines[i][equal_index+1:]
+            var_names.append(var_name)
+            full_var_value = getVarValue(var_name)
+            if isAPointer(getVarType(var_name)):
+                full_var_value = full_var_value[full_var_value.find(")")+1:]
+            rem = len(full_var_value) - len(var_value) - 1
+            if full_var_value == var_value:
+                rem = 0
+        else:
+            rem -= len(info_lines[i])
+            if rem > 0:
+                rem -= 1
+#object_varibals = getVarValue("* this")
 
     try :
         object_varibals = (getVarValue("*this")).split("\n")
@@ -97,7 +105,7 @@ def isPrimitive(var_type):
         return False
 
 def updateScope():
-    var_names = getLocalVariablesName()
+    var_names = getVariablesName()
     for var_name in var_names:
         addVarNameToDic(var_name)
 
@@ -118,7 +126,7 @@ def getCrrentLine():
     line = executeGdbCommand("frame").split("\n")[1].split()[0]
     print(line)
     print ("done")
-    
+
 vars_def = {}
 def bulidGraph(vars_def_list = "" , var_name = "" ):
     start_time = time.time();
@@ -134,7 +142,7 @@ def bulidGraph(vars_def_list = "" , var_name = "" ):
             vars_def[var[0]].append(var[1] + " " +  var[2] + " " + var[3])
     getLineNumber()
     if var_name == "":
-        var_names = getLocalVariablesName()
+        var_names = getVariablesName()
         for var_name in var_names:
             analyseVar(var_name,var_name,True)
     else:

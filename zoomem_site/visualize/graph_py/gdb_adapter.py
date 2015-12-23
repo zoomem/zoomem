@@ -210,7 +210,7 @@ class GdbAdapter:
         self.gdb_process.write("python (executeGdbCommand('run < " + input_file_name + " > " + output_file_name + "'))")
         self.gdb_process.write("python (executeGdbCommand('target record-full'))")
         self.gdb_process.write("python print('end')")
-        print self.gdb_process.clean()
+        self.gdb_process.clean()
 
     def next(self,number = 1):
         self.gdb_process.write("python executeGdbCommand('n "+ str(number) + "')")
@@ -239,7 +239,6 @@ class GdbAdapter:
 
     def bulidGraph(self, edges):
         g = gdbGraph()
-        print edges
         for edge in edges:
             if edge.strip() == "":
                 continue
