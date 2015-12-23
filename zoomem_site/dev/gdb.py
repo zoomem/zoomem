@@ -13,17 +13,16 @@ OBJECT_FLAG = '3'
 PRIMITIVE_FLAG = '4'
 
 visted_list = {}
-
 def getVarAddress(var_name):
     var_address = executeGdbCommand("p &" + var_name)
-    index = var_address.find("<_start")
+    index = var_address.find("<")
     if index != -1:
         var_address = var_address[0:index-1]
     return var_address[var_address.rfind(" ") + 1:].strip()
 
 def getVarType(var_name):
     var_type = executeGdbCommand("ptype " + var_name)
-    var_type = var_type[var_type.rfind("=") + 1:].strip()
+    var_type = var_type[var_type.find("=") + 1:].strip()
     if '{' in var_type:
         return (var_type[0:var_type.find("{")-1]+var_type[var_type.find("}")+1:]).strip()
     return var_type
@@ -34,35 +33,45 @@ def getVarValue(var_name):
 
 def getVarSize(var_name):
     var_size =  executeGdbCommand("print sizeof(" + var_name + ")")
-    return var_size[var_size.rfind("=") + 1:].strip()
+    return var_size[var_size.find("=") + 1:].strip()
 
 def getNumberOfArrayElements(var_name):
     return int(int(getVarSize(var_name)) / int(getVarSize("(" + var_name + ")[0]")))
 
-def getLocalVariablesName():
+def parseInfoLines(info_lines):
     var_names = []
-    info_local_lines = (executeGdbCommand("info locals")).split("\n")
     full_var_value = ""
     rem = 0
-    if info_local_lines[0] != "No locals.":
-        for i in range(0,len(info_local_lines)):
-            if rem == 0:
-                equal_index = info_local_lines[i].find("=")
-                var_name = info_local_lines[i][0:equal_index-1].strip()
-                var_value = info_local_lines[i][equal_index+1:]
-                var_names.append(var_name)
-                full_var_value = getVarValue(var_name)
-                if isAPointer(getVarType(var_name)):
-                    full_var_value = full_var_value[full_var_value.find(")")+1:]
-                rem = len(full_var_value) - len(var_value) - 1
-                if full_var_value == var_value:
-                    rem = 0
-            else:
-                rem -= len(info_local_lines[i])
-                if rem > 0:
-                    rem -= 1
-    #object_varibals = getVarValue("* this")
+    for i in range(0,len(info_lines)):
+        if rem == 0:
+            equal_index = info_lines[i].find("=")
+            var_name = info_lines[i][0:equal_index-1].strip()
+            var_value = info_lines[i][equal_index+1:]
+            var_names.append(var_name)
+            full_var_value = getVarValue(var_name)
+            if isAPointer(getVarType(var_name)):
+                full_var_value = full_var_value[full_var_value.find(")")+1:]
+            rem = len(full_var_value) - len(var_value) - 1
+            if full_var_value == var_value:
+                rem = 0
+        else:
+            rem -= len(info_lines[i])
+            if rem > 0:
+                rem -= 1
+    return var_names
 
+def getVariablesNames(info_command,info_empty_response):
+    info_lines = (executeGdbCommand(info_command)).split("\n")
+
+    if info_lines[0] == info_empty_response:
+        return []
+
+    return parseInfoLines(info_lines)
+
+vars_def = {}
+global_vars = {}
+def getCurrentClassMembersNames():
+    var_names = []
     try :
         object_varibals = (getVarValue("*this")).split("\n")
         for member in object_varibals:
@@ -73,6 +82,18 @@ def getLocalVariablesName():
         error = "exception"
     return var_names
 
+def getAllVariablesNames():
+    var_names = getVariablesNames("info locals","No locals.")
+    var_names += getCurrentClassMembersNames()
+    global global_vars
+    for key, value in global_vars.items():
+        var_names.append(key)
+
+    definied_vars = getVariablesNames("info args","No arguments.")
+    for var_name in var_names:
+        if isDefined(var_name):
+            definied_vars.append(var_name)
+    return definied_vars
 def isAPointer(var_type):
     try:
         return var_type[var_type.rfind(" ") + 1:][0] == "*"
@@ -98,7 +119,7 @@ def isPrimitive(var_type):
         return False
 
 def updateScope():
-    var_names = getLocalVariablesName()
+    var_names = getVariablesName()
     for var_name in var_names:
         addVarNameToDic(var_name)
 
@@ -114,26 +135,36 @@ line_number = 0
 def getLineNumber():
     global line_number
     line_number = executeGdbCommand("frame").split("\n")[1].split()[0]
+
 def getCrrentLine():
     line = executeGdbCommand("frame").split("\n")[1].split()[0]
     print(line)
     print ("done")
-vars_def = {}
-def bulidGraph(vars_def_list = "" , var_name = "" ):
-    start_time = time.time();
-    executeGdbCommand("set print pretty on")
+
+
+def initlizeHashes(vars_def_list):
     global vars_def
+    global global_vars
     vars_def = {}
+    global_vars = {}
     if len(vars_def_list) > 0:
         vars_def_list = vars_def_list.split("-")
         for defin in vars_def_list:
             var = defin.split(" ")
-            if not var[0] in vars_def:
-                vars_def[var[0]] = []
-            vars_def[var[0]].append(var[1] + " " +  var[2] + " " + var[3])
+            if var[1] == "0":
+                global_vars[var[0]] = var[3]
+            else:
+                if not var[0] in vars_def:
+                    vars_def[var[0]] = []
+                vars_def[var[0]].append(var[1] + " " +  var[2] + " " + var[3])
+
+def bulidGraph(vars_def_list = "" , var_name = "" ):
+    start_time = time.time();
+    executeGdbCommand("set print pretty on")
+    initlizeHashes(vars_def_list)
     getLineNumber()
     if var_name == "":
-        var_names = getLocalVariablesName()
+        var_names = getAllVariablesNames()
         for var_name in var_names:
             analyseVar(var_name,var_name,True)
     else:
@@ -142,11 +173,11 @@ def bulidGraph(vars_def_list = "" , var_name = "" ):
     visted_list = {}
     print("done")
 
-def analyseVar(var_short_name,var_name,root_var = False,Type = "",depth = False):
+def isDefined(var_short_name):
     global vars_def
     global line_number
+    global global_vars
     line_number = int(line_number)
-    is_def = False
     if var_short_name in vars_def:
         for defini in vars_def[var_short_name]:
             nums = defini.split(" ")
@@ -154,12 +185,13 @@ def analyseVar(var_short_name,var_name,root_var = False,Type = "",depth = False)
             function_end = int(nums[1]) - 1
             declartion_line = int(nums[2]) - 1
             if function_start < line_number and function_end >= line_number and declartion_line < line_number:
-                is_def = True
-                break
+                return True
+    if var_short_name in global_vars:
+        if int(global_vars[var_short_name]) < line_number:
+            return True
+    return False
 
-    if is_def == False and root_var == True:
-        return
-
+def analyseVar(var_short_name,var_name,root_var = False,Type = "",depth = False):
     var_type = getVarType(var_name) if Type == "" else Type
     if isPrimitive(var_type):
         parsePrimitiveVar(var_short_name,var_name,root_var)
@@ -238,7 +270,11 @@ def getVarHash(var_name):
     if isAArray(var_hash['var_type']):
         var_hash['var_value'] = str(getNumberOfArrayElements(var_name))
     else:
-        var_hash['var_value'] = (getVarValue(var_name) if isPrimitive(var_hash['var_type']) else  "none")
+        var_value = getVarValue(var_name)
+        if var_hash['var_type'] == "char":
+            var_hash['var_value'] = var_value[var_value.find("\'")+1:var_value.rfind("\'")]
+        else:
+            var_hash['var_value'] = (var_value if isPrimitive(var_hash['var_type']) else  "none")
     return var_hash
 
 def compileFiles():
