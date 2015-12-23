@@ -15,7 +15,7 @@ PRIMITIVE_FLAG = '4'
 visted_list = {}
 def getVarAddress(var_name):
     var_address = executeGdbCommand("p &" + var_name)
-    index = var_address.find("<_start")
+    index = var_address.find("<")
     if index != -1:
         var_address = var_address[0:index-1]
     return var_address[var_address.rfind(" ") + 1:].strip()
@@ -68,8 +68,12 @@ def getVariablesName():
             rem -= len(info_lines[i])
             if rem > 0:
                 rem -= 1
-#object_varibals = getVarValue("* this")
 
+    return var_names
+vars_def = {}
+global_vars = {}
+def getCurrentClassMembersNames():
+    var_names = []
     try :
         object_varibals = (getVarValue("*this")).split("\n")
         for member in object_varibals:
@@ -80,6 +84,18 @@ def getVariablesName():
         error = "exception"
     return var_names
 
+def getAllVariablesNames():
+    var_names = []
+    local_vars = getLocalVariablesName()
+    class_members = getCurrentClassMembersNames()
+    for var in local_vars:
+        var_names.append(var)
+    for var in class_members:
+        var_names.append(var)
+    global global_vars
+    for key, value in global_vars.items():
+        var_names.append(key)
+    return var_names
 def isAPointer(var_type):
     try:
         return var_type[var_type.rfind(" ") + 1:][0] == "*"
@@ -127,22 +143,30 @@ def getCrrentLine():
     print(line)
     print ("done")
 
-vars_def = {}
-def bulidGraph(vars_def_list = "" , var_name = "" ):
-    start_time = time.time();
-    executeGdbCommand("set print pretty on")
+
+def initlizeHashes(vars_def_list):
     global vars_def
+    global global_vars
     vars_def = {}
+    global_vars = {}
     if len(vars_def_list) > 0:
         vars_def_list = vars_def_list.split("-")
         for defin in vars_def_list:
             var = defin.split(" ")
-            if not var[0] in vars_def:
-                vars_def[var[0]] = []
-            vars_def[var[0]].append(var[1] + " " +  var[2] + " " + var[3])
+            if var[1] == "0":
+                global_vars[var[0]] = var[3]
+            else:
+                if not var[0] in vars_def:
+                    vars_def[var[0]] = []
+                vars_def[var[0]].append(var[1] + " " +  var[2] + " " + var[3])
+
+def bulidGraph(vars_def_list = "" , var_name = "" ):
+    start_time = time.time();
+    executeGdbCommand("set print pretty on")
+    initlizeHashes(vars_def_list)
     getLineNumber()
     if var_name == "":
-        var_names = getVariablesName()
+        var_names = getAllVariablesNames()
         for var_name in var_names:
             analyseVar(var_name,var_name,True)
     else:
@@ -151,11 +175,11 @@ def bulidGraph(vars_def_list = "" , var_name = "" ):
     visted_list = {}
     print("done")
 
-def analyseVar(var_short_name,var_name,root_var = False,Type = "",depth = False):
+def isDefined(var_short_name):
     global vars_def
     global line_number
+    global global_vars
     line_number = int(line_number)
-    is_def = False
     if var_short_name in vars_def:
         for defini in vars_def[var_short_name]:
             nums = defini.split(" ")
@@ -163,10 +187,15 @@ def analyseVar(var_short_name,var_name,root_var = False,Type = "",depth = False)
             function_end = int(nums[1]) - 1
             declartion_line = int(nums[2]) - 1
             if function_start < line_number and function_end >= line_number and declartion_line < line_number:
-                is_def = True
-                break
+                return True
+    if var_short_name in global_vars:
+        if int(global_vars[var_short_name]) < line_number:
+            return True
+    return False
 
-    if is_def == False and root_var == True:
+def analyseVar(var_short_name,var_name,root_var = False,Type = "",depth = False):
+
+    if isDefined(var_short_name) == False and root_var == True:
         return
 
     var_type = getVarType(var_name) if Type == "" else Type
@@ -247,7 +276,11 @@ def getVarHash(var_name):
     if isAArray(var_hash['var_type']):
         var_hash['var_value'] = str(getNumberOfArrayElements(var_name))
     else:
-        var_hash['var_value'] = (getVarValue(var_name) if isPrimitive(var_hash['var_type']) else  "none")
+        var_value = getVarValue(var_name)
+        if var_hash['var_type'] == "char":
+            var_hash['var_value'] = var_value[var_value.find("\'")+1:var_value.rfind("\'")]
+        else:
+            var_hash['var_value'] = (var_value if isPrimitive(var_hash['var_type']) else  "none")
     return var_hash
 
 def compileFiles():
