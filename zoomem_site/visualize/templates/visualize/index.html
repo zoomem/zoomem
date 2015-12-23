@@ -35,10 +35,12 @@
   </head>
 
   <body>
-    <div id="drawArea" class = "graph_area"></div>
+    <div id="drawArea" class = "graph_  area">
+      <canvas id="cvs" width="1280" height="720"></canvas>
       <script>
-        drawGraph({{edges|safe}},{{cnt}} * 80)
+        drawGraph({{edges|safe}},{{cnt}})
       </script>
+   </div>
   </div>
 
   <div class="center-block">
