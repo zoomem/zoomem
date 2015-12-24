@@ -24,7 +24,7 @@ class node(object):
             command.append(child_node.type)
             command.append(child_node.size)
             command.append(str(child_node.value))
-            command.append(flags[int(child_node.flag)])
+            command.append(int(child_node.flag))
             edges.append(command)
             if not child_node.id in vs :
                 vs[child_node.id] = True
