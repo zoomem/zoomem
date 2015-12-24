@@ -9,21 +9,13 @@ import random, string
 import os
 import time
 from django.http import JsonResponse
+import json
 from django.utils.safestring import mark_safe
 gdb_adapters = {}
 
 # Create your views here.
 def index(request):
-    context  = {}
-    g_data =  getEdges(gdb_adapters[request.session.session_key])
-    context["edges"] = g_data["edges"]
-    context["cnt"] = g_data["cnt"]
-
-    context["line_num"] = gdb_adapters[request.session.session_key].getCurrnetLine()
-    context["code"] = request.session["code"]
-    context["output"] = gdb_adapters[request.session.session_key].readOutput()
-
-    return render(request, 'visualize/index.html',context)
+    return render(request, 'visualize/index.html',{'code':request.session["code"]})
 
 def home(request):
     return render(request, 'visualize/home.html',{})
@@ -34,6 +26,16 @@ def submit(request):
     request.session["code"] = request.POST['code']
     request.session["input"] = request.POST['input']
     return index(request)
+
+def update(request):
+    g_data =  getEdges(gdb_adapters[request.session.session_key])
+    data = json.dumps({
+        'edges': g_data["edges"],
+        'cnt': g_data["cnt"],
+        'line_num': gdb_adapters[request.session.session_key].getCurrnetLine(),
+        'output':  gdb_adapters[request.session.session_key].readOutput(),
+    })
+    return HttpResponse(data, content_type='application/json')
 
 def reorder(txt):
     code = []
@@ -61,14 +63,14 @@ def next(request):
     if(step == ""):
         step = 1
     gdb_adapters[request.session.session_key].next(step)
-    return index(request)
+    return update(request)
 
 def prev(request):
     step =  request.GET["step"]
     if(step == ""):
         step = 1
     gdb_adapters[request.session.session_key].prev(step)
-    return index(request)
+    return update(request)
 
 def randomword(length):
    return ''.join(random.choice(string.lowercase) for i in range(length))
