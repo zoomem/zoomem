@@ -94,12 +94,19 @@ Node.prototype.draw=function(){
   ctx.fillStyle=style[this.flag].font;
   fillText(this.value,this.x+3,this.y+50,this.w-8);
 };
+function drawEdge(x1,y1,x2,y2){
+  ctx.lineWidth=2;
+  ctx.beginPath();
+  ctx.moveTo(x1,y1);
+  ctx.bezierCurveTo(x2,y2,x1,y1,x2,y2);
+  ctx.stroke();
+}
 var cam = {
     x: 0,
     y: 0,
     cx: 0,
     cy: 0,
-    z: 1.5,
+    z: 1,
     cz: 1,
 };
 var mouse = {
@@ -144,27 +151,35 @@ function DFS(u,x,y){
   }
   var firstY=y-10;
   for(var i=0;i<tree[u].length;++i){
-    y=DFS(tree[u][i],x+200,y);
+    if(i+1<tree[u].length)
+      y=DFS(tree[u][i],x+200,y);
+    else {
+      DFS(tree[u][i],x+200,y);
+    }
     if(i+1<tree[u].length)
       y+=64;
   }
-  var lastY=y-10;
+  y+=10;
+  var lastY=y+56;
   if(nodes[u].flag==2){
     ctx.fillStyle=FRAMEBORDERCOLOR;
-    ctx.fillRect(x+190-1,firstY-1,85+2,lastY-firstY+1+2);
+    ctx.fillRect(x+190-1,firstY-1,98+2,lastY-firstY+1+2);
     ctx.fillStyle=FRAMEBGCOLOR;
-    ctx.fillRect(x+190,firstY,85,lastY-firstY+1);
+    ctx.fillRect(x+190,firstY,98,lastY-firstY+1);
   }
-  y+=10;
+  y+=12;
   nodes[u].x=x;
   nodes[u].y=(nodes[tree[u][0]].y+nodes[tree[u][tree[u].length-1]].y)/2;
-
+  if(nodes[u].flag==0){
+    drawEdge(nodes[u].x+nodes[u].w-10,nodes[u].y+12,x+200-1,firstY+20);
+  }else if(nodes[u].flag==2){
+    drawEdge(nodes[u].x+nodes[u].w-10,nodes[u].y+12,x+190-1,(firstY+lastY)/2);
+  }
   return y;
 }
 var first=1;
 var dataEdges,dataN;
 function drawGraph(edges,n) {
-  alert(edges);
   if(first==1){
     dataEdges=edges;
     dataN=n;
