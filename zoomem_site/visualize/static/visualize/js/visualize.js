@@ -6,7 +6,7 @@ $("#next").on("click", function() {
     data:data,
     context: document.body,
      success: function(data) {
-       $(document.body).html(data);
+      updatePage(data);
      }
    })
 });
@@ -20,7 +20,7 @@ $("#prev").on("click", function() {
     data:data,
     context: document.body,
      success: function(data) {
-       $(document.body).html(data);
+       updatePage(data);
      }
    })
 });
@@ -32,16 +32,18 @@ var cppEditor = CodeMirror.fromTextArea(document.getElementById("cpp-code"), {
   readOnly: true
 });
 
+function updatePage(json){
+  highlightLine(json.line_num);
+  $(".output").html(json.output);
+  drawGraph(json.edges,json.cnt,true);
+}
+
 function highlightLine(lineNumber) {
-    var WRAP_CLASS = "CodeMirror-activeline";
-    var BACK_CLASS = "CodeMirror-activeline-background";
-       //Line number is zero based index
+   var BACK_CLASS = "CodeMirror-activeline-background";
    var actualLineNumber = lineNumber - 1;
    var myEditor = $(".CodeMirror");
-   console.log(myEditor);
-   console.log(myEditor[0].CodeMirror);
    var codeMirrorEditor = myEditor[0].CodeMirror;
-   codeMirrorEditor.addLineClass(actualLineNumber, "wrap", WRAP_CLASS);
+   for(var i=0; i<codeMirrorEditor.lineCount(); i++)
+      codeMirrorEditor.removeLineClass(i,"background");
    codeMirrorEditor.addLineClass(actualLineNumber, "background", BACK_CLASS);
-
-   }
+ }
