@@ -23,16 +23,20 @@
     <link href={% static "visualize/css/visualize.css" %} rel="stylesheet" type="text/css">
     <style type="text/css">
       .CodeMirror { border: 1px solid silver; }
-      .CodeMirror {width:49.5%}
+      .CodeMirror {width:25%}
+      .CodeMirror {height:600px}
       .CodeMirror {float:left}
       .CodeMirror pre.CodeMirror-placeholder { color: #999; }
     </style>
   </head>
 
   <body>
-    <div id="drawArea" class = "graph_  area">
-      <canvas id="cvs" width="1280" height="720"></canvas>
-   </div>
+    <div  class = ".highlighted_code">
+      <textarea id="cpp-code">{{code}}</textarea>
+      <div class id="drawArea" class = "graph_  area">
+        <canvas id="cvs" width="1080px" height="600px"></canvas>
+      </div>
+    </div>
 
   <div class="center-block">
     <div class="row" style = "margin:1%;">
@@ -49,11 +53,7 @@
       </div><!-- /.col-lg-6 -->
     </div><!-- /.row -->
   </div>
-
-  <div  class = ".highlighted_code">
-    <textarea id="cpp-code">{{code}}</textarea>
-    <textarea readonly class ="output" placeholder="code output goes here"> </textarea>
-  </div>
+    <textarea class = "output" readonly placeholder="code output goes here"> </textarea>
   <script type="text/javascript" src={% static "visualize/js/visualize.js" %}></script>
   <script>  highlightLine({{line_num}}) </script>
 

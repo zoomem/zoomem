@@ -14,7 +14,6 @@ $("#next").on("click", function() {
 $("#prev").on("click", function() {
   var number = $('#step');
   var data = 'step=' + number.val();
-
   $.ajax({
     url: "/visualize/prev",
     data:data,
@@ -39,11 +38,18 @@ function updatePage(json){
 }
 
 function highlightLine(lineNumber) {
-   var BACK_CLASS = "CodeMirror-activeline-background";
-   var actualLineNumber = lineNumber - 1;
-   var myEditor = $(".CodeMirror");
-   var codeMirrorEditor = myEditor[0].CodeMirror;
-   for(var i=0; i<codeMirrorEditor.lineCount(); i++)
-      codeMirrorEditor.removeLineClass(i,"background");
-   codeMirrorEditor.addLineClass(actualLineNumber, "background", BACK_CLASS);
+  var BACK_CLASS = "CodeMirror-activeline-background";
+  var actualLineNumber = lineNumber - 1;
+  var myEditor = $(".CodeMirror");
+  var codeMirrorEditor = myEditor[0].CodeMirror;
+  for(var i=0; i<codeMirrorEditor.lineCount(); i++)
+    codeMirrorEditor.removeLineClass(i,"background");
+  codeMirrorEditor.addLineClass(actualLineNumber, "background", BACK_CLASS);
+  jumpToLine(lineNumber,codeMirrorEditor);
  }
+
+ function jumpToLine(i,editor) {
+  var t = editor.charCoords({line: i, ch: 0}, "local").top;
+  var middleHeight = editor.getScrollerElement().offsetHeight / 2;
+  editor.scrollTo(null, t - middleHeight - 5);
+}

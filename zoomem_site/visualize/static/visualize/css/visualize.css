@@ -17,15 +17,15 @@
   float:left
 }
 .output {
-  height:300px;
-  width: 49.5%;
-  float:right;
+  height:150px;
+  width: 60%;
+  overflow-y: auto;
+  resize: none;
 }
 
 #drawArea {
    border: solid white 5px;
-   overflow: scroll;
-   height: 500px;
+   height: 600px;
 }
 
 .center-block {
