@@ -94,6 +94,7 @@ def getAllVariablesNames():
         if isDefined(var_name):
             definied_vars.append(var_name)
     return definied_vars
+    
 def isAPointer(var_type):
     try:
         return "*" in var_type

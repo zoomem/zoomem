@@ -60,12 +60,22 @@ def getVariableDeclartionLine(line):
     right = line.find(":",left)-1
     return line[left:right + 1]
 
+def isFunctionDefinision(line):
+    if line.find("FunctionDecl") != -1:
+        return True
+    if line.find("CXXMethodDecl") != -1:
+        return True
+    if line.find("CXXConstructorDecl") != -1:
+        return True
+    if line.find("CXXDestructorDecl") != -1:
+        return True
+    return False
+
 def getFunctionBounds(line):
     # returns empty string if the line dosen't declare compound statment
-    index = line.find("FunctionDecl")
-    if index == -1 :
+    if isFunctionDefinision(line) == False:
         return ""
-    left = line.find("line:",index+1)+5
+    left = line.find("line:")+5
     right = line.find(":",left)-1
     if left == 4 or right == -2:
         return ""
@@ -173,12 +183,12 @@ def getVariablesDef(txt):
                 vars_def_list += var_name +" " + function_start+ " " + function_end + " " + cur_line
             list_empty = False
 
-        member_name = getClassMemberName(line)
-        if member_name != "":
-            if list_empty == False:
-                vars_def_list += '-'
-            list_empty = False
-            vars_def_list += member_name + " " + class_start + " " + class_end + " " + class_start
+        #member_name = getClassMemberName(line)
+        #if member_name != "":
+        #    if list_empty == False:
+    #            vars_def_list += '-'
+    #        list_empty = False
+    #        vars_def_list += member_name + " " + class_start + " " + class_end + " " + class_start
 
         bounds = getFunctionBounds(line)
         if bounds != "":
@@ -186,11 +196,11 @@ def getVariablesDef(txt):
             function_start = bounds[:index]
             function_end = bounds[index+1:]
 
-        bounds = getClassBounds(line)
-        if bounds != "":
-            index = bounds.find(" ")
-            class_start = bounds[:index]
-            class_end = bounds[index+1:]
+    #    bounds = getClassBounds(line)
+    #    if bounds != "":
+    #        index = bounds.find(" ")
+    #        class_start = bounds[:index]
+    #        class_end = bounds[index+1:]
     print(vars_def_list)
     return vars_def_list
 
