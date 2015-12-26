@@ -194,6 +194,9 @@ def isDefined(var_short_name):
 
 def analyseVar(var_short_name,var_name,root_var = False,Type = "",depth = False):
     var_type = getVarType(var_name) if Type == "" else Type
+
+    if check_node(var_name,var_type):
+        return
     if isPrimitive(var_type):
         parsePrimitiveVar(var_short_name,var_name,root_var)
     elif isAArray(var_type):
@@ -203,9 +206,8 @@ def analyseVar(var_short_name,var_name,root_var = False,Type = "",depth = False)
     elif isAObject(var_type):
         parseObjectVar(var_short_name,var_name,root_var)
 
-def check_node(var_name):
+def check_node(var_name,var_type):
     var_address = getVarAddress(var_name)
-    var_type = getVarType(var_name)
     if (var_address + "_" + var_type) in visted_list:
         return True
     else:
@@ -227,11 +229,9 @@ def parseArrayVar(var_short_name,var_name,root_var,depth):
 def parsePointerVar(var_short_name,var_name,root_var):
     addVarCommand(var_short_name,var_name,POINTER_FLAG)
     if root_var : addChildCommand("$root",var_name)
-    if check_node(var_name):
-        return
     child_var_name = "(*" + var_name+ ")"
     try:
-        analyseVar("DA",child_var_name)
+        analyseVar("$",child_var_name)
         addChildCommand(var_name,child_var_name)
     except Exception:
         return

@@ -67,7 +67,7 @@ class gdbGraph:
             self.node_hash[ident] = node(address,typ,value,size,flag,self.id_cnt,name);
             return self.node_hash[ident];
 
-        elif self.node_hash[ident].name == "DA":
+        elif self.node_hash[ident].name == "$":
             self.node_hash[ident].name = name
 
     def addChildren(self,parent_address, parent_type, child_address, child_type, name):
