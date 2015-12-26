@@ -24,6 +24,17 @@ $("#prev").on("click", function() {
    })
 });
 
+$( document ).ready(function() {
+  $.ajax({
+    url: "/visualize/update",
+    context: document.body,
+     success: function(data) {
+       updatePage(data);
+     }
+   })
+});
+
+
 var cppEditor = CodeMirror.fromTextArea(document.getElementById("cpp-code"), {
   lineNumbers: true,
   matchBrackets: true,

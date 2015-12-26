@@ -256,7 +256,7 @@ function drawGraph(edges,n,new_data) {
     var str = ""
     for(var i = 0 ;i<edges.length;i++ )
       str+=edges[i] + "\n";
-    alert(str);
+    //alert(str);
     dataEdges=edges;
     dataN=n;
     initialize();
@@ -426,7 +426,7 @@ function initialize(){
         }
     } else {
         cam.x += (x - mouse.x);
-        cam.y += (y - mouse.y);بستنى
+        cam.y += (y - mouse.y);
     }
     cam.x=Math.max(cam.x,minX*cam.z/4);
     cam.x=Math.min(cam.x,-maxX*cam.z/4);

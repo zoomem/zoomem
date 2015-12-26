@@ -15,7 +15,7 @@ gdb_adapters = {}
 
 # Create your views here.
 def index(request):
-    return render(request, 'visualize/index.html',{'code':request.session["code"],'line_num': gdb_adapters[request.session.session_key].getCurrnetLine()})
+    return render(request, 'visualize/index.html',{'code':request.session["code"]})
 
 def home(request):
     return render(request, 'visualize/home.html',{})
