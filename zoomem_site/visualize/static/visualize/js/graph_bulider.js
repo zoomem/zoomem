@@ -4,6 +4,7 @@ var FRAMEBORDERCOLOR="#e4d6a7";
 var nodes=[];
 var adj=[];
 var key=[];
+var minX=0,maxX=0,minY=0,maxY=0;
 var redraw;
 var style=[
 
@@ -27,6 +28,7 @@ var style=[
     typebg:"#f9fafb",
     titlebg:"#586792",
     font:"#586792",
+    line:"#c6cde3",
   },
   { // green
     border:"#b0bea3",
@@ -34,7 +36,6 @@ var style=[
     typebg:"#fafbfa",
     titlebg:"#748a61",
     font:"#748a61",
-    line:"#cfd8c7",
   },
 ];
 function Node(o){
@@ -46,6 +47,7 @@ function Node(o){
   this.flag=o.flag;
   this.type=o.type;
   this.value=o.value;
+  this.address=o.address;
   this.members=[];
   this.rect1=null;
   this.rect2=null;
@@ -111,9 +113,17 @@ Node.prototype.draw=function(calcOnly){
   var curY=this.y+50;
   for(var i=0;i<this.members.length;++i){
     if(calcOnly!=true){
-      ctx.fillStyle=style[this.flag].font;
+      ctx.fillStyle=style[nodes[this.members[i]].flag].font;
       fillText(nodes[this.members[i]].name,this.x+6,curY,this.w/2-11);
-      fillText(nodes[this.members[i]].value,this.x+this.w/2+6,curY,this.w/2-11,true);
+      var printContent=nodes[this.members[i]].value;
+      if(nodes[this.members[i]].flag==0){
+        if(adj[this.members[i]].length==0)
+          printContent="NULL";
+        else
+          printContent=nodes[adj[this.members[i]][0]].address;
+      }
+      if(nodes[this.members[i]].flag!=2)
+        fillText(printContent,this.x+this.w/2+6,curY,this.w/2-11,true);
       if(i+1<this.members.length){
         ctx.fillStyle=style[this.flag].line;
         ctx.fillRect(this.x+5,curY+5,this.w-10,1);
@@ -121,7 +131,7 @@ Node.prototype.draw=function(calcOnly){
     }
     curY-=17;
     if(calcOnly!=true){
-      ctx.fillStyle=style[this.flag].border;
+      ctx.fillStyle=style[nodes[this.members[i]].flag].border;
       ctx.beginPath();
       ctx.moveTo(this.x,curY+11);
       ctx.lineTo(this.x+3,curY+14);
@@ -174,8 +184,60 @@ function drawEdge(from,to,startColor,endColor){
         y1=from[i].y;
         x2=to[j].x;
         y2=to[j].y;
+        if(Math.abs(x1-x2)<10)
+          i=j=1e9;
       }
     }
+  var c1x,c1y,c2x,c2y;
+  if(Math.abs(x1-x2)<10){
+    if(y2<y1){
+      c1x=x1-32;
+      c1y=y1+16;
+      c2x=x2-5;
+      c2y=y2+5;
+    }else{
+      c1x=x1-5;
+      c1y=y1+5;
+      c2x=x2-32;
+      c2y=y2+16;
+    }
+  }else if(Math.abs(y1-y2)<10){
+    if(x1<x2){
+      c1x=x1+10;
+      c1y=y1-100;
+      c2x=x2-10;
+      c2y=y2-10;
+    }else{
+      c1x=x1-10;
+      c1y=y1-10;
+      c2x=x2+10;
+      c2y=y2+10;
+    }
+  }else if(x1<x2){
+    if(y1<y2){
+      c1x=x1+10;
+      c1y=y1-10;
+      c2x=x2-10;
+      c2y=y2+10;
+    }else{
+      c1x=x1+10;
+      c1y=y1+10;
+      c2x=x2-10;
+      c2y=y2-10;
+    }
+  }else{
+    if(y2<y1){
+      c1x=x1-10;
+      c1y=y1-10;
+      c2x=x2+10;
+      c2y=y2+10;
+    }else{
+      c1x=x1-10;
+      c1y=y1+10;
+      c2x=x2+10;
+      c2y=y2-10;
+    }
+  }
   ctx.lineWidth=1.5;
   var gradient = ctx.createLinearGradient(x1,y1, x2, y2);
   gradient.addColorStop("0", startColor);
@@ -185,8 +247,27 @@ function drawEdge(from,to,startColor,endColor){
   ctx.strokeStyle=gradient;
   ctx.beginPath();
   ctx.moveTo(x1,y1);
-  ctx.bezierCurveTo(x1+45,y1-35,x2+5,y2,x2,y2);
+  ctx.bezierCurveTo(c1x,c1y,c2x,c2y,x2,y2);
+  ctx.save();
+  ctx.globalAlpha=0.5;
   ctx.stroke();
+  var angle=Math.atan2(y2-c2y,x2-c2x);
+  var cx=c2x+Math.cos(angle)*10;
+  var cy=c2y+Math.sin(angle)*10;
+  ctx.beginPath();
+  ctx.moveTo(cx,cy);
+  angle+=Math.PI/4;
+  cx=c2x+Math.cos(angle)*5;
+  cy=c2y+Math.sin(angle)*5;
+  ctx.lineTo(cx,cy);
+  angle-=Math.PI/4*2;
+  cx=c2x+Math.cos(angle)*5;
+  cy=c2y+Math.sin(angle)*5;
+  ctx.lineTo(cx,cy);
+  ctx.closePath();
+  ctx.fill();
+  ctx.stroke();
+  ctx.restore();
 }
 var vis=[];
 var tree=[];
@@ -266,7 +347,6 @@ function drawGraph(edges,n,new_data) {
   n=dataN;
   nodes=[];
   adj=[];
-  minX=minY=maxX=maxY=0;
   for(var i=0;i<n;++i){
     nodes.push(new Node({w:150,h:56,name:"-"}));
     adj.push([]);
@@ -276,6 +356,7 @@ function drawGraph(edges,n,new_data) {
     nodes[edges[i][1]-1].flag=edges[i][7]-1;
     nodes[edges[i][1]-1].type=edges[i][4];
     nodes[edges[i][1]-1].value=edges[i][6];
+    nodes[edges[i][1]-1].address=edges[i][3];
     adj[edges[i][0]-1].push(edges[i][1]-1);
   }
   for(var i=0;i<edges.length;++i){
@@ -296,7 +377,7 @@ function drawGraph(edges,n,new_data) {
   for(var i=0;i<vis.length;++i)
     vis[i]=false;
   for(var i=0;i<vis.length;++i)
-    if(nodes[i].flag==2 || nodes[i].name=="$"){
+    if(nodes[i].flag==1 || nodes[i].flag==2 || nodes[i].name=="$"){
       vis[i]=true;
       nodes[i].draw(true);
     }
@@ -310,6 +391,10 @@ function drawGraph(edges,n,new_data) {
       nodesInOrder.splice(i,1);
       --i;
     }
+  minX=0;
+  minY=0;
+  maxX=0;
+  maxY=0;
   var curX=10,curY=10;
   for(var i=0;i<nodesInOrder.length;++i){
     if(i>0 && nodesInOrder[i][1]!=nodesInOrder[i-1][1]){
@@ -336,8 +421,8 @@ function drawGraph(edges,n,new_data) {
       var options2=[];
       if(nodes[u].rect1!=null){
         x1=nodes[u].rect1.x;
-        y1=nodes[u].rect1.y+12;
-        options1.push({x:x1,y:y1});
+        y1=nodes[u].rect1.y+11;
+        options1.push({x:x1-3,y:y1});
         options1.push({x:x1+nodes[u].rect1.w,y:y1});
       }else{
         x1=nodes[u].rect2.x;
@@ -346,9 +431,9 @@ function drawGraph(edges,n,new_data) {
         options1.push({x:x1+nodes[u].rect2.w,y:y1});
       }
       if(nodes[v].rect1!=null){
-        x2=nodes[v].rect1.x+nodes[v].rect1.w;
-        y2=nodes[v].rect1.y+12;
-        options2.push({x:x2,y:y2});
+        x2=nodes[v].rect1.x;
+        y2=nodes[v].rect1.y+11;
+        options2.push({x:x2-3,y:y2});
         options2.push({x:x2+nodes[v].rect1.w,y:y2});
       }else{
         x2=nodes[v].rect2.x;
@@ -356,7 +441,7 @@ function drawGraph(edges,n,new_data) {
         options2.push({x:x2,y:y2});
         options2.push({x:x2+nodes[v].rect2.w,y:y2});
       }
-      drawEdge(options1,options2,style[nodes[u].flag].titlebg,style[nodes[v].flag].titlebg);
+      drawEdge(options1,options2,style[nodes[u].flag].border,style[nodes[v].flag].titlebg);
     }
   }
   for(var i=1;i<nodes.length;++i)
@@ -372,12 +457,12 @@ function drawGraph(edges,n,new_data) {
           y1=nodes[u].rect2.y+nodes[u].rect2.h/2;
           var options1=[{x:x1,y:y1},{x:x1+nodes[u].rect2.w,y:y1}];
           x2=nodes[u].rect1.x;
-          y2=nodes[u].rect1.y+12;
-          var options2=[{x:x2,y:y2},{x:x2+nodes[u].rect1.w,y:y2}];
-          drawEdge(options1,options2,style[nodes[u].flag].titlebg,style[nodes[u].flag].titlebg);
+          y2=nodes[u].rect1.y+11;
+          var options2=[{x:x2-3,y:y2},{x:x2+nodes[u].rect1.w,y:y2}];
+          drawEdge(options1,options2,style[nodes[u].flag].border,style[nodes[u].flag].titlebg);
       }
 }
-var minX,maxX,minY,maxY;
+
 function draw(){
   updateCamera();
   ctx.clearRect(0,0,W,H);
@@ -397,8 +482,8 @@ function initialize(){
   done=1;
   cvs=document.getElementById("cvs");
   ctx=cvs.getContext("2d");
-  W=1280;
-  H=720;
+  W=900;
+  H=600;
   cvs.onmousedown = function (e) {
       mouse.down = true;
       mouse.x = e.offsetX || (e.layerX-10);
@@ -418,20 +503,18 @@ function initialize(){
         var os = 256;
         if (cam.z - (y - mouse.y) / os > 0.128 && cam.z - (y - mouse.y) / os < 2.25) {
             cam.z -= (y - mouse.y) / os;
-            cam.x += (y - mouse.y)*cam.z;
-            cam.x += (x - mouse.x)*cam.z;
-            cam.y += (y - mouse.y)*cam.z;
-            //cam.x += (y - mouse.y) / os * W / 2;
-            //cam.y += (y - mouse.y) / os * H / 2;
+
+            cam.x += (y - mouse.y) / os * W / 2;
+            cam.y += (y - mouse.y) / os * H / 2;
         }
     } else {
         cam.x += (x - mouse.x);
         cam.y += (y - mouse.y);
     }
-    cam.x=Math.max(cam.x,minX*cam.z/4);
-    cam.x=Math.min(cam.x,-maxX*cam.z/4);
-    cam.y=Math.max(cam.y,minY*cam.z/4);
-    cam.y=Math.min(cam.y,-maxY*cam.z/4);
+    cam.x=Math.max(cam.x,-(maxX-minX+1)+50);
+    cam.x=Math.min(cam.x,W-50);
+    cam.y=Math.max(cam.y,-(maxY-minY+1)+50);
+    cam.y=Math.min(cam.y,H-50);
     mouse.x = x;
     mouse.y = y;
   };
