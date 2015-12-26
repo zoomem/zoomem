@@ -28,7 +28,10 @@ def submit(request):
     return index(request)
 
 def update(request):
-    g_data =  getEdges(gdb_adapters[request.session.session_key])
+    var_name = ""
+    if "var_name" in request.GET:
+        var_name = request.GET["var_name"]
+    g_data =  getEdges(gdb_adapters[request.session.session_key],var_name)
     data = json.dumps({
         'edges': g_data["edges"],
         'cnt': g_data["cnt"],
@@ -102,8 +105,8 @@ def createNewGdbAdapter(code,inpt):
     compileFile(code_file_name)
     return GdbAdapter(code_file_name,input_file_name,output_file_name)
 
-def getEdges(g_adapter):
-    g = g_adapter.bulidGraph(g_adapter.getGraphEdegs())
+def getEdges(g_adapter,var_name):
+    g = g_adapter.bulidGraph(g_adapter.getGraphEdegs(var_name))
     data = {}
     data["edges"] = g.getGraphEdges()
     data["cnt"] = g.id_cnt
