@@ -48,9 +48,11 @@ function Node(o){
   this.type=o.type;
   this.value=o.value;
   this.address=o.address;
+  this.size=o.size;
   this.members=[];
   this.rect1=null;
   this.rect2=null;
+  this.fullName = o.fullName;
 }
 function fillText(text,x,y,w,right){
   if(ctx.measureText(text).width<=w){
@@ -63,6 +65,35 @@ function fillText(text,x,y,w,right){
   }while(ctx.measureText(text+"...").width>w);
   var offset=right?+w-ctx.measureText(text).width:0;
   ctx.fillText(text+"...",x+offset,y);
+}
+var arrayVisible=[];
+var map=[];
+function getArrayEdges(arrayName){
+  var data = 'var_name=' + arrayName;
+  var edges;
+  $.ajax({
+    url: "/visualize/update",
+    data:data,
+    context: document.body,
+     success: function(data) {
+       edges=data.edges;
+       for(var i=0;i<edges.length;++i){
+         edges[i].push(arrayName);
+         dataEdges.push(edges[i]);
+       }
+     }
+   });
+}
+function inside(x,y,rect){
+  rect.x*=cam.cz;
+  rect.y*=cam.cz;
+  rect.x+=cam.cx;
+  rect.y+=cam.cy;
+  rect.w*=cam.cz;
+  rect.h*=cam.cz;
+  if(x>=rect.x && y>=rect.y && x<=rect.x+rect.w && y<=rect.y+rect.h)
+    return true;
+  return false;
 }
 Node.prototype.draw=function(calcOnly){
   this.h=37+this.members.length*17;
@@ -114,16 +145,34 @@ Node.prototype.draw=function(calcOnly){
   for(var i=0;i<this.members.length;++i){
     if(calcOnly!=true){
       ctx.fillStyle=style[nodes[this.members[i]].flag].font;
-      fillText(nodes[this.members[i]].name,this.x+6,curY,this.w/2-11);
-      var printContent=nodes[this.members[i]].value;
-      if(nodes[this.members[i]].flag==0){
-        if(adj[this.members[i]].length==0)
-          printContent="NULL";
-        else
-          printContent=nodes[adj[this.members[i]][0]].address;
-      }
-      if(nodes[this.members[i]].flag!=2)
+      nodes[this.members[i]].rect2={x:this.x,y:curY-17+6,w:this.w,h:17};
+      var mouseDown=false;
+      if(mouse.down==false || !inside(mouse.x,mouse.y,nodes[this.members[i]].rect2)){
+        fillText(nodes[this.members[i]].name,this.x+6,curY,this.w/2-11);
+        var printContent=nodes[this.members[i]].value;
+        if(nodes[this.members[i]].flag==0){
+          if(adj[this.members[i]].length==0)
+            printContent="NULL";
+          else
+            printContent=nodes[adj[this.members[i]][0]].address;
+        }
+        if(nodes[this.members[i]].flag!=2)
+          fillText(printContent,this.x+this.w/2+6,curY,this.w/2-11,true);
+      }else{
+        if(nodes[this.members[i]].flag==1){
+          if(arrayVisible[nodes[this.members[i]].fullName]==true){
+            for(var i=0;i<dataEdges.length;++i)
+              if(dataEdges[i][dataEdges[i].length-1]==nodes[this.members[i]].fullName){
+                dataEdges.splice(i,1);
+                --i;
+              }
+          }else
+            getArrayEdges(nodes[this.members[i]].fullName);
+        }
+        fillText(nodes[this.members[i]].type,this.x+6,curY,this.w/2-11);
+        var printContent=nodes[this.members[i]].size;
         fillText(printContent,this.x+this.w/2+6,curY,this.w/2-11,true);
+      }
       if(i+1<this.members.length){
         ctx.fillStyle=style[this.flag].line;
         ctx.fillRect(this.x+5,curY+5,this.w-10,1);
@@ -265,6 +314,8 @@ function drawEdge(from,to,startColor,endColor){
   cy=c2y+Math.sin(angle)*5;
   ctx.lineTo(cx,cy);
   ctx.closePath();
+  ctx.strokeStyle="black";
+  ctx.fillStyle="gray";
   ctx.fill();
   ctx.stroke();
   ctx.restore();
@@ -357,6 +408,8 @@ function drawGraph(edges,n,new_data) {
     nodes[edges[i][1]-1].type=edges[i][4];
     nodes[edges[i][1]-1].value=edges[i][6];
     nodes[edges[i][1]-1].address=edges[i][3];
+    nodes[edges[i][1]-1].size=edges[i][5];
+    nodes[edges[i][1]-1].fullName=edges[i][8];
     adj[edges[i][0]-1].push(edges[i][1]-1);
   }
   for(var i=0;i<edges.length;++i){
@@ -511,9 +564,9 @@ function initialize(){
         cam.x += (x - mouse.x);
         cam.y += (y - mouse.y);
     }
-    cam.x=Math.max(cam.x,-(maxX-minX+1)+50);
+    cam.x=Math.max(cam.x,-(maxX-minX+1)*cam.z+50);
     cam.x=Math.min(cam.x,W-50);
-    cam.y=Math.max(cam.y,-(maxY-minY+1)+50);
+    cam.y=Math.max(cam.y,-(maxY-minY+1)*cam.z+50);
     cam.y=Math.min(cam.y,H-50);
     mouse.x = x;
     mouse.y = y;
