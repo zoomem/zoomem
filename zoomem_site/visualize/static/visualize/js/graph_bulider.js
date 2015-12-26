@@ -3,6 +3,7 @@ var FRAMEBGCOLOR="#fffae7";
 var FRAMEBORDERCOLOR="#e4d6a7";
 var nodes=[];
 var adj=[];
+var key=[];
 var redraw;
 var style=[
 
@@ -138,6 +139,10 @@ Node.prototype.draw=function(calcOnly){
     curY+=17*2;
   }
   this.rect1={x:this.x,y:this.y,w:this.w,h:this.h};
+  minX=Math.min(minX,this.x);
+  maxX=Math.max(maxX,this.x+this.w);
+  minY=Math.min(minY,this.y);
+  maxY=Math.max(maxY,this.y+this.h);
 };
 var cam = {
     x: 0,
@@ -261,6 +266,7 @@ function drawGraph(edges,n,new_data) {
   n=dataN;
   nodes=[];
   adj=[];
+  minX=minY=maxX=maxY=0;
   for(var i=0;i<n;++i){
     nodes.push(new Node({w:150,h:56,name:"-"}));
     adj.push([]);
@@ -290,7 +296,7 @@ function drawGraph(edges,n,new_data) {
   for(var i=0;i<vis.length;++i)
     vis[i]=false;
   for(var i=0;i<vis.length;++i)
-    if(nodes[i].flag==2){
+    if(nodes[i].flag==2 || nodes[i].name=="$"){
       vis[i]=true;
       nodes[i].draw(true);
     }
@@ -371,6 +377,7 @@ function drawGraph(edges,n,new_data) {
           drawEdge(options1,options2,style[nodes[u].flag].titlebg,style[nodes[u].flag].titlebg);
       }
 }
+var minX,maxX,minY,maxY;
 function draw(){
   updateCamera();
   ctx.clearRect(0,0,W,H);
@@ -407,10 +414,40 @@ function initialize(){
         return;
     var x = e.clientX - cvs.offsetLeft;
     var y = e.clientY - cvs.offsetTop;
-    cam.x += (x - mouse.x);
-    cam.y += (y - mouse.y);
+    if (key[17] == true || key[157] == true) {
+        var os = 256;
+        if (cam.z - (y - mouse.y) / os > 0.128 && cam.z - (y - mouse.y) / os < 2.25) {
+            cam.z -= (y - mouse.y) / os;
+            cam.x += (y - mouse.y)*cam.z;
+            cam.x += (x - mouse.x)*cam.z;
+            cam.y += (y - mouse.y)*cam.z;
+            //cam.x += (y - mouse.y) / os * W / 2;
+            //cam.y += (y - mouse.y) / os * H / 2;
+        }
+    } else {
+        cam.x += (x - mouse.x);
+        cam.y += (y - mouse.y);بستنى
+    }
+    cam.x=Math.max(cam.x,minX*cam.z/4);
+    cam.x=Math.min(cam.x,-maxX*cam.z/4);
+    cam.y=Math.max(cam.y,minY*cam.z/4);
+    cam.y=Math.min(cam.y,-maxY*cam.z/4);
     mouse.x = x;
     mouse.y = y;
   };
+  document.onblur = function () {
+      mouse.down = false;
+  };
   draw();
+};
+
+window.onkeydown = function (e) {
+    key[e.keyCode] = true;
+};
+window.onkeyup = function (e) {
+    key[e.keyCode] = false;
+};
+window.onblur = function (e) {
+    mouse.down = false;
+    key = [];
 };
