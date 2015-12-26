@@ -149,12 +149,6 @@ Node.prototype.draw=function(calcOnly){
       if(mouse.down==false || !inside(mouse.x,mouse.y,nodes[this.members[i]].rect2)){
         fillText(nodes[this.members[i]].name,this.x+6,curY,this.w/2-11);
         var printContent=nodes[this.members[i]].value;
-        if(nodes[this.members[i]].flag==0){
-          if(adj[this.members[i]].length==0)
-            printContent="NULL";
-          else
-            printContent=nodes[adj[this.members[i]][0]].address;
-        }
         if(nodes[this.members[i]].flag!=2)
           fillText(printContent,this.x+this.w/2+6,curY,this.w/2-11,true);
       }else{
@@ -195,6 +189,15 @@ Node.prototype.draw=function(calcOnly){
     }
     nodes[this.members[i]].rect2={x:this.x,y:curY+6,w:this.w,h:17};
     curY+=17*2;
+  }
+  if(this.flag!=2){
+    ctx.fillStyle=style[this.flag].font;
+    var text=this.value;
+    if(this.flag==0 || this.flag==1){
+      if(text=="none")
+        text="NULL";
+    }
+    ctx.fillText(text,this.x+4,curY);
   }
   this.rect1={x:this.x,y:this.y,w:this.w,h:this.h};
   minX=Math.min(minX,this.x);
@@ -410,6 +413,12 @@ function drawGraph(edges,n,new_data) {
     nodes[edges[i][1]-1].size=edges[i][5];
     nodes[edges[i][1]-1].fullName=edges[i][8];
     adj[edges[i][0]-1].push(edges[i][1]-1);
+  }
+  for(var i=0;i<edges.length;++i){
+    if(nodes[edges[i][0]-1].flag==0)
+      nodes[edges[i][0]-1].value=nodes[edges[i][1]-1].address;
+    if(nodes[edges[i][1]-1].flag==1)
+      nodes[edges[i][1]-1].value=nodes[edges[i][1]-1].address;
   }
   for(var i=0;i<edges.length;++i){
     if(nodes[edges[i][0]-1].flag==2){
