@@ -67,7 +67,6 @@ function fillText(text,x,y,w,right){
   ctx.fillText(text+"...",x+offset,y);
 }
 var arrayVisible=[];
-var map=[];
 function getArrayEdges(arrayName){
   var data = 'var_name=' + arrayName;
   var edges;
