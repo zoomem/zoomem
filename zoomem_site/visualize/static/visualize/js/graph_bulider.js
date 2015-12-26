@@ -61,73 +61,79 @@ function fillText(text,x,y,w,right){
   var offset=right?+w-ctx.measureText(text).width:0;
   ctx.fillText(text+"...",x+offset,y);
 }
-Node.prototype.draw=function(){
+Node.prototype.draw=function(calcOnly){
   this.h=37+this.members.length*17;
   if(this.flag!=2)
     this.h+=17;
   else
     this.h+=1;
-  ctx.lineWidth="1";
-  ctx.fillStyle=style[this.flag].border;
-  ctx.fillRect(this.x-1,this.y-1,this.w+2,this.h+2);
-  ctx.fillStyle=style[this.flag].boxbg;
-  ctx.fillRect(this.x,this.y,this.w,this.h);
+  if(calcOnly!=true){
+    ctx.lineWidth="1";
+    ctx.fillStyle=style[this.flag].border;
+    ctx.fillRect(this.x-1,this.y-1,this.w+2,this.h+2);
+    ctx.fillStyle=style[this.flag].boxbg;
+    ctx.fillRect(this.x,this.y,this.w,this.h);
 
-  ctx.fillStyle=style[this.flag].border;
-  ctx.fillRect(this.x-1,this.y+21,this.w+2,16);
-  ctx.fillStyle=style[this.flag].typebg;
-  ctx.fillRect(this.x,this.y+22,this.w,14);
+    ctx.fillStyle=style[this.flag].border;
+    ctx.fillRect(this.x-1,this.y+21,this.w+2,16);
+    ctx.fillStyle=style[this.flag].typebg;
+    ctx.fillRect(this.x,this.y+22,this.w,14);
 
-/*
-  ctx.fillStyle=style[this.flag].border;
-  ctx.fillRect(this.x-1,this.y+38,this.w+2,16);
-  ctx.fillStyle=style[this.flag].typebg;
-  ctx.fillRect(this.x,this.y+39,this.w,14);
-*/
+  /*
+    ctx.fillStyle=style[this.flag].border;
+    ctx.fillRect(this.x-1,this.y+38,this.w+2,16);
+    ctx.fillStyle=style[this.flag].typebg;
+    ctx.fillRect(this.x,this.y+39,this.w,14);
+  */
 
-  ctx.fillStyle=style[this.flag].font;
-  fillText(this.type,this.x+3,this.y+21+12,this.w-8);
+    ctx.fillStyle=style[this.flag].font;
+    fillText(this.type,this.x+3,this.y+21+12,this.w-8);
 
-  ctx.strokeStyle=style[this.flag].border;
-  ctx.beginPath();
-  ctx.moveTo(this.x-3,this.y+3);
-  ctx.lineTo(this.x+this.w-15,this.y+3);
-  ctx.lineTo(this.x+this.w-5,this.y+12);
-  ctx.lineTo(this.x+this.w-15,this.y+18);
-  ctx.lineTo(this.x-3,this.y+18);
-  ctx.closePath();
-  ctx.stroke();
-  ctx.fillStyle=style[this.flag].titlebg;
-  ctx.fill();
-  ctx.fillStyle="#ffffff";
-  fillText(this.name,this.x+3,this.y+14,this.w-16);
+    ctx.strokeStyle=style[this.flag].border;
+    ctx.beginPath();
+    ctx.moveTo(this.x-3,this.y+3);
+    ctx.lineTo(this.x+this.w-15,this.y+3);
+    ctx.lineTo(this.x+this.w-5,this.y+12);
+    ctx.lineTo(this.x+this.w-15,this.y+18);
+    ctx.lineTo(this.x-3,this.y+18);
+    ctx.closePath();
+    ctx.stroke();
+    ctx.fillStyle=style[this.flag].titlebg;
+    ctx.fill();
+    ctx.fillStyle="#ffffff";
+    fillText(this.name,this.x+3,this.y+14,this.w-16);
 
-  /*ctx.fillStyle=style[this.flag].font;
-  fillText(this.value,this.x+3,this.y+50,this.w-8);*/
+    /*ctx.fillStyle=style[this.flag].font;
+    fillText(this.value,this.x+3,this.y+50,this.w-8);*/
+  }
 
   var curY=this.y+50;
   for(var i=0;i<this.members.length;++i){
-    ctx.fillStyle=style[this.flag].font;
-    fillText(nodes[this.members[i]].name,this.x+6,curY,this.w/2-11);
-    fillText(nodes[this.members[i]].value,this.x+this.w/2+6,curY,this.w/2-11,true);
-    if(i+1<this.members.length){
-      ctx.fillStyle=style[this.flag].line;
-      ctx.fillRect(this.x+5,curY+5,this.w-10,1);
+    if(calcOnly!=true){
+      ctx.fillStyle=style[this.flag].font;
+      fillText(nodes[this.members[i]].name,this.x+6,curY,this.w/2-11);
+      fillText(nodes[this.members[i]].value,this.x+this.w/2+6,curY,this.w/2-11,true);
+      if(i+1<this.members.length){
+        ctx.fillStyle=style[this.flag].line;
+        ctx.fillRect(this.x+5,curY+5,this.w-10,1);
+      }
     }
     curY-=17;
-    ctx.fillStyle=style[this.flag].border;
-    ctx.beginPath();
-    ctx.moveTo(this.x,curY+11);
-    ctx.lineTo(this.x+3,curY+14);
-    ctx.lineTo(this.x,curY+17);
-    ctx.closePath();
-    ctx.fill();
-    ctx.beginPath();
-    ctx.moveTo(this.x+this.w,curY+11);
-    ctx.lineTo(this.x+this.w-3,curY+14);
-    ctx.lineTo(this.x+this.w,curY+17);
-    ctx.closePath();
-    ctx.fill();
+    if(calcOnly!=true){
+      ctx.fillStyle=style[this.flag].border;
+      ctx.beginPath();
+      ctx.moveTo(this.x,curY+11);
+      ctx.lineTo(this.x+3,curY+14);
+      ctx.lineTo(this.x,curY+17);
+      ctx.closePath();
+      ctx.fill();
+      ctx.beginPath();
+      ctx.moveTo(this.x+this.w,curY+11);
+      ctx.lineTo(this.x+this.w-3,curY+14);
+      ctx.lineTo(this.x+this.w,curY+17);
+      ctx.closePath();
+      ctx.fill();
+    }
     nodes[this.members[i]].rect2={x:this.x,y:curY+6,w:this.w,h:17};
     curY+=17*2;
   }
@@ -157,7 +163,7 @@ function drawEdge(from,to,startColor,endColor){
   for(var i=0;i<from.length;++i)
     for(var j=0;j<to.length;++j){
       var distance=Math.sqrt(Math.pow(from[i].x-to[j].x,2)+Math.pow(from[i].y-to[j].y,2));
-      if(distance-1e-9<=bestDistance){
+      if(distance-0.01<=bestDistance){
         bestDistance=distance;
         x1=from[i].x;
         y1=from[i].y;
@@ -202,19 +208,14 @@ function BFS(n){
       nodesInOrder.push([u,cost[u]]);
     for(var i=0;i<adj[u].length;++i)
       if(vis[adj[u][i]]==0){
-        if(cost[u]!=0 && nodes[adj[u][i]].flag!=1 && nodes[adj[u][i]].flag!=2 && nodes[adj[u][i]].name!="$")
-          continue;
+        /*if(cost[u]!=0 && nodes[adj[u][i]].flag!=1 && nodes[adj[u][i]].flag!=2 && nodes[adj[u][i]].name!="$")
+          continue;*/
         vis[adj[u][i]]=1;
         cost[adj[u][i]]=cost[u]+1;
         tree[u].push(adj[u][i]);
         q[++l]=adj[u][i];
       }
   }
-  for(var i=0;i<n;++i)
-    if(nodes[i].name=="$"){
-      vis[i]=true;
-      nodesInOrder.push([i,4]);
-    }
 }
 function DFS(u,x,y){
   if(tree[u].length==0){
@@ -285,8 +286,24 @@ function drawGraph(edges,n,new_data) {
   for(var i=1;i<n;++i)
     if(vis[i]==1){
       nodes[i].draw();
-
     }*/
+  for(var i=0;i<vis.length;++i)
+    vis[i]=false;
+  for(var i=0;i<vis.length;++i)
+    if(nodes[i].flag==2){
+      vis[i]=true;
+      nodes[i].draw(true);
+    }
+  for(var i=0;i<edges.length;++i)
+    if(nodes[edges[i][1]-1].rect1==null && nodes[edges[i][1]-1].rect2==null){
+      vis[edges[i][1]-1]=true;
+      nodes[edges[i][1]-1].draw(true);
+    }
+  for(var i=0;i<nodesInOrder.length;++i)
+    if(vis[nodesInOrder[i][0]]==false){
+      nodesInOrder.splice(i,1);
+      --i;
+    }
   var curX=10,curY=10;
   for(var i=0;i<nodesInOrder.length;++i){
     if(i>0 && nodesInOrder[i][1]!=nodesInOrder[i-1][1]){
