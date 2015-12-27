@@ -67,7 +67,7 @@ class gdbGraph:
         self.node_hash = {}
         self.node_hash["$root_$root"] = self.root
 
-    def addNode(self,address, typ, value, size, flag,name):
+    def addNode(self,address,typ,size,flag,name,value):
         ident = address + "_" + typ
         if not ident in self.node_hash:
             self.id_cnt+= 1

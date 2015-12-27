@@ -276,7 +276,7 @@ def parsePrimitiveVar(var_short_name,var_name,root_var):
 
 def addVarCommand(var_short_name,var_name,flags):
     var_hash = getVarHash(var_name)
-    command = '1,' + var_hash['var_address'] + ',' + var_hash['var_type'] + ',' + var_hash['var_value'] + ',' + str(var_hash['var_size']) +',' + flags + ',' + var_short_name
+    command = '1,' + var_hash['var_address'] + ',' + var_hash['var_type'] + ',' + str(var_hash['var_size']) +',' + flags + ',' + var_short_name + ',' + var_hash['var_value']
     print(command)
 
 def addChildCommand(parent_var_name, child_var_name):
