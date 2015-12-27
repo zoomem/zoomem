@@ -31,7 +31,14 @@ def getVarType(var_name):
 
 def getVarValue(var_name):
     var_val = executeGdbCommand("print " + var_name)
-    return (var_val[var_val.find("=") + 1:])
+    start_index = var_val.find("=") + 1
+    end_index = len(var_val)
+    if isAPointer(getVarType(var_name)):
+        start_index = var_val.find(")",start_index)+1
+        temp = var_val.find("<",start_index)-1
+        if temp != -1:
+            end_index = temp
+    return (var_val[start_index:end_index].strip())
 
 def getVarSize(var_name):
     var_size =  executeGdbCommand("print sizeof(" + var_name + ")")
@@ -248,14 +255,6 @@ def parseObjectVar(var_short_name,var_name,root_var):
     addVarCommand(var_short_name,var_name,OBJECT_FLAG)
     if root_var : addChildCommand("$root",var_name)
 
-
-    #object_varibals = (getVarValue(var_name)).split("\n")
-    #for member in object_varibals:
-    #    member_var = (member[0:member.find("=")]).strip()
-    #    if member_var!= "":
-    #        analyseVar(member_var,var_name + "." + member_var,False)
-    #        addChildCommand(var_name,var_name + "." + member_var)
-
     object_value = getVarValue(var_name)
     next_member_start = object_value.find("{")+1
     next_member_end = object_value.find("=")-1
@@ -263,7 +262,6 @@ def parseObjectVar(var_short_name,var_name,root_var):
         if next_member_start <= 0:
             break;
         member_name = object_value[next_member_start:next_member_end].strip()
-        #member_name = var_name + "." + object_value[next_member_start:next_member_end].strip()
         member_value_length = len(getVarValue(var_name + "." +member_name))
         analyseVar(member_name,var_name + "." +member_name,False)
         addChildCommand(var_name,var_name + "." +member_name)

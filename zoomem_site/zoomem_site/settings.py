@@ -82,8 +82,8 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'zoomem',
-        'USER': 'root',
-        'PASSWORD': 'traqes',
+        'USER': 'au',
+        'PASSWORD': '1234',
         'HOST': 'localhost',
         'PORT': '',
     }
