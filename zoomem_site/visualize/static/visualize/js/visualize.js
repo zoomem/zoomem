@@ -34,7 +34,6 @@ var cppEditor = CodeMirror.fromTextArea(document.getElementById("cpp-code"), {
 function updatePage(json){
   var d = new Date();
   var n = d.getTime();
-  alert(n)
   highlightLine(json.line_num);
   $(".output").html(json.output);
   drawGraph(json.edges,json.cnt,true);

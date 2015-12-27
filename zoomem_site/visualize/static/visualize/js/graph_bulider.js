@@ -390,7 +390,7 @@ function drawGraph(edges,n,new_data) {
     var str = ""
     for(var i = 0 ;i<edges.length;i++ )
       str+=edges[i] + "\n";
-    alert(str);
+    //alert(str);
     dataEdges=edges;
     dataN=n;
     initialize();
@@ -510,7 +510,7 @@ function drawGraph(edges,n,new_data) {
     }
   }
   for(var i=1;i<nodes.length;++i)
-    if(nodes[i].flag==2)
+    if(nodes[i].flag==2 || nodes[i].flag==1)
       for(var j=0;j<nodes[i].members.length;++j)
         if(nodes[nodes[i].members[j]].flag==2){
           var u=nodes[i].members[j];
