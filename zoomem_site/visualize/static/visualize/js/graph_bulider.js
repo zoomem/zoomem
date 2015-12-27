@@ -75,11 +75,7 @@ function getArrayEdges(arrayName){
     data:data,
     context: document.body,
      success: function(data) {
-       edges=data.edges;
-       for(var i=0;i<edges.length;++i){
-         edges[i].push(arrayName);
-         dataEdges.push(edges[i]);
-       }
+       drawGraph(data.edges,data.cnt,true);
      }
    });
 }

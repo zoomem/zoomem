@@ -19,7 +19,6 @@
     <link href={% static "bootstrap/css/bootstrap.min.css" %} rel="stylesheet">
 
     <script type="text/javascript" src={% static "visualize/js/graph_bulider.js" %}></script>
-
     <link href={% static "visualize/css/visualize.css" %} rel="stylesheet" type="text/css">
     <style type="text/css">
       .CodeMirror { border: 1px solid silver; }
@@ -35,7 +34,6 @@
       <textarea id="cpp-code">{{code}}</textarea>
       <div class id="drawArea" class = "graph_  area">
         <canvas id="cvs" width="900px" height="600px"></canvas>
-        <div id="bug">debug</div>
       </div>
     </div>
 
@@ -56,5 +54,16 @@
   </div>
     <textarea class = "output" readonly placeholder="code output goes here"> </textarea>
   <script type="text/javascript" src={% static "visualize/js/visualize.js" %}></script>
+  <script>
+    $(document).ready(function() {
+      $.ajax({
+        url: "/visualize/update",
+        context: document.body,
+         success: function(data) {
+           updatePage(data);
+         }
+       })
+    });
+  </script>
   </body>
 </html>

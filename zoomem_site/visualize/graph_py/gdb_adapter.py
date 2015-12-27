@@ -222,12 +222,15 @@ class GdbAdapter:
         self.gdb_process.write("python (executeGdbCommand('target record-full'))")
         self.gdb_process.write("python print('end')")
         self.gdb_process.clean()
+        self.graph = gdbGraph()
 
     def next(self,number = 1):
         self.gdb_process.write("python executeGdbCommand('n "+ str(number) + "')")
+        self.graph = gdbGraph()
 
     def prev(self,number = 1):
         self.gdb_process.write("python executeGdbCommand('rn "+ str(number) + "')")
+        self.graph = gdbGraph()
 
     def readOutput(self):
         content = ""
@@ -237,6 +240,7 @@ class GdbAdapter:
 
     def goToLine(self,line):
         self.gdb_process.write("python executeGdbCommand('until "+ str(line) + "')")
+        self.graph = gdbGraph()
 
     def getGraphEdegs(self,var_name = ""):
         self.vars_def_list = self.vars_def_list
@@ -249,17 +253,16 @@ class GdbAdapter:
         return int(self.gdb_process.readTill("done")[0])
 
     def bulidGraph(self, edges):
-        g = gdbGraph()
         for edge in edges:
             if edge.strip() == "":
                 continue
             attributes = edge.split(',')
             if len(attributes) > 0:
                 if attributes[0] == '1':
-                    g.addNode(attributes[1],attributes[2],attributes[3],attributes[4],attributes[5],attributes[6])
+                    self.graph.addNode(attributes[1],attributes[2],attributes[3],attributes[4],attributes[5],attributes[6])
                 else:
-                    g.addChildren(attributes[1],attributes[2],attributes[3],attributes[4],attributes[5])
-        return g
+                    self.graph.addChildren(attributes[1],attributes[2],attributes[3],attributes[4],attributes[5])
+        return self.graph
 
     def send_command(command):
         self.gdb_process.write(command + "\n")

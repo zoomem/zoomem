@@ -38,6 +38,8 @@ def update(request):
         'line_num': gdb_adapters[request.session.session_key].getCurrnetLine(),
         'output':  gdb_adapters[request.session.session_key].readOutput(),
     })
+    s = lambda: int(round(time.time() * 1000))
+    print s()
     return HttpResponse(data, content_type='application/json')
 
 def reorder(txt):

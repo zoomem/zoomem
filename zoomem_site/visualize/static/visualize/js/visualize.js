@@ -24,17 +24,6 @@ $("#prev").on("click", function() {
    })
 });
 
-$( document ).ready(function() {
-  $.ajax({
-    url: "/visualize/update",
-    context: document.body,
-     success: function(data) {
-       updatePage(data);
-     }
-   })
-});
-
-
 var cppEditor = CodeMirror.fromTextArea(document.getElementById("cpp-code"), {
   lineNumbers: true,
   matchBrackets: true,
@@ -43,6 +32,9 @@ var cppEditor = CodeMirror.fromTextArea(document.getElementById("cpp-code"), {
 });
 
 function updatePage(json){
+  var d = new Date();
+  var n = d.getTime();
+  alert(n)
   highlightLine(json.line_num);
   $(".output").html(json.output);
   drawGraph(json.edges,json.cnt,true);
