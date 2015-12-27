@@ -6,6 +6,7 @@ var adj=[];
 var key=[];
 var minX=0,maxX=0,minY=0,maxY=0;
 var redraw;
+var visArray=[];
 var style=[
 
   { // red
@@ -66,8 +67,7 @@ function fillText(text,x,y,w,right){
   var offset=right?+w-ctx.measureText(text).width:0;
   ctx.fillText(text+"...",x+offset,y);
 }
-var arrayVisible=[];
-function getArrayEdges(arrayName){
+function getArrayEdges(arrayName,uniqueName){
   var data = 'var_name=' + arrayName;
   var edges;
   $.ajax({
@@ -75,6 +75,7 @@ function getArrayEdges(arrayName){
     data:data,
     context: document.body,
      success: function(data) {
+       visArray[uniqueName]=true;
        drawGraph(data.edges,data.cnt,true);
      }
    });
@@ -135,7 +136,6 @@ Node.prototype.draw=function(calcOnly){
     /*ctx.fillStyle=style[this.flag].font;
     fillText(this.value,this.x+3,this.y+50,this.w-8);*/
   }
-
   var curY=this.y+50;
   for(var i=0;i<this.members.length;++i){
     if(calcOnly!=true){
@@ -146,17 +146,11 @@ Node.prototype.draw=function(calcOnly){
         fillText(nodes[this.members[i]].name,this.x+6,curY,this.w/2-11);
         var printContent=nodes[this.members[i]].value;
         if(nodes[this.members[i]].flag!=2)
-          fillText(printContent,this.x+this.w/2+6,curY,this.w/2-11,true);
+          fillText(printContent,this.x+this.w/2+6,curY,this.w/2-19,true);
       }else{
         if(nodes[this.members[i]].flag==1){
-          if(arrayVisible[nodes[this.members[i]].fullName]==true){
-            for(var i=0;i<dataEdges.length;++i)
-              if(dataEdges[i][dataEdges[i].length-1]==nodes[this.members[i]].fullName){
-                dataEdges.splice(i,1);
-                --i;
-              }
-          }else
-            getArrayEdges(nodes[this.members[i]].fullName);
+          if(visArray[nodes[this.members[i]].address+nodes[this.members[i]].type]!=true)
+              getArrayEdges(nodes[this.members[i]].fullName,nodes[this.members[i]].address+nodes[this.members[i]].type);
         }
         fillText(nodes[this.members[i]].type,this.x+6,curY,this.w/2-11);
         var printContent=nodes[this.members[i]].size;
@@ -186,12 +180,19 @@ Node.prototype.draw=function(calcOnly){
     nodes[this.members[i]].rect2={x:this.x,y:curY+6,w:this.w,h:17};
     curY+=17*2;
   }
+  this.rect1={x:this.x,y:this.y,w:this.w,h:this.h};
   if(this.flag!=2){
     ctx.fillStyle=style[this.flag].font;
     var text=this.value;
     if(this.flag==0 || this.flag==1){
       if(text=="none")
         text="NULL";
+    }
+    if(mouse.down==true && inside(mouse.x,mouse.y,this.rect1)){
+      text=this.address;
+      if(this.flag==1)
+        getArrayEdges(this.fullName,this.address+this.type);
+        //alert(this.fullName);
     }
     ctx.fillText(text,this.x+4,curY);
   }
@@ -380,13 +381,16 @@ function DFS(u,x,y){
 var first=1;
 var dataEdges,dataN;
 function drawGraph(edges,n,new_data) {
+
   if(new_data == true)
+  {
     first = 1;
+  }
   if(first==1){
     var str = ""
     for(var i = 0 ;i<edges.length;i++ )
       str+=edges[i] + "\n";
-    //alert(str);
+    alert(str);
     dataEdges=edges;
     dataN=n;
     initialize();
@@ -421,7 +425,8 @@ function drawGraph(edges,n,new_data) {
       nodes[edges[i][0]-1].members.push(edges[i][1]-1);
       //alert(edges[i][0] + " " + edges[i][1]);
       //alert((edges[i][0]-1) + " " + (edges[i][1]-1));
-    }
+    }else if(nodes[edges[i][0]-1].flag==1 && visArray[nodes[edges[i][0]-1].address+nodes[edges[i][0]-1].type])
+      nodes[edges[i][0]-1].members.push(edges[i][1]-1);
 
   }
   BFS(n);
@@ -434,7 +439,10 @@ function drawGraph(edges,n,new_data) {
   for(var i=0;i<vis.length;++i)
     vis[i]=false;
   for(var i=0;i<vis.length;++i)
-    if(nodes[i].flag==1 || nodes[i].flag==2 || nodes[i].name=="$"){
+    if(nodes[i].flag==2 || nodes[i].name=="$"){
+      vis[i]=true;
+      nodes[i].draw(true);
+    }else if(nodes[i].flag==1 && visArray[nodes[i].address+nodes[i].type]){
       vis[i]=true;
       nodes[i].draw(true);
     }
@@ -518,6 +526,21 @@ function drawGraph(edges,n,new_data) {
           var options2=[{x:x2-3,y:y2},{x:x2+nodes[u].rect1.w,y:y2}];
           drawEdge(options1,options2,style[nodes[u].flag].border,style[nodes[u].flag].titlebg);
       }
+      for(var i=1;i<nodes.length;++i)
+        if(nodes[i].flag==1){
+              var u=i;
+              var x1,y1,x2,y2;
+              if(nodes[u].rect2==null || nodes[u].rect1==null){
+                continue;
+              }
+              x1=nodes[u].rect2.x;
+              y1=nodes[u].rect2.y+nodes[u].rect2.h/2;
+              var options1=[{x:x1,y:y1},{x:x1+nodes[u].rect2.w,y:y1}];
+              x2=nodes[u].rect1.x;
+              y2=nodes[u].rect1.y+11;
+              var options2=[{x:x2-3,y:y2},{x:x2+nodes[u].rect1.w,y:y2}];
+              drawEdge(options1,options2,style[nodes[u].flag].border,style[nodes[u].flag].titlebg);
+          }
 }
 
 function draw(){

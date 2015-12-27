@@ -13,7 +13,7 @@ class node(object):
         self.id = id
         self.name = name
 
-    def calcGraphEdges(self,vs,edges):
+    def calcGraphEdges(self,vs,edges,vs2):
         for child_edge in self.children:
             child_node = child_edge.to
             command = []
@@ -29,10 +29,13 @@ class node(object):
                 command.append(child_edge.name)
             else:
                 command.append("")
-            edges.append(command)
+            temp = str(self.id) + "_" + str(child_node.id)
+            if(not temp in vs2 ):
+                edges.append(command)
+                vs2[temp] = True
             if not child_node.id in vs :
                 vs[child_node.id] = True
-                child_node.calcGraphEdges(vs,edges)
+                child_node.calcGraphEdges(vs,edges,vs2)
 
     def printNode(self, vs):
         for child_edge in self.children:
@@ -85,5 +88,5 @@ class gdbGraph:
 
     def getGraphEdges(self):
         edges = []
-        self.root.calcGraphEdges({},edges)
+        self.root.calcGraphEdges({},edges,{})
         return edges

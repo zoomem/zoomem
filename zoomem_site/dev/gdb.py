@@ -171,7 +171,7 @@ def bulidGraph(vars_def_list = "" , var_name = "" ):
         for var_name in var_names:
             analyseVar(var_name,var_name,True)
     else:
-        analyseVar(var_name,var_name,True,"",True)
+        analyseVar(var_name,var_name,False,"",True)
     global visted_list
     visted_list = {}
     print("done")
