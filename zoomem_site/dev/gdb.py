@@ -38,7 +38,7 @@ def getVarValue(var_name):
         temp = var_val.find("<",start_index)-1
         if temp != -1:
             end_index = temp
-    return (var_val[start_index:end_index].strip())
+    return (var_val[start_index:end_index]).strip()
 
 def getVarSize(var_name):
     var_size =  executeGdbCommand("print sizeof(" + var_name + ")")
@@ -55,11 +55,9 @@ def parseInfoLines(info_lines):
         if rem == 0:
             equal_index = info_lines[i].find("=")
             var_name = info_lines[i][0:equal_index-1].strip()
-            var_value = info_lines[i][equal_index+1:]
+            var_value = info_lines[i][equal_index+1:].strip()
             var_names.append(var_name)
             full_var_value = getVarValue(var_name)
-            if isAPointer(getVarType(var_name)):
-                full_var_value = full_var_value[full_var_value.find(")")+1:]
             rem = len(full_var_value) - len(var_value) - 1
             if full_var_value == var_value:
                 rem = 0
@@ -71,10 +69,8 @@ def parseInfoLines(info_lines):
 
 def getVariablesNames(info_command,info_empty_response):
     info_lines = (executeGdbCommand(info_command)).split("\n")
-
     if info_lines[0] == info_empty_response:
         return []
-
     return parseInfoLines(info_lines)
 
 vars_def = {}
@@ -97,7 +93,6 @@ def getAllVariablesNames():
     global global_vars
     for key, value in global_vars.items():
         var_names.append(key)
-
     definied_vars = getVariablesNames("info args","No arguments.")
     for var_name in var_names:
         if isDefined(var_name):
@@ -203,7 +198,6 @@ def isDefined(var_short_name):
 
 def analyseVar(var_short_name,var_name,root_var = False,Type = "",depth = False):
     var_type = getVarType(var_name) if Type == "" else Type
-
     if check_node(var_name,var_type,var_short_name):
         return
     if isPrimitive(var_type):
@@ -232,7 +226,6 @@ def check_node(var_name,var_type,var_short_name):
 def parseArrayVar(var_short_name,var_name,root_var,depth):
     addVarCommand(var_short_name,var_name,ARRAY_FLAG)
     if root_var: addChildCommand("$root",var_name)
-
     prev_node = var_name
     child_type = getVarType(var_name + "[0]")
     if depth == True:
@@ -254,7 +247,6 @@ def parsePointerVar(var_short_name,var_name,root_var):
 def parseObjectVar(var_short_name,var_name,root_var):
     addVarCommand(var_short_name,var_name,OBJECT_FLAG)
     if root_var : addChildCommand("$root",var_name)
-
     object_value = getVarValue(var_name)
     next_member_start = object_value.find("{")+1
     next_member_end = object_value.find("=")-1
@@ -294,7 +286,7 @@ def getVarHash(var_name):
         var_hash['var_value'] = str(getNumberOfArrayElements(var_name))
     else:
         var_value = getVarValue(var_name)
-        if var_hash['var_type'] == "char":
+        if var_hash['var_type'] == "char" or var_hash['var_type'] == "signed char" or var_hash['var_type'] == "unsigned char":
             var_hash['var_value'] = var_value[var_value.find("\'")+1:var_value.rfind("\'")]
         else:
             var_hash['var_value'] = (var_value if isPrimitive(var_hash['var_type']) else  "none")
