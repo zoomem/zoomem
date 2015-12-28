@@ -32,13 +32,11 @@ def getVarType(var_name):
 def getVarValue(var_name):
     var_val = executeGdbCommand("print " + var_name)
     start_index = var_val.find("=") + 1
-    end_index = len(var_val)
     if isAPointer(getVarType(var_name)):
-        start_index = var_val.find(")",start_index)+1
-        temp = var_val.find("<",start_index)-1
+        temp = var_val.find(")",start_index)
         if temp != -1:
-            end_index = temp
-    return (var_val[start_index:end_index]).strip()
+            start_index = temp+1
+    return (var_val[start_index:]).strip()
 
 def getVarSize(var_name):
     var_size =  executeGdbCommand("print sizeof(" + var_name + ")")
@@ -152,6 +150,8 @@ def initlizeHashes(vars_def_list):
     global global_vars
     vars_def = {}
     global_vars = {}
+    if vars_def_list == "":
+        vars_def["$$"] = 1
     if len(vars_def_list) > 0:
         vars_def_list = vars_def_list.split("-")
         for defin in vars_def_list:
@@ -180,6 +180,8 @@ def bulidGraph(vars_def_list = "" , var_name = "" ):
 
 def isDefined(var_short_name):
     global vars_def
+    if "$$" in vars_def:
+        return True
     global line_number
     global global_vars
     line_number = int(line_number)
