@@ -233,7 +233,7 @@ def parseArrayVar(var_short_name,var_name,root_var,depth):
     if depth == True:
         for i in range(0,getNumberOfArrayElements(var_name)):
             child_var_name = var_name+ "[" + str(i) + "]"
-            analyseVar(var_short_name+"[" + str(i) + "]",child_var_name,False,child_type,depth)
+            analyseVar(var_short_name+"[" + str(i) + "]",child_var_name,False,child_type,False)
             addChildCommand(var_name,child_var_name)
 
 def parsePointerVar(var_short_name,var_name,root_var):
