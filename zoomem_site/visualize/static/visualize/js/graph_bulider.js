@@ -68,6 +68,9 @@ function fillText(text,x,y,w,right){
   ctx.fillText(text+"...",x+offset,y);
 }
 function getArrayEdges(arrayName,uniqueName){
+  if(visArray[uniqueName]==1)
+    return;
+  visArray[uniqueName]=2;
   var data = 'var_name=' + arrayName;
   var edges;
   $.ajax({
@@ -75,9 +78,15 @@ function getArrayEdges(arrayName,uniqueName){
     data:data,
     context: document.body,
      success: function(data) {
-       visArray[uniqueName]=true;
+       visArray[uniqueName]=1;
        drawGraph(data.edges,data.cnt,true);
-     }
+     },
+     error: function(){
+       if(visArray[uniqueName]==2){
+         visArray[uniqueName]=0;
+         alert("ERROR");
+       }
+     },
    });
 }
 function inside(x,y,rect){
@@ -149,7 +158,7 @@ Node.prototype.draw=function(calcOnly){
           fillText(printContent,this.x+this.w/2+6,curY,this.w/2-19,true);
       }else{
         if(nodes[this.members[i]].flag==1){
-          if(visArray[nodes[this.members[i]].address+nodes[this.members[i]].type]!=true)
+          if(visArray[nodes[this.members[i]].address+nodes[this.members[i]].type]!=1)
               getArrayEdges(nodes[this.members[i]].fullName,nodes[this.members[i]].address+nodes[this.members[i]].type);
         }
         fillText(nodes[this.members[i]].type,this.x+6,curY,this.w/2-11);
@@ -239,49 +248,49 @@ function drawEdge(from,to,startColor,endColor){
   var c1x,c1y,c2x,c2y;
   if(Math.abs(x1-x2)<10){
     if(y2<y1){
-      c1x=x1-32;
-      c1y=y1+16;
+      c1x=x1-75;
+      c1y=y2+(y1-y2)*0.75;
       c2x=x2-5;
       c2y=y2+5;
     }else{
-      c1x=x1-5;
-      c1y=y1+5;
+      c1x=x1-75;
+      c1y=y1+(y2-y1)*0.25;
       c2x=x2-32;
       c2y=y2+16;
     }
   }else if(Math.abs(y1-y2)<10){
     if(x1<x2){
-      c1x=x1+10;
-      c1y=y1-100;
+      c1x=x1+(x2-x1)*0.25;
+      c1y=y1+(x2-x1)*0.40;
       c2x=x2-10;
       c2y=y2-10;
     }else{
-      c1x=x1-10;
-      c1y=y1-10;
+      c1x=x1-(x1-x2)*0.25;
+      c1y=y1-(x1-x2)*0.40;
       c2x=x2+10;
       c2y=y2+10;
     }
   }else if(x1<x2){
     if(y1<y2){
-      c1x=x1+10;
-      c1y=y1-10;
+      c1x=x1+(x2-x1)*0.30;
+      c1y=y1-25;
       c2x=x2-10;
       c2y=y2+10;
     }else{
-      c1x=x1+10;
-      c1y=y1+10;
+      c1x=x1+(x2-x1)*0.30;
+      c1y=y1+25;
       c2x=x2-10;
       c2y=y2-10;
     }
   }else{
     if(y2<y1){
-      c1x=x1-10;
-      c1y=y1-10;
+      c1x=x1-(x1-x2)*0.30;
+      c1y=y1+25;
       c2x=x2+10;
       c2y=y2+10;
     }else{
-      c1x=x1-10;
-      c1y=y1+10;
+      c1x=x1-(x1-x2)*0.30;
+      c1y=y1-25;
       c2x=x2+10;
       c2y=y2-10;
     }
@@ -293,6 +302,30 @@ function drawEdge(from,to,startColor,endColor){
   gradient.addColorStop("0.5", "black");
   //gradient.addColorStop("1", endColor);
   ctx.strokeStyle=gradient;
+
+
+  var startPointX = x1;
+  var startPointY = y1;
+  var endPointX = x2;
+  var endPointY = y2;
+  var quadPointX = c1x;
+  var quadPointY = c1y;
+
+  var arrowAngle = Math.atan2(quadPointX - endPointX, quadPointY - endPointY) + Math.PI;
+  var arrowWidth = 10;
+
+  ctx.beginPath();
+  ctx.moveTo(startPointX, startPointY);
+  ctx.quadraticCurveTo(quadPointX, quadPointY, endPointX, endPointY);
+  ctx.moveTo(endPointX - (arrowWidth * Math.sin(arrowAngle - Math.PI / 6)),
+             endPointY - (arrowWidth * Math.cos(arrowAngle - Math.PI / 6)));
+  ctx.lineTo(endPointX, endPointY);
+  ctx.lineTo(endPointX - (arrowWidth * Math.sin(arrowAngle + Math.PI / 6)),
+             endPointY - (arrowWidth * Math.cos(arrowAngle + Math.PI / 6)));
+  ctx.stroke();
+  ctx.closePath();
+  return;
+
   ctx.beginPath();
   ctx.moveTo(x1,y1);
   ctx.bezierCurveTo(c1x,c1y,c2x,c2y,x2,y2);
@@ -425,7 +458,7 @@ function drawGraph(edges,n,new_data) {
       nodes[edges[i][0]-1].members.push(edges[i][1]-1);
       //alert(edges[i][0] + " " + edges[i][1]);
       //alert((edges[i][0]-1) + " " + (edges[i][1]-1));
-    }else if(nodes[edges[i][0]-1].flag==1 && visArray[nodes[edges[i][0]-1].address+nodes[edges[i][0]-1].type])
+    }else if(nodes[edges[i][0]-1].flag==1 && visArray[nodes[edges[i][0]-1].address+nodes[edges[i][0]-1].type]==1)
       nodes[edges[i][0]-1].members.push(edges[i][1]-1);
 
   }
@@ -442,7 +475,7 @@ function drawGraph(edges,n,new_data) {
     if(nodes[i].flag==2 || nodes[i].name=="$"){
       vis[i]=true;
       nodes[i].draw(true);
-    }else if(nodes[i].flag==1 && visArray[nodes[i].address+nodes[i].type]){
+    }else if(nodes[i].flag==1 && visArray[nodes[i].address+nodes[i].type]==1){
       vis[i]=true;
       nodes[i].draw(true);
     }
@@ -464,7 +497,7 @@ function drawGraph(edges,n,new_data) {
   for(var i=0;i<nodesInOrder.length;++i){
     if(i>0 && nodesInOrder[i][1]!=nodesInOrder[i-1][1]){
       curY=10;
-      curX+=200;
+      curX+=256;
     }
     nodes[nodesInOrder[i][0]].x=curX;
     nodes[nodesInOrder[i][0]].y=curY;
@@ -498,13 +531,13 @@ function drawGraph(edges,n,new_data) {
       if(nodes[v].rect1!=null){
         x2=nodes[v].rect1.x;
         y2=nodes[v].rect1.y+11;
-        options2.push({x:x2-3,y:y2});
-        options2.push({x:x2+nodes[v].rect1.w,y:y2});
+        options2.push({x:x2-6,y:y2});
+        options2.push({x:x2+nodes[v].rect1.w+6,y:y2});
       }else{
         x2=nodes[v].rect2.x;
         y2=nodes[v].rect2.y+nodes[v].rect2.h/2;
-        options2.push({x:x2,y:y2});
-        options2.push({x:x2+nodes[v].rect2.w,y:y2});
+        options2.push({x:x2-6,y:y2});
+        options2.push({x:x2+nodes[v].rect2.w+6,y:y2});
       }
       drawEdge(options1,options2,style[nodes[u].flag].border,style[nodes[v].flag].titlebg);
     }
@@ -523,7 +556,7 @@ function drawGraph(edges,n,new_data) {
           var options1=[{x:x1,y:y1},{x:x1+nodes[u].rect2.w,y:y1}];
           x2=nodes[u].rect1.x;
           y2=nodes[u].rect1.y+11;
-          var options2=[{x:x2-3,y:y2},{x:x2+nodes[u].rect1.w,y:y2}];
+          var options2=[{x:x2-6,y:y2},{x:x2+nodes[u].rect1.w+6,y:y2}];
           drawEdge(options1,options2,style[nodes[u].flag].border,style[nodes[u].flag].titlebg);
       }
       for(var i=1;i<nodes.length;++i)
@@ -538,7 +571,7 @@ function drawGraph(edges,n,new_data) {
               var options1=[{x:x1,y:y1},{x:x1+nodes[u].rect2.w,y:y1}];
               x2=nodes[u].rect1.x;
               y2=nodes[u].rect1.y+11;
-              var options2=[{x:x2-3,y:y2},{x:x2+nodes[u].rect1.w,y:y2}];
+              var options2=[{x:x2-6,y:y2},{x:x2+nodes[u].rect1.w+6,y:y2}];
               drawEdge(options1,options2,style[nodes[u].flag].border,style[nodes[u].flag].titlebg);
           }
 }
