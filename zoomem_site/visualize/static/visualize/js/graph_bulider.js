@@ -68,26 +68,42 @@ function fillText(text,x,y,w,right){
   ctx.fillText(text+"...",x+offset,y);
 }
 function getArrayEdges(arrayName,uniqueName){
-  if(visArray[uniqueName]==1)
-    return;
-  visArray[uniqueName]=2;
-  var data = 'var_name=' + arrayName;
-  var edges;
-  $.ajax({
-    url: "/visualize/update",
-    data:data,
-    context: document.body,
-     success: function(data) {
-       visArray[uniqueName]=1;
-       drawGraph(data.edges,data.cnt,true);
-     },
-     error: function(){
-       if(visArray[uniqueName]==2){
-         visArray[uniqueName]=0;
-         alert("ERROR");
-       }
-     },
-   });
+  mouse.down=false;
+  if(visArray[uniqueName]==0 || visArray[uniqueName]==2){
+    visArray[uniqueName]=2;
+    var data = 'var_name=' + arrayName;
+    var edges;
+    $.ajax({
+      url: "/visualize/update",
+      data:data,
+      context: document.body,
+       success: function(data) {
+         visArray[uniqueName]=1;
+         drawGraph(data.edges,data.cnt,true);
+       },
+       error: function(){
+         if(visArray[uniqueName]==2)
+           visArray[uniqueName]=0;
+       },
+     });
+   }else{
+     visArray[uniqueName]=3;
+     var data = 'del_name=' + arrayName;
+     var edges;
+     $.ajax({
+       url: "/visualize/removeGraphEdges",
+       data:data,
+       context: document.body,
+        success: function(data) {
+          visArray[uniqueName]=0;
+          drawGraph(data.edges,data.cnt,true);
+        },
+        error: function(){
+          if(visArray[uniqueName]==3)
+            visArray[uniqueName]=1;
+        },
+      });
+   }
 }
 function inside(x,y,rect){
   rect.x*=cam.cz;
@@ -158,8 +174,7 @@ Node.prototype.draw=function(calcOnly){
           fillText(printContent,this.x+this.w/2+6,curY,this.w/2-19,true);
       }else{
         if(nodes[this.members[i]].flag==1){
-          if(visArray[nodes[this.members[i]].address+nodes[this.members[i]].type]!=1)
-              getArrayEdges(nodes[this.members[i]].fullName,nodes[this.members[i]].address+nodes[this.members[i]].type);
+          getArrayEdges(nodes[this.members[i]].fullName,nodes[this.members[i]].address+nodes[this.members[i]].type);
         }
         fillText(nodes[this.members[i]].type,this.x+6,curY,this.w/2-11);
         var printContent=nodes[this.members[i]].size;
