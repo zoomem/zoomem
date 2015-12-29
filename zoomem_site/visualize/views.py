@@ -44,12 +44,12 @@ def update(request):
 
 def removeGraphEdges(request):
     var_name = ""
-    if "var_name" in request.GET:
-        var_name = request.GET["var_name"]
+    if "del_name" in request.GET:
+        var_name = request.GET["del_name"]
     g_adapter = gdb_adapters[request.session.session_key]
     edges = g_adapter.getGraphEdegs(var_name,'100')
     g_adapter.removeGraphEdges(edges)
-    return HttpResponse("edges removed")
+    return update(request)
 
 def reorder(txt):
     code = []
