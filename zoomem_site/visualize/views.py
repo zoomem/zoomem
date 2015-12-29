@@ -31,7 +31,7 @@ def update(request):
     var_name = ""
     if "var_name" in request.GET:
         var_name = request.GET["var_name"]
-    g_data =  getEdges(gdb_adapters[request.session.session_key],var_name)
+    g_data = getEdges(gdb_adapters[request.session.session_key],var_name)
     data = json.dumps({
         'edges': g_data["edges"],
         'cnt': g_data["cnt"],
@@ -41,6 +41,15 @@ def update(request):
     s = lambda: int(round(time.time() * 1000))
     print s()
     return HttpResponse(data, content_type='application/json')
+
+def removeGraphEdges(request):
+    var_name = ""
+    if "var_name" in request.GET:
+        var_name = request.GET["var_name"]
+    g_adapter = gdb_adapters[request.session.session_key]
+    edges = g_adapter.getGraphEdegs(var_name,'100')
+    g_adapter.removeGraphEdges(edges)
+    return HttpResponse("edges removed")
 
 def reorder(txt):
     code = []
@@ -108,7 +117,10 @@ def createNewGdbAdapter(code,inpt):
     return GdbAdapter(code_file_name,input_file_name,output_file_name)
 
 def getEdges(g_adapter,var_name):
-    g = g_adapter.bulidGraph(g_adapter.getGraphEdegs(var_name))
+    depth = 0
+    if var_name != "":
+        depth = 1
+    g = g_adapter.bulidGraph(g_adapter.getGraphEdegs(var_name,str(depth)))
     data = {}
     data["edges"] = g.getGraphEdges()
     data["cnt"] = g.id_cnt

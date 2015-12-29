@@ -8,4 +8,6 @@ urlpatterns = [
     url(r'^next', views.next, name='next'),
     url(r'^prev', views.prev, name='prev'),
     url(r'^update', views.update, name='update'),
+    url(r'^removeGraphEdges', views.removeGraphEdges, name='removeGraphEdges'),
+
 ]

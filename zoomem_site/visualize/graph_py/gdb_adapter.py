@@ -240,7 +240,7 @@ class GdbAdapter:
 
         self.gdb_process.write("python (executeGdbCommand('run < " + input_file_name + " > " + output_file_name + "'))")
         self.gdb_process.write("python (executeGdbCommand('target record-full'))")
-        self.gdb_process.write("python print('end')")
+        self.gdb_process.write("python print('begin')")
         self.gdb_process.clean()
         self.graph = gdbGraph()
 
@@ -262,11 +262,11 @@ class GdbAdapter:
         self.gdb_process.write("python executeGdbCommand('until "+ str(line) + "')")
         self.graph = gdbGraph()
 
-    def getGraphEdegs(self,var_name = ""):
+    def getGraphEdegs(self,var_name = "",depth = 0):
         self.vars_def_list = self.vars_def_list
         var_name = "\"" + var_name + "\""
-        self.gdb_process.write("python bulidGraph(\"" +self.vars_def_list+"\","+var_name+ ")")
-        return self.gdb_process.readTill("done")
+        self.gdb_process.write("python bulidGraph(\"" +self.vars_def_list+"\","+var_name+ "," + depth + ")")
+        return (self.gdb_process.readTill("done"))
 
     def getCurrnetLine(self):
         self.gdb_process.write("python getCrrentLine()")
@@ -282,7 +282,15 @@ class GdbAdapter:
             else:
                 attributes = parseAttributes(edge,5)
                 self.graph.addChildren(attributes[1],attributes[2],attributes[3],attributes[4],attributes[5])
+        return self.graph
 
+    def removeGraphEdges(self,edges):
+        for edge in edges:
+            if edge.strip() == "":
+                continue
+            if(edge[0] == '2'):
+                attributes = parseAttributes(edge,5)
+                self.graph.removeChildren(attributes[1],attributes[2],attributes[3],attributes[4],attributes[5])
         return self.graph
 
     def send_command(command):

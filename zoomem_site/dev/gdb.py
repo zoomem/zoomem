@@ -163,7 +163,7 @@ def initlizeHashes(vars_def_list):
                     vars_def[var[0]] = []
                 vars_def[var[0]].append(var[1] + " " +  var[2] + " " + var[3])
 
-def bulidGraph(vars_def_list = "" , var_name = "" ):
+def bulidGraph(vars_def_list = "" , var_name = "",depth = 0 ):
     start_time = time.time();
     executeGdbCommand("set print pretty on")
     initlizeHashes(vars_def_list)
@@ -173,7 +173,7 @@ def bulidGraph(vars_def_list = "" , var_name = "" ):
         for var_name in var_names:
             analyseVar(var_name,var_name,True)
     else:
-        analyseVar(var_name,var_name,False,"",True)
+        analyseVar(var_name,var_name,False,"",depth)
     global visted_list
     visted_list = {}
     print("done")
@@ -198,7 +198,7 @@ def isDefined(var_short_name):
             return True
     return False
 
-def analyseVar(var_short_name,var_name,root_var = False,Type = "",depth = False):
+def analyseVar(var_short_name,var_name,root_var = False,Type = "",depth = 0):
     var_type = getVarType(var_name) if Type == "" else Type
     if check_node(var_name,var_type,var_short_name):
         return
@@ -230,10 +230,10 @@ def parseArrayVar(var_short_name,var_name,root_var,depth):
     if root_var: addChildCommand("$root",var_name)
     prev_node = var_name
     child_type = getVarType(var_name + "[0]")
-    if depth == True:
+    if depth > 0:
         for i in range(0,getNumberOfArrayElements(var_name)):
             child_var_name = var_name+ "[" + str(i) + "]"
-            analyseVar(var_short_name+"[" + str(i) + "]",child_var_name,False,child_type,False)
+            analyseVar(var_short_name+"[" + str(i) + "]",child_var_name,False,child_type,depth -1)
             addChildCommand(var_name,child_var_name)
 
 def parsePointerVar(var_short_name,var_name,root_var):
