@@ -51,6 +51,26 @@ def removeGraphEdges(request):
     g_adapter.removeGraphEdges(edges)
     return update(request)
 
+
+def next(request):
+    step =  request.GET["step"]
+    if(step == ""):
+        step = 1
+    gdb_adapters[request.session.session_key].next(step)
+    return update(request)
+
+def prev(request):
+    step =  request.GET["step"]
+    if(step == ""):
+        step = 1
+    gdb_adapters[request.session.session_key].prev(step)
+    return update(request)
+
+def finishFuncton(request):
+    gdb_adapters[request.session.session_key].finishFuncton()
+    return update(request)
+
+#anything below this line can't be accessd from urls k ?
 def reorder(txt):
     code = []
     non_include = 0
@@ -71,20 +91,6 @@ def reorder(txt):
                 code.append("int dummyVaribleDeclaredToBeUsedToParseClangOutput__4zoomem;\n")
             code.append(line)
     return code
-
-def next(request):
-    step =  request.GET["step"]
-    if(step == ""):
-        step = 1
-    gdb_adapters[request.session.session_key].next(step)
-    return update(request)
-
-def prev(request):
-    step =  request.GET["step"]
-    if(step == ""):
-        step = 1
-    gdb_adapters[request.session.session_key].prev(step)
-    return update(request)
 
 def randomword(length):
    return ''.join(random.choice(string.lowercase) for i in range(length))

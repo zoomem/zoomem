@@ -13,6 +13,7 @@ OBJECT_FLAG = '3'
 PRIMITIVE_FLAG = '4'
 
 visted_list = {}
+
 def getVarAddress(var_name):
     var_address = executeGdbCommand("p &" + var_name)
     index = var_address.rfind("0x")
@@ -111,7 +112,7 @@ def isAObject(var_type):
 
 def isAArray(var_type):
     try:
-        return var_type[var_type.rfind(" ") + 1:][0] == "["
+        return "[" in var_type
     except Exception:
         return False
 
@@ -120,11 +121,6 @@ def isPrimitive(var_type):
         return var_type[var_type.find("=") + 1:].strip() in PRIMITIVES_TYPES
     except Exception:
         return False
-
-def updateScope():
-    var_names = getVariablesName()
-    for var_name in var_names:
-        addVarNameToDic(var_name)
 
 def addVarNameToDic(var_name):
     var_address = getVarAddress(var_name)
@@ -138,12 +134,23 @@ line_number = 0
 def getLineNumber():
     global line_number
     line_number = executeGdbCommand("frame").split("\n")[1].split()[0]
+    return line_number
 
 def getCrrentLine():
-    line = executeGdbCommand("frame").split("\n")[1].split()[0]
-    print(line)
+    print(getLineNumber())
     print ("done")
 
+def next(n):
+    n = int(n)
+    for i in range(0,n):
+        executeGdbCommand("n")
+    gdb.flush()
+
+def prev(n):
+    n = int(n)
+    for i in range(0,n):
+        executeGdbCommand("rn")
+    gdb.flush()
 
 def initlizeHashes(vars_def_list):
     global vars_def
@@ -163,7 +170,7 @@ def initlizeHashes(vars_def_list):
                     vars_def[var[0]] = []
                 vars_def[var[0]].append(var[1] + " " +  var[2] + " " + var[3])
 
-def bulidGraph(vars_def_list = "" , var_name = "",depth = 0 ):
+def generateGraphEdges(vars_def_list = "" , var_name = "",depth = 0 ):
     start_time = time.time();
     executeGdbCommand("set print pretty on")
     initlizeHashes(vars_def_list)
