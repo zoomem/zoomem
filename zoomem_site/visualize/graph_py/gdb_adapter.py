@@ -27,7 +27,7 @@ class GdbAdapter:
         self.graph = gdbGraph()
         self.status = True
 
-    def finishFuncton(self):
+    def stepOut(self):
         self.gdb_process.write("python executeGdbCommand('finish')")
         self.graph = gdbGraph()
 

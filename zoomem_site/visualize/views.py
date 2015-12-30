@@ -66,8 +66,8 @@ def prev(request):
     gdb_adapters[request.session.session_key].prev(step)
     return update(request)
 
-def finishFuncton(request):
-    gdb_adapters[request.session.session_key].finishFuncton()
+def stepOut(request):
+    gdb_adapters[request.session.session_key].stepOut()
     return update(request)
 
 #anything below this line can't be accessd from urls k ?
