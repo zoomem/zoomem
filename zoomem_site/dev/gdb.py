@@ -2,7 +2,7 @@ from subprocess import Popen, PIPE
 import hashlib
 import time
 import subprocess
-
+import time
 PRIMITIVES_TYPES = ['std::string','short', 'short int', 'signed short', 'signed short int', 'unsigned short', 'unsigned short int', 'int', 'signed', 'signed int', 'unsigned', 'unsigned int', 'long', 'long int', 'signed long', 'signed long int', 'unsigned long', 'unsigned long int', 'long long', 'long long int', 'signed long long', 'signed long long int', 'unsigned long long', 'unsigned long long int', 'float', 'double', 'long double ', 'signed char', 'unsigned char', 'char', 'wchar_t', 'char16_t', 'char32_t', 'bool']
 
 graph_process = Popen('./graph',stdin = PIPE, stdout = PIPE, stderr = PIPE,shell = True)
@@ -13,6 +13,16 @@ OBJECT_FLAG = '3'
 PRIMITIVE_FLAG = '4'
 
 visted_list = {}
+def maxNumberOfSteps():
+    start = time.time()
+    cnt = 0
+    try:
+        while(time.time() - start < 5):
+            next('1')
+            cnt+=1
+        print("TLE\ndone")
+    except Exception:
+        print(str(cnt-2) + "\ndone")
 
 def getVarAddress(var_name):
     var_address = executeGdbCommand("p &" + var_name)
