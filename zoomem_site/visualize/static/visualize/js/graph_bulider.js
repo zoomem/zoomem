@@ -161,18 +161,19 @@ Node.prototype.draw=function(calcOnly){
     /*ctx.fillStyle=style[this.flag].font;
     fillText(this.value,this.x+3,this.y+50,this.w-8);*/
   }
+  var mouseOnMembers=false;
   var curY=this.y+50;
   for(var i=0;i<this.members.length;++i){
     if(calcOnly!=true){
       ctx.fillStyle=style[nodes[this.members[i]].flag].font;
       nodes[this.members[i]].rect2={x:this.x,y:curY-17+6,w:this.w,h:17};
-      var mouseDown=false;
       if(mouse.down==false || !inside(mouse.x,mouse.y,nodes[this.members[i]].rect2)){
         fillText(nodes[this.members[i]].name,this.x+6,curY,this.w/2-11);
         var printContent=nodes[this.members[i]].value;
         if(nodes[this.members[i]].flag!=2)
           fillText(printContent,this.x+this.w/2+6,curY,this.w/2-19,true);
       }else{
+        mouseOnMembers=true;
         if(nodes[this.members[i]].flag==1){
           getArrayEdges(nodes[this.members[i]].fullName,nodes[this.members[i]].address+nodes[this.members[i]].type);
         }
@@ -212,7 +213,7 @@ Node.prototype.draw=function(calcOnly){
       if(text=="none")
         text="NULL";
     }
-    if(mouse.down==true && inside(mouse.x,mouse.y,this.rect1)){
+    if(mouseOnMembers==false && mouse.down==true && inside(mouse.x,mouse.y,this.rect1)){
       text=this.address;
       if(this.flag==1)
         getArrayEdges(this.fullName,this.address+this.type);
@@ -473,7 +474,7 @@ function drawGraph(edges,n,new_data) {
       nodes[edges[i][0]-1].members.push(edges[i][1]-1);
       //alert(edges[i][0] + " " + edges[i][1]);
       //alert((edges[i][0]-1) + " " + (edges[i][1]-1));
-    }else if(nodes[edges[i][0]-1].flag==1 && visArray[nodes[edges[i][0]-1].address+nodes[edges[i][0]-1].type]==1)
+    }else if(nodes[edges[i][0]-1].flag==1 && (visArray[nodes[edges[i][0]-1].address+nodes[edges[i][0]-1].type]==1 || visArray[nodes[edges[i][0]-1].address+nodes[edges[i][0]-1].type]==3))
       nodes[edges[i][0]-1].members.push(edges[i][1]-1);
 
   }
@@ -490,7 +491,7 @@ function drawGraph(edges,n,new_data) {
     if(nodes[i].flag==2 || nodes[i].name=="$"){
       vis[i]=true;
       nodes[i].draw(true);
-    }else if(nodes[i].flag==1 && visArray[nodes[i].address+nodes[i].type]==1){
+    }else if(nodes[i].flag==1 && (visArray[nodes[i].address+nodes[i].type]==1 || visArray[nodes[i].address+nodes[i].type]==3)){
       vis[i]=true;
       nodes[i].draw(true);
     }
@@ -604,6 +605,13 @@ function draw(){
   requestAnimationFrame(draw);
 }
 var done=0;
+function getMousePosition(e){
+  var rect = cvs.getBoundingClientRect();
+  return {
+    x: e.clientX - rect.left,
+    y: e.clientY - rect.top
+  };
+}
 function initialize(){
   if(done==1)
     return;
@@ -614,8 +622,9 @@ function initialize(){
   H=600;
   cvs.onmousedown = function (e) {
       mouse.down = true;
-      mouse.x = e.offsetX || (e.layerX-10);
-      mouse.y = e.offsetY || (e.layerY-10);
+      var pos=getMousePosition(e);
+      mouse.x = pos.x;
+      mouse.y = pos.y;
       mouse.last = { x: mouse.x, y: mouse.y };
   };
   document.onmouseup = function (e) {
@@ -625,8 +634,9 @@ function initialize(){
   document.onmousemove = function (e) {
     if (mouse.down == false)
         return;
-    var x = e.clientX - cvs.offsetLeft;
-    var y = e.clientY - cvs.offsetTop;
+    var pos=getMousePosition(e);
+    var x = pos.x;
+    var y = pos.y;
     if (key[17] == true || key[157] == true) {
         var os = 256;
         if (cam.z - (y - mouse.y) / os > 0.128 && cam.z - (y - mouse.y) / os < 2.25) {
