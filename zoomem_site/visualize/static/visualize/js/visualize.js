@@ -1,4 +1,13 @@
+
+function disable_buttons(){
+  $("input[type=button],:button").attr("disabled","disabled");
+}
+function enable_buttons()
+{
+  $("input[type=button],:button").removeAttr("disabled");
+}
 $("#next").on("click", function() {
+  disable_buttons()
   var number = $('#step');
   var data = 'step=' + number.val();
   $.ajax({
@@ -7,11 +16,13 @@ $("#next").on("click", function() {
     context: document.body,
      success: function(data) {
       updatePage(data);
+      enable_buttons();
      }
    })
 });
 
 $("#prev").on("click", function() {
+  disable_buttons()
   var number = $('#step');
   var data = 'step=' + number.val();
   $.ajax({
@@ -20,16 +31,19 @@ $("#prev").on("click", function() {
     context: document.body,
      success: function(data) {
        updatePage(data);
+       enable_buttons();
      }
    })
 });
 
 $("#stepout").on("click", function() {
+  disable_buttons()
   $.ajax({
     url: "/visualize/stepOut",
     context: document.body,
      success: function(data) {
        updatePage(data);
+       enable_buttons();
      }
    })
 });
