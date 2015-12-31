@@ -21,7 +21,7 @@ class GdbAdapter:
             self.gdb_process.write("python (executeGdbCommand('b " + function + "'))")
 
         self.gdb_process.write("python (executeGdbCommand('set confirm off'))")
-        self.gdb_process.write("python (executeGdbCommand('run'))")
+        self.gdb_process.write("python (executeGdbCommand('run < " + input_file_name + " > " + output_file_name + "'))")
         self.gdb_process.write("python calcMaxNumberOfSteps()")
 
         self.gdb_process.write("python (executeGdbCommand('run < " + input_file_name + " > " + output_file_name + "'))")
