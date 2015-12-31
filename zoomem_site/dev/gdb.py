@@ -11,18 +11,29 @@ POINTER_FLAG = '1'
 ARRAY_FLAG = '2'
 OBJECT_FLAG = '3'
 PRIMITIVE_FLAG = '4'
+MAX_STEPS = 0
+CUR_STPES = 0
 
 visted_list = {}
-def maxNumberOfSteps():
+def getMaxNumberOfSteps():
+    global MAX_STEPS
+    print(str(MAX_STEPS) + "\ndone")
+
+def getCurrNumberOfSteps():
+    global CUR_STPES
+    print(str(CUR_STPES) + "\ndone")
+
+def calcMaxNumberOfSteps():
+    global MAX_STEPS
     start = time.time()
     cnt = 0
     try:
         while(time.time() - start < 5):
-            next('1')
+            executeGdbCommand('next')
             cnt+=1
-        print("TLE\ndone")
+        MAX_STEPS =  cnt
     except Exception:
-        print(str(cnt-2) + "\ndone")
+        MAX_STEPS = cnt-3
 
 def getVarAddress(var_name):
     var_address = executeGdbCommand("p &" + var_name)
@@ -151,15 +162,21 @@ def getCrrentLine():
     print ("done")
 
 def next(n):
+    global CUR_STPES,MAX_STEPS
     n = int(n)
+    n = min(n,(MAX_STEPS-CUR_STPES))
     for i in range(0,n):
         executeGdbCommand("n")
+        CUR_STPES+=1
     gdb.flush()
 
 def prev(n):
+    global CUR_STPES,MAX_STEPS
     n = int(n)
+    n = min(n,CUR_STPES)
     for i in range(0,n):
         executeGdbCommand("rn")
+        CUR_STPES-=1
     gdb.flush()
 
 def initlizeHashes(vars_def_list):

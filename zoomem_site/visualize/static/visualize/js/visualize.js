@@ -26,8 +26,7 @@ $("#prev").on("click", function() {
 
 $("#stepout").on("click", function() {
   $.ajax({
-    url: "/visualize/prev",
-    data:data,
+    url: "/visualize/stepOut",
     context: document.body,
      success: function(data) {
        updatePage(data);

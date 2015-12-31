@@ -20,12 +20,24 @@ class GdbAdapter:
         for function in defined_functions:
             self.gdb_process.write("python (executeGdbCommand('b " + function + "'))")
 
+        self.gdb_process.write("python (executeGdbCommand('set confirm off'))")
+        self.gdb_process.write("python (executeGdbCommand('run'))")
+        self.gdb_process.write("python calcMaxNumberOfSteps()")
+
         self.gdb_process.write("python (executeGdbCommand('run < " + input_file_name + " > " + output_file_name + "'))")
         self.gdb_process.write("python (executeGdbCommand('target record-full'))")
         self.gdb_process.write("python print('begin')")
         self.gdb_process.clean()
+
         self.graph = gdbGraph()
-        self.status = True
+
+    def getMaxNumberOfSteps(self):
+        self.gdb_process.write("python getMaxNumberOfSteps()")
+        return (self.gdb_process.readTill("done"))
+
+    def getCurrNumberOfSteps(self):
+        self.gdb_process.write("python getCurrNumberOfSteps()")
+        return (self.gdb_process.readTill("done"))
 
     def stepOut(self):
         self.gdb_process.write("python executeGdbCommand('finish')")
