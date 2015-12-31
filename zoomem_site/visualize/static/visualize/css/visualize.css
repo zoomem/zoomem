@@ -50,9 +50,15 @@ td{
   height: 100px;
   font-size: 80%;
   resize: vertical;
+  float:left;
+  margin-bottom: 10px;
 }
 
 .home_btn {
   float:left;
   width:5%;
+}
+
+textarea{
+  background-color: :white;
 }

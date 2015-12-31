@@ -618,8 +618,6 @@ function initialize(){
   done=1;
   cvs=document.getElementById("cvs");
   ctx=cvs.getContext("2d");
-  W=900;
-  H=600;
   cvs.onmousedown = function (e) {
       mouse.down = true;
       var pos=getMousePosition(e);
@@ -671,4 +669,14 @@ window.onkeyup = function (e) {
 window.onblur = function (e) {
     mouse.down = false;
     key = [];
+};
+
+window.onload=function(){
+  var rect = document.getElementById('cvs_cont').getBoundingClientRect();
+  W=rect.width-10;
+  H=rect.height-10;
+  document.getElementById('cvs').setAttribute('width',W);
+  document.getElementById('cvs').setAttribute('height',H);
+
+
 };
