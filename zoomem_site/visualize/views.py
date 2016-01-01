@@ -47,7 +47,7 @@ def remove_graph_edges(request):
     if "del_name" in request.GET:
         var_name = request.GET["del_name"]
     g_adapter = gdb_adapters[request.session.session_key]
-    edges = g_adapter.getGraphEdegs(var_name,'100')
+    edges = g_adapter.getGraphData(var_name,'100')
     g_adapter.removeGraphEdges(edges)
     return update(request)
 
@@ -134,7 +134,7 @@ def getEdges(g_adapter,var_name):
     depth = 0
     if var_name != "":
         depth = 1
-    g = g_adapter.bulidGraph(g_adapter.getGraphEdegs(var_name,str(depth)))
+    g = g_adapter.bulidGraph(g_adapter.getGraphData(var_name,str(depth)))
     data = {}
     data["edges"] = g.getGraphEdges()
     data["cnt"] = g.id_cnt

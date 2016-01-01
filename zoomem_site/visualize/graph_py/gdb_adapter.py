@@ -56,14 +56,10 @@ class GdbAdapter:
             content = content_file.read()
         return content
 
-    def goToLine(self,line):
-        self.gdb_process.write("python executeGdbCommand('until "+ str(line) + "')")
-        self.graph = gdbGraph()
-
-    def getGraphEdegs(self,var_name = "",depth = 0):
+    def getGraphData(self,var_name = "",depth = 0):
         self.vars_def_list = self.vars_def_list
         var_name = "\"" + var_name + "\""
-        self.gdb_process.write("python generateGraphEdges(\"" +self.vars_def_list+"\","+var_name+ "," + depth + ")")
+        self.gdb_process.write("python generateGraphData(\"" +self.vars_def_list+"\","+var_name+ "," + depth + ")")
         return (self.gdb_process.readTill("done"))
 
     def getCurrnetLine(self):
@@ -90,7 +86,3 @@ class GdbAdapter:
                 attributes = code_parser.parseAttributes(edge,5)
                 self.graph.removeChildren(attributes[1],attributes[2],attributes[3],attributes[4],attributes[5])
         return self.graph
-
-    def send_command(command):
-        self.gdb_process.write(command + "\n")
-        return self.gdb_process.read()

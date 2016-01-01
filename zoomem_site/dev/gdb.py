@@ -212,7 +212,7 @@ def initlizeHashes(vars_def_list):
                     vars_def[var[0]] = []
                 vars_def[var[0]].append(var[1] + " " +  var[2] + " " + var[3])
 
-def generateGraphEdges(vars_def_list = "" , var_name = "",depth = 0 ):
+def generateGraphData(vars_def_list = "" , var_name = "",depth = 0 ):
     start_time = time.time();
     executeGdbCommand("set print pretty on")
     initlizeHashes(vars_def_list)
