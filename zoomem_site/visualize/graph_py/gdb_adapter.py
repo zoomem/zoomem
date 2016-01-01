@@ -22,25 +22,16 @@ class GdbAdapter:
 
         self.gdb_process.write("python (executeGdbCommand('set confirm off'))")
         self.gdb_process.write("python (executeGdbCommand('run < " + input_file_name + " > " + output_file_name + "'))")
-        self.gdb_process.write("python calcMaxNumberOfSteps()")
+        self.gdb_process.write("python setLastLine()")
 
-        self.gdb_process.write("python (executeGdbCommand('run < " + input_file_name + " > " + output_file_name + "'))")
         self.gdb_process.write("python (executeGdbCommand('target record-full'))")
         self.gdb_process.write("python print('begin')")
         self.gdb_process.clean()
 
         self.graph = gdbGraph()
 
-    def getMaxNumberOfSteps(self):
-        self.gdb_process.write("python getMaxNumberOfSteps()")
-        return (self.gdb_process.readTill("done"))
-
-    def getCurrNumberOfSteps(self):
-        self.gdb_process.write("python getCurrNumberOfSteps()")
-        return (self.gdb_process.readTill("done"))
-
     def stepOut(self):
-        self.gdb_process.write("python executeGdbCommand('finish')")
+        self.gdb_process.write("python (executeGdbCommand('finish'))")
         self.graph = gdbGraph()
 
     def next(self,number = 1):
@@ -48,7 +39,7 @@ class GdbAdapter:
         self.graph = gdbGraph()
 
     def prev(self,number = 1):
-        self.gdb_process.write("python prev('"+ str(number) + "')")
+        self.gdb_process.write("python executeGdbCommand('rn " + str(number) + "')")
         self.graph = gdbGraph()
 
     def readOutput(self):

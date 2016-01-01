@@ -3,6 +3,34 @@ import hashlib
 import time
 import subprocess
 import time
+
+class BreakReturn(gdb.Command):
+    def __init__(self):
+        super().__init__(
+            'break-return',
+            gdb.COMMAND_RUNNING,
+            gdb.COMPLETE_NONE,
+            False
+        )
+    def invoke(self, arg, from_tty):
+        frame = gdb.selected_frame()
+        # TODO make this work if there is no debugging information, where .block() fails.
+        block = frame.block()
+        # Find the function block in case we are in an inner block.
+        while block:
+            if block.function:
+                break
+            block = block.superblock
+        start = block.start
+        end = block.end
+        arch = frame.architecture()
+        pc = gdb.selected_frame().pc()
+        instructions = arch.disassemble(start, end - 1)
+        for instruction in instructions:
+            if instruction['asm'].startswith('retq '):
+                gdb.Breakpoint('*{}'.format(instruction['addr']))
+BreakReturn()
+
 PRIMITIVES_TYPES = ['std::string','short', 'short int', 'signed short', 'signed short int', 'unsigned short', 'unsigned short int', 'int', 'signed', 'signed int', 'unsigned', 'unsigned int', 'long', 'long int', 'signed long', 'signed long int', 'unsigned long', 'unsigned long int', 'long long', 'long long int', 'signed long long', 'signed long long int', 'unsigned long long', 'unsigned long long int', 'float', 'double', 'long double ', 'signed char', 'unsigned char', 'char', 'wchar_t', 'char16_t', 'char32_t', 'bool']
 
 graph_process = Popen('./graph',stdin = PIPE, stdout = PIPE, stderr = PIPE,shell = True)
@@ -11,29 +39,15 @@ POINTER_FLAG = '1'
 ARRAY_FLAG = '2'
 OBJECT_FLAG = '3'
 PRIMITIVE_FLAG = '4'
-MAX_STEPS = 0
-CUR_STPES = 0
+LAST_LINE = '0'
 
 visted_list = {}
-def getMaxNumberOfSteps():
-    global MAX_STEPS
-    print(str(MAX_STEPS) + "\ndone")
 
-def getCurrNumberOfSteps():
-    global CUR_STPES
-    print(str(CUR_STPES) + "\ndone")
-
-def calcMaxNumberOfSteps():
-    global MAX_STEPS
-    start = time.time()
-    cnt = 0
-    try:
-        while(time.time() - start < 5):
-            executeGdbCommand('next')
-            cnt+=1
-        MAX_STEPS =  cnt
-    except Exception:
-        MAX_STEPS = cnt-3
+def setLastLine():
+    command = executeGdbCommand("break-return")
+    line = command[command.rfind(" "):command.rfind(".")]
+    global LAST_LINE
+    LAST_LINE = line.strip()
 
 def getVarAddress(var_name):
     var_address = executeGdbCommand("p &" + var_name)
@@ -162,22 +176,15 @@ def getCrrentLine():
     print ("done")
 
 def next(n):
-    global CUR_STPES,MAX_STEPS
+    global LAST_LINE
     n = int(n)
-    n = min(n,(MAX_STEPS-CUR_STPES))
     for i in range(0,n):
-        executeGdbCommand("n")
-        CUR_STPES+=1
+        if str(getLineNumber()) != (LAST_LINE):
+            executeGdbCommand("n")
+        else:
+            break
     gdb.flush()
 
-def prev(n):
-    global CUR_STPES,MAX_STEPS
-    n = int(n)
-    n = min(n,CUR_STPES)
-    for i in range(0,n):
-        executeGdbCommand("rn")
-        CUR_STPES-=1
-    gdb.flush()
 
 def initlizeHashes(vars_def_list):
     global vars_def
