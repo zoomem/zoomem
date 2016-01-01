@@ -91,7 +91,7 @@ function getArrayEdges(arrayName,uniqueName){
      var data = 'del_name=' + arrayName;
      var edges;
      $.ajax({
-       url: "/visualize/removeGraphEdges",
+       url: "/visualize/remove_graph_edges",
        data:data,
        context: document.body,
         success: function(data) {

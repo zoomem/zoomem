@@ -13,7 +13,7 @@ td{
 
 #io{
   width:100%;
-  height:27px;
+  height:25%;
   padding-top:2px;
   padding-bottom:2px;
   text-align: center;
@@ -21,11 +21,6 @@ td{
   border:dashed 1px lightgray;
 }
 
-.btn{
-  width:20%;
-  height:24px;
-  color:#444;
-}
 
 #step{
   width:30%;
@@ -58,7 +53,11 @@ td{
   float:left;
   width:5%;
 }
-
+.btn {
+  margin-bottom: 5px
+  text-align: center;
+  margin: auto;
+}
 textarea{
   background-color: :white;
 }

@@ -42,7 +42,7 @@ def update(request):
     print s()
     return HttpResponse(data, content_type='application/json')
 
-def removeGraphEdges(request):
+def remove_graph_edges(request):
     var_name = ""
     if "del_name" in request.GET:
         var_name = request.GET["del_name"]
@@ -66,8 +66,16 @@ def prev(request):
     gdb_adapters[request.session.session_key].prev(step)
     return update(request)
 
-def stepOut(request):
-    gdb_adapters[request.session.session_key].stepOut()
+def end_funciton(request):
+    gdb_adapters[request.session.session_key].endFunciton()
+    return update(request)
+
+def stack_up(request):
+    gdb_adapters[request.session.session_key].stackUp()
+    return update(request)
+
+def stack_down(request):
+    gdb_adapters[request.session.session_key].stackDown()
     return update(request)
 
 #anything below this line can't be accessd from urls k ?

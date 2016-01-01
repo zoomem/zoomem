@@ -30,8 +30,16 @@ class GdbAdapter:
 
         self.graph = gdbGraph()
 
-    def stepOut(self):
+    def endFunciton(self):
         self.gdb_process.write("python (executeGdbCommand('finish'))")
+        self.graph = gdbGraph()
+
+    def stackUp(self):
+        self.gdb_process.write("python (executeGdbCommand('up'))")
+        self.graph = gdbGraph()
+
+    def stackDown(self):
+        self.gdb_process.write("python (executeGdbCommand('down'))")
         self.graph = gdbGraph()
 
     def next(self,number = 1):

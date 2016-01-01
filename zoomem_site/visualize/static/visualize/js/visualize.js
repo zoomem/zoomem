@@ -36,10 +36,34 @@ $("#prev").on("click", function() {
    })
 });
 
-$("#stepout").on("click", function() {
+$("#end_funciton").on("click", function() {
   disable_buttons()
   $.ajax({
-    url: "/visualize/stepOut",
+    url: "/visualize/end_funciton",
+    context: document.body,
+     success: function(data) {
+       updatePage(data);
+       enable_buttons();
+     }
+   })
+});
+
+$("#stack_up").on("click", function() {
+  disable_buttons()
+  $.ajax({
+    url: "/visualize/stack_up",
+    context: document.body,
+     success: function(data) {
+       updatePage(data);
+       enable_buttons();
+     }
+   })
+});
+
+$("#stack_down").on("click", function() {
+  disable_buttons()
+  $.ajax({
+    url: "/visualize/stack_down",
     context: document.body,
      success: function(data) {
        updatePage(data);
