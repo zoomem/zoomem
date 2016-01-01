@@ -24,7 +24,6 @@ td{
 
 #step{
   width:30%;
-  height:22px;
   border:solid 1px lightgray;
   padding-left:4px;
   padding-right:4px;
@@ -57,7 +56,4 @@ td{
   margin-bottom: 5px
   text-align: center;
   margin: auto;
-}
-textarea{
-  background-color: :white;
 }
