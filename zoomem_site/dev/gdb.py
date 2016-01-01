@@ -135,7 +135,12 @@ def getAllVariablesNames():
 
 def isAPointer(var_type):
     try:
-        return "*" in var_type
+        index = var_type.find("*")
+        if index == -1:
+            return False
+        if index == len(var_type) - 1 or var_type[index+1] == "[":
+            return True
+        return False
     except Exception:
         return False
 
@@ -147,7 +152,11 @@ def isAObject(var_type):
 
 def isAArray(var_type):
     try:
-        return "[" in var_type
+        close_index = var_type.rfind("]")
+        if close_index == -1:
+            return False
+        open_index = var_type.rfind("[")
+        return var_type[open_index+1:close_index].find("with") == -1
     except Exception:
         return False
 
