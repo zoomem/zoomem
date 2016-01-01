@@ -52,8 +52,17 @@ td{
   float:left;
   width:5%;
 }
+
 .btn {
   margin-bottom: 5px
   text-align: center;
   margin: auto;
+}
+
+.input-xs {
+    height: 22px;
+    padding: 5px 5px;
+    font-size: 12px;
+    line-height: 1.5;
+    border-radius: 3px;
 }

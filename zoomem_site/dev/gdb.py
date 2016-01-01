@@ -185,7 +185,6 @@ def next(n):
             break
     gdb.flush()
 
-
 def initlizeHashes(vars_def_list):
     global vars_def
     global global_vars
