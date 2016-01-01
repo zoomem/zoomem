@@ -21,14 +21,6 @@ td{
   border:dashed 1px lightgray;
 }
 
-
-#step{
-  width:30%;
-  border:solid 1px lightgray;
-  padding-left:4px;
-  padding-right:4px;
-}
-
 #output{
   overflow-y: auto;
   resize: none;

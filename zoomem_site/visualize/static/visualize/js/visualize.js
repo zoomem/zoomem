@@ -72,6 +72,11 @@ $("#stack_down").on("click", function() {
    })
 });
 
+$("#edit").on("click", function() {
+  window.location.href = '/?code=True';
+
+});
+
 var cppEditor = CodeMirror.fromTextArea(document.getElementById("cpp-code"), {
   lineNumbers: true,
   matchBrackets: true,

@@ -18,7 +18,10 @@ def index(request):
     return render(request, 'visualize/index.html',{'code':request.session["code"]})
 
 def home(request):
-    return render(request, 'visualize/home.html',{})
+    code = "#include <iostream>\nusing namespace std;\nint main()\n{\n  return 0;\n}"
+    if 'code' in request.GET and 'code' in request.session:
+        code = request.session['code']
+    return render(request, 'visualize/home.html',{'code':code})
 
 def submit(request):
     global gdb_adapters
@@ -53,7 +56,7 @@ def remove_graph_edges(request):
 
 
 def next(request):
-    step =  request.GET["step"]
+    step = request.GET["step"]
     if(step == ""):
         step = 1
     gdb_adapters[request.session.session_key].next(step)
