@@ -66,15 +66,15 @@ class GdbAdapter:
         self.gdb_process.write("python getCrrentLine()")
         return int(self.gdb_process.readTill("done")[0])
 
-    def bulidGraph(self, edges):
-        for edge in edges:
-            if edge.strip() == "":
+    def bulidGraph(self, grahData):
+        for data in grahData:
+            if data.strip() == "":
                 continue
-            if(edge[0] == '1'):
-                attributes = code_parser.parseAttributes(edge,6)
+            if(data[0] == '1'):
+                attributes = code_parser.parseAttributes(data,6)
                 self.graph.addNode(attributes[1],attributes[2],attributes[3],attributes[4],attributes[5],attributes[6])
             else:
-                attributes = code_parser.parseAttributes(edge,5)
+                attributes = code_parser.parseAttributes(data,5)
                 self.graph.addChildren(attributes[1],attributes[2],attributes[3],attributes[4],attributes[5])
         return self.graph
 

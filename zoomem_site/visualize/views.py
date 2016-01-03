@@ -45,7 +45,6 @@ def update(request):
         'output':  gdb_adapters[request.session.session_key].readOutput(),
     })
     s = lambda: int(round(time.time() * 1000))
-    print s()
     return HttpResponse(data, content_type='application/json')
 
 def remove_graph_edges(request):

@@ -69,7 +69,7 @@ function fillText(text,x,y,w,right){
 }
 function getArrayEdges(arrayName,uniqueName){
   mouse.down=false;
-  if(visArray[uniqueName]==2 || visArray[uniqueName]==3)
+  if(visArray[uniqueName]==2 || visArray[uniqueName]==3 || $("#next").is(":disabled"))
     return;
   if(visArray[uniqueName]==0 || visArray[uniqueName] == null ){
     visArray[uniqueName]=2;
