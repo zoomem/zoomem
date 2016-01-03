@@ -441,7 +441,7 @@ function drawGraph(edges,n,new_data) {
     var str = ""
     for(var i = 0 ;i<edges.length;i++ )
       str+=edges[i] + "\n";
-    //alert(str);
+    alert(str);
     dataEdges=edges;
     dataN=n;
     initialize();
@@ -511,10 +511,10 @@ function drawGraph(edges,n,new_data) {
   minY=0;
   maxX=0;
   maxY=0;
-  var curX=10,curY=10;
+  var curX=60,curY=60;
   for(var i=0;i<nodesInOrder.length;++i){
     if(i>0 && nodesInOrder[i][1]!=nodesInOrder[i-1][1]){
-      curY=10;
+      curY=60;
       curX+=256;
     }
     nodes[nodesInOrder[i][0]].x=curX;
