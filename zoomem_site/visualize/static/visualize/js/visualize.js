@@ -17,7 +17,10 @@ $("#next").on("click", function() {
      success: function(data) {
       updatePage(data);
       enable_buttons();
-     }
+     },
+     error: function(){
+       enable_buttons();
+     },
    })
 });
 
@@ -32,7 +35,10 @@ $("#prev").on("click", function() {
      success: function(data) {
        updatePage(data);
        enable_buttons();
-     }
+     },
+     error: function(){
+       enable_buttons();
+     },
    })
 });
 
@@ -44,7 +50,10 @@ $("#end_funciton").on("click", function() {
      success: function(data) {
        updatePage(data);
        enable_buttons();
-     }
+     },
+     error: function(){
+       enable_buttons();
+     },
    })
 });
 
@@ -56,7 +65,10 @@ $("#stack_up").on("click", function() {
      success: function(data) {
        updatePage(data);
        enable_buttons();
-     }
+     },
+     error: function(){
+       enable_buttons();
+     },
    })
 });
 
@@ -68,7 +80,10 @@ $("#stack_down").on("click", function() {
      success: function(data) {
        updatePage(data);
        enable_buttons();
-     }
+     },
+     error: function(){
+       enable_buttons();
+     },
    })
 });
 

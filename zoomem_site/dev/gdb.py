@@ -135,7 +135,7 @@ def getAllVariablesNames():
 
 def isAPointer(var_type):
     try:
-        index = var_type.find("*")
+        index = var_type.rfind("*")
         if index == -1:
             return False
         if index == len(var_type) - 1 or var_type[index+1] == "[":

@@ -75,6 +75,7 @@ function getArrayEdges(arrayName,uniqueName){
     visArray[uniqueName]=2;
     var data = 'var_name=' + arrayName;
     var edges;
+    cvs.style.cursor="wait";
     $.ajax({
       url: "/visualize/update",
       data:data,
@@ -82,14 +83,17 @@ function getArrayEdges(arrayName,uniqueName){
        success: function(data) {
          visArray[uniqueName]=1;
          drawGraph(data.edges,data.cnt,true);
+         cvs.style.cursor="default";
        },
        error: function(){
          if(visArray[uniqueName]==2)
            visArray[uniqueName]=0;
+         cvs.style.cursor="default";
        },
      });
    }else{
      visArray[uniqueName]=3;
+     cvs.style.cursor="wait";
      var data = 'del_name=' + arrayName;
      var edges;
      $.ajax({
@@ -99,10 +103,12 @@ function getArrayEdges(arrayName,uniqueName){
         success: function(data) {
           visArray[uniqueName]=0;
           drawGraph(data.edges,data.cnt,true);
+          cvs.style.cursor="default";
         },
         error: function(){
           if(visArray[uniqueName]==3)
             visArray[uniqueName]=1;
+          cvs.style.cursor="default";
         },
       });
    }
@@ -136,13 +142,6 @@ Node.prototype.draw=function(calcOnly){
     ctx.fillStyle=style[this.flag].typebg;
     ctx.fillRect(this.x,this.y+22,this.w,14);
 
-  /*
-    ctx.fillStyle=style[this.flag].border;
-    ctx.fillRect(this.x-1,this.y+38,this.w+2,16);
-    ctx.fillStyle=style[this.flag].typebg;
-    ctx.fillRect(this.x,this.y+39,this.w,14);
-  */
-
     ctx.fillStyle=style[this.flag].font;
     fillText(this.type,this.x+3,this.y+21+12,this.w-8);
 
@@ -160,8 +159,6 @@ Node.prototype.draw=function(calcOnly){
     ctx.fillStyle="#ffffff";
     fillText(this.name,this.x+3,this.y+14,this.w-16);
 
-    /*ctx.fillStyle=style[this.flag].font;
-    fillText(this.value,this.x+3,this.y+50,this.w-8);*/
   }
   var mouseOnMembers=false;
   var curY=this.y+50;
@@ -180,7 +177,7 @@ Node.prototype.draw=function(calcOnly){
           getArrayEdges(nodes[this.members[i]].fullName,nodes[this.members[i]].address+nodes[this.members[i]].type);
         }
         fillText(nodes[this.members[i]].type,this.x+6,curY,this.w/2-11);
-        var printContent=nodes[this.members[i]].size;
+        var printContent=nodes[this.members[i]].address;
         fillText(printContent,this.x+this.w/2+6,curY,this.w/2-11,true);
       }
       if(i+1<this.members.length){
@@ -320,18 +317,14 @@ function drawEdge(from,to,startColor,endColor){
   gradient.addColorStop("0.5", "black");
   //gradient.addColorStop("1", endColor);
   ctx.strokeStyle=gradient;
-
-
   var startPointX = x1;
   var startPointY = y1;
   var endPointX = x2;
   var endPointY = y2;
   var quadPointX = c1x;
   var quadPointY = c1y;
-
   var arrowAngle = Math.atan2(quadPointX - endPointX, quadPointY - endPointY) + Math.PI;
   var arrowWidth = 10;
-
   ctx.beginPath();
   ctx.moveTo(startPointX, startPointY);
   ctx.quadraticCurveTo(quadPointX, quadPointY, endPointX, endPointY);
@@ -342,33 +335,6 @@ function drawEdge(from,to,startColor,endColor){
              endPointY - (arrowWidth * Math.cos(arrowAngle + Math.PI / 6)));
   ctx.stroke();
   ctx.closePath();
-  return;
-
-  ctx.beginPath();
-  ctx.moveTo(x1,y1);
-  ctx.bezierCurveTo(c1x,c1y,c2x,c2y,x2,y2);
-  ctx.save();
-  ctx.globalAlpha=0.5;
-  ctx.stroke();
-  var angle=Math.atan2(y2-c2y,x2-c2x);
-  var cx=c2x+Math.cos(angle)*10;
-  var cy=c2y+Math.sin(angle)*10;
-  ctx.beginPath();
-  ctx.moveTo(cx,cy);
-  angle+=Math.PI/4;
-  cx=c2x+Math.cos(angle)*5;
-  cy=c2y+Math.sin(angle)*5;
-  ctx.lineTo(cx,cy);
-  angle-=Math.PI/4*2;
-  cx=c2x+Math.cos(angle)*5;
-  cy=c2y+Math.sin(angle)*5;
-  ctx.lineTo(cx,cy);
-  ctx.closePath();
-  ctx.strokeStyle="black";
-  ctx.fillStyle="gray";
-  ctx.fill();
-  ctx.stroke();
-  ctx.restore();
 }
 var vis=[];
 var tree=[];
@@ -395,8 +361,6 @@ function BFS(n){
       nodesInOrder.push([u,cost[u]]);
     for(var i=0;i<adj[u].length;++i)
       if(vis[adj[u][i]]==0){
-        /*if(cost[u]!=0 && nodes[adj[u][i]].flag!=1 && nodes[adj[u][i]].flag!=2 && nodes[adj[u][i]].name!="$")
-          continue;*/
         vis[adj[u][i]]=1;
         cost[adj[u][i]]=cost[u]+1;
         tree[u].push(adj[u][i]);
@@ -404,89 +368,18 @@ function BFS(n){
       }
   }
 }
-function DFS(u,x,y){
-  if(tree[u].length==0){
-    nodes[u].x=x;
-    nodes[u].y=y;
-    return y;
-  }
-  var firstY=y-10;
-  for(var i=0;i<tree[u].length;++i){
-    y=DFS(tree[u][i],x+200,y);
-    if(i+1<tree[u].length)
-      y+=64;
-  }
-  var lastY=y-10;
-  if(nodes[u].flag==2){
-    ctx.fillStyle=FRAMEBORDERCOLOR;
-    ctx.fillRect(x+190-1,firstY-1,85+2,lastY-firstY+1+2);
-    ctx.fillStyle=FRAMEBGCOLOR;
-    ctx.fillRect(x+190,firstY,85,lastY-firstY+1);
-  }
-  y+=10;
-  nodes[u].x=x;
-  nodes[u].y=(nodes[tree[u][0]].y+nodes[tree[u][tree[u].length-1]].y)/2;
-
-  return y;
-}
-var first=1;
-var dataEdges,dataN;
-function drawGraph(edges,n,new_data) {
-
-  if(new_data == true)
-  {
-    first = 1;
-  }
-  if(first==1){
-    var str = ""
-    for(var i = 0 ;i<edges.length;i++ )
-      str+=edges[i] + "\n";
-    alert(str);
-    dataEdges=edges;
-    dataN=n;
-    initialize();
-    first=0;
-  }
-  edges=dataEdges;
-  n=dataN;
-  nodes=[];
-  adj=[];
-  for(var i=0;i<n;++i){
-    nodes.push(new Node({w:150,h:56,name:"-"}));
-    adj.push([]);
-  }
-  for(var i=0;i<edges.length;++i){
-    nodes[edges[i][1]-1].name=edges[i][2];
-    nodes[edges[i][1]-1].flag=edges[i][7]-1;
-    nodes[edges[i][1]-1].type=edges[i][4];
-    nodes[edges[i][1]-1].value=edges[i][6];
-    nodes[edges[i][1]-1].address=edges[i][3];
-    nodes[edges[i][1]-1].size=edges[i][5];
-    nodes[edges[i][1]-1].fullName=edges[i][8];
-    adj[edges[i][0]-1].push(edges[i][1]-1);
-  }
-  for(var i=0;i<edges.length;++i){
-    if(nodes[edges[i][0]-1].flag==0)
-      nodes[edges[i][0]-1].value=nodes[edges[i][1]-1].address;
-    if(nodes[edges[i][1]-1].flag==1)
-      nodes[edges[i][1]-1].value=nodes[edges[i][1]-1].address;
-  }
+function buildMembersLists(edges){
   for(var i=0;i<edges.length;++i){
     if(nodes[edges[i][0]-1].flag==2){
       nodes[edges[i][0]-1].members.push(edges[i][1]-1);
-      //alert(edges[i][0] + " " + edges[i][1]);
-      //alert((edges[i][0]-1) + " " + (edges[i][1]-1));
     }else if(nodes[edges[i][0]-1].flag==1 && (visArray[nodes[edges[i][0]-1].address+nodes[edges[i][0]-1].type]==1 || visArray[nodes[edges[i][0]-1].address+nodes[edges[i][0]-1].type]==3))
       nodes[edges[i][0]-1].members.push(edges[i][1]-1);
-
   }
+}
+function calcLevels(edges,n){
   BFS(n);
+  // set visible nodes
   vis[0]=false;
-  /*DFS(0,10,10);
-  for(var i=1;i<n;++i)
-    if(vis[i]==1){
-      nodes[i].draw();
-    }*/
   for(var i=0;i<vis.length;++i)
     vis[i]=false;
   for(var i=0;i<vis.length;++i)
@@ -507,6 +400,8 @@ function drawGraph(edges,n,new_data) {
       nodesInOrder.splice(i,1);
       --i;
     }
+}
+function setNodePosition(){
   minX=0;
   minY=0;
   maxX=0;
@@ -522,6 +417,8 @@ function drawGraph(edges,n,new_data) {
     nodes[nodesInOrder[i][0]].draw();
     curY+=nodes[nodesInOrder[i][0]].h+10;
   }
+}
+function drawGraphEdges(edges){
   for(var i=0;i<edges.length;++i){
     var u=edges[i][0]-1;
     var v=edges[i][1]-1;
@@ -577,21 +474,65 @@ function drawGraph(edges,n,new_data) {
           var options2=[{x:x2-6,y:y2},{x:x2+nodes[u].rect1.w+6,y:y2}];
           drawEdge(options1,options2,style[nodes[u].flag].border,style[nodes[u].flag].titlebg);
       }
-      for(var i=1;i<nodes.length;++i)
-        if(nodes[i].flag==1){
-              var u=i;
-              var x1,y1,x2,y2;
-              if(nodes[u].rect2==null || nodes[u].rect1==null){
-                continue;
-              }
-              x1=nodes[u].rect2.x;
-              y1=nodes[u].rect2.y+nodes[u].rect2.h/2;
-              var options1=[{x:x1,y:y1},{x:x1+nodes[u].rect2.w,y:y1}];
-              x2=nodes[u].rect1.x;
-              y2=nodes[u].rect1.y+11;
-              var options2=[{x:x2-6,y:y2},{x:x2+nodes[u].rect1.w+6,y:y2}];
-              drawEdge(options1,options2,style[nodes[u].flag].border,style[nodes[u].flag].titlebg);
+  for(var i=1;i<nodes.length;++i)
+    if(nodes[i].flag==1){
+          var u=i;
+          var x1,y1,x2,y2;
+          if(nodes[u].rect2==null || nodes[u].rect1==null){
+            continue;
           }
+          x1=nodes[u].rect2.x;
+          y1=nodes[u].rect2.y+nodes[u].rect2.h/2;
+          var options1=[{x:x1,y:y1},{x:x1+nodes[u].rect2.w,y:y1}];
+          x2=nodes[u].rect1.x;
+          y2=nodes[u].rect1.y+11;
+          var options2=[{x:x2-6,y:y2},{x:x2+nodes[u].rect1.w+6,y:y2}];
+          drawEdge(options1,options2,style[nodes[u].flag].border,style[nodes[u].flag].titlebg);
+      }
+}
+var first=1;
+var dataEdges,dataN;
+function drawGraph(edges,n,new_data) {
+  if(new_data == true)
+    first = 1;
+  if(first==1){
+    var str = ""
+    for(var i = 0 ;i<edges.length;i++ )
+      str+=edges[i] + "\n";
+    //alert(str);
+    dataEdges=edges;
+    dataN=n;
+    initialize();
+    first=0;
+  }
+  edges=dataEdges;
+  n=dataN;
+  nodes=[];
+  adj=[];
+  for(var i=0;i<n;++i){
+    nodes.push(new Node({w:150,h:56,name:"-"}));
+    adj.push([]);
+  }
+  for(var i=0;i<edges.length;++i){
+    nodes[edges[i][1]-1].name=edges[i][2];
+    nodes[edges[i][1]-1].flag=edges[i][7]-1;
+    nodes[edges[i][1]-1].type=edges[i][4];
+    nodes[edges[i][1]-1].value=edges[i][6];
+    nodes[edges[i][1]-1].address=edges[i][3];
+    nodes[edges[i][1]-1].size=edges[i][5];
+    nodes[edges[i][1]-1].fullName=edges[i][8];
+    adj[edges[i][0]-1].push(edges[i][1]-1);
+  }
+  for(var i=0;i<edges.length;++i){
+    if(nodes[edges[i][0]-1].flag==0)
+      nodes[edges[i][0]-1].value=nodes[edges[i][1]-1].address;
+    if(nodes[edges[i][1]-1].flag==1)
+      nodes[edges[i][1]-1].value=nodes[edges[i][1]-1].address;
+  }
+  buildMembersLists(edges);
+  calcLevels(edges,n);
+  setNodePosition();
+  drawGraphEdges(edges);
 }
 
 function draw(){
@@ -679,6 +620,4 @@ window.onload=function(){
   H=rect.height-10;
   document.getElementById('cvs').setAttribute('width',W);
   document.getElementById('cvs').setAttribute('height',H);
-
-
 };
