@@ -1,0 +1,17 @@
+{% load staticfiles %}
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <script type="text/javascript" src={% static "jquery/jquery-1.11.3.min.js" %}></script>
+    <script type="text/javascript" src={% static "bootstrap/js/bootstrap.min.js" %}></script>
+    <link href={% static "bootstrap/css/bootstrap.min.css" %} rel="stylesheet">
+    <link href={% static "visualize/css/visualize.css" %} rel="stylesheet" type="text/css">
+  </head>
+  <body>
+    <h1 style="color:#6a778f;">ZoomMEM <small>Helping you understand c++ code!</h1>
+    <h3 style="color:#6a778f"> There was a compilation error while trying to compile your code :(<small style="color:green"> don't give up you are one bit away :) </small></h3>
+    <div class="alert alert-danger" role="alert">{{error}}</div>
+  </body>
+</html>

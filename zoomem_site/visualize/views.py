@@ -5,6 +5,7 @@ import sys
 sys.path.append("visualize/graph_py")
 from gdb_adapter import GdbAdapter
 from graph import gdbGraph
+from subprocess import Popen, PIPE
 import random, string
 import os
 import time
@@ -28,7 +29,11 @@ def home(request):
 
 def submit(request):
     global gdb_adapters
-    gdb_adapters[request.session.session_key] = createNewGdbAdapter(request.POST['code'], request.POST['input'])
+    try:
+        gdb_adapters[request.session.session_key] = createNewGdbAdapter(request.POST['code'], request.POST['input'])
+    except CompilationError as e:
+        return render(request, 'visualize/error.html',{'error':e.message})
+
     request.session["code"] = request.POST['code']
     request.session["input"] = request.POST['input']
     return index(request)
@@ -123,9 +128,10 @@ def createFile(txt,exten):
     return 'visualize/static/cpp_files/' + file_name
 
 def compileFile(file_name):
-    res = os.system("g++ -g -O0 -o " + file_name + " " + file_name + ".cpp")
-    if(res != 0):
-        raise Exception("Error Compiling file \n")
+    proc = Popen("g++ -g -O0 -o " + file_name + " " + file_name + ".cpp",stdin = PIPE, stdout = PIPE, stderr = PIPE, shell = True)
+    out, err = proc.communicate()
+    if len(err) > 0:
+        raise CompilationError(err,"Error Compiling file")
 
 def createNewGdbAdapter(code,inpt):
     code_file_name = createFile(code,".cpp")
@@ -143,3 +149,8 @@ def getEdges(g_adapter,var_name):
     data["edges"] = g.getGraphEdges()
     data["cnt"] = g.id_cnt
     return data
+
+class CompilationError(Exception):
+    def __init__(self, message, errors):
+        super(CompilationError, self).__init__(message)
+        self.errors = errors
