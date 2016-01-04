@@ -57,3 +57,7 @@ td{
     line-height: 1.5;
     border-radius: 3px;
 }
+.btn-submit:hover {
+    color: #6BB12F;
+    border-color: #6BB12F;
+}

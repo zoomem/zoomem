@@ -92,6 +92,10 @@ $("#edit").on("click", function() {
 
 });
 
+$(".err-btn").on("click", function() {
+  window.location.href = '/?code=True';
+});
+
 var cppEditor = CodeMirror.fromTextArea(document.getElementById("cpp-code"), {
   lineNumbers: true,
   matchBrackets: true,

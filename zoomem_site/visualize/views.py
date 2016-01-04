@@ -29,13 +29,12 @@ def home(request):
 
 def submit(request):
     global gdb_adapters
+    request.session["code"] = request.POST['code']
+    request.session["input"] = request.POST['input']
     try:
         gdb_adapters[request.session.session_key] = createNewGdbAdapter(request.POST['code'], request.POST['input'])
     except CompilationError as e:
         return render(request, 'visualize/error.html',{'error':e.message})
-
-    request.session["code"] = request.POST['code']
-    request.session["input"] = request.POST['input']
     return index(request)
 
 def update(request):
