@@ -74,11 +74,11 @@ def next(request):
         gdb_adapters[request.session.session_key].next(step)
         return update(request)
     except ProcRunTimeError as e:
-        gdb_adapters[request.session.session_key] = None
+        gdb_adapters[request.session.session_key].exitProcess()
         return render(request, 'visualize/error.html',{'error':e.message,'error_type':e.errors,'state':"run"})
     except TimeLimitError as e:
         line =  str(gdb_adapters[request.session.session_key].current_line)
-        gdb_adapters[request.session.session_key] = None
+        gdb_adapters[request.session.session_key].exitProcess()
         return render(request, 'visualize/error.html',{'error':"Faild it line " + line, 'error_type':e.errors,'state':'run'})
 
 def prev(request):

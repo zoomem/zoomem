@@ -1,9 +1,13 @@
 
 function disable_buttons(){
+  cvs.style.cursor="wait";
   $("input[type=button],:button").attr("disabled","disabled");
+  $("#edit").removeAttr("disabled")
+
 }
 function enable_buttons()
 {
+  cvs.style.cursor="default";
   $("input[type=button],:button").removeAttr("disabled");
 }
 $("#next").on("click", function() {

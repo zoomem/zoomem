@@ -76,6 +76,7 @@ function getArrayEdges(arrayName,uniqueName){
     var data = 'var_name=' + arrayName;
     var edges;
     cvs.style.cursor="wait";
+    disable_buttons()
     $.ajax({
       url: "/visualize/update",
       data:data,
@@ -83,17 +84,17 @@ function getArrayEdges(arrayName,uniqueName){
        success: function(data) {
          visArray[uniqueName]=1;
          drawGraph(data.edges,data.cnt,true);
-         cvs.style.cursor="default";
+         enable_buttons()
        },
        error: function(){
          if(visArray[uniqueName]==2)
            visArray[uniqueName]=0;
-         cvs.style.cursor="default";
-       },
+           enable_buttons()
+         },
      });
    }else{
      visArray[uniqueName]=3;
-     cvs.style.cursor="wait";
+     disable_buttons()     
      var data = 'del_name=' + arrayName;
      var edges;
      $.ajax({
@@ -103,13 +104,13 @@ function getArrayEdges(arrayName,uniqueName){
         success: function(data) {
           visArray[uniqueName]=0;
           drawGraph(data.edges,data.cnt,true);
-          cvs.style.cursor="default";
-        },
+          enable_buttons()
+         },
         error: function(){
           if(visArray[uniqueName]==3)
             visArray[uniqueName]=1;
-          cvs.style.cursor="default";
-        },
+            enable_buttons()
+           },
       });
    }
 }

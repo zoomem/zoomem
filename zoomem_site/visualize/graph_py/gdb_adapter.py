@@ -36,6 +36,9 @@ class GdbAdapter:
 
         self.graph = gdbGraph()
 
+    def exitProcess(self):
+        self.gdb_process.exitProc()
+
     def endFunciton(self):
         self.gdb_process.write("python (executeGdbCommand('finish'))")
         self.graph = gdbGraph()
