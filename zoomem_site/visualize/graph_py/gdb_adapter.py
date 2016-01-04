@@ -44,6 +44,9 @@ class GdbAdapter:
 
     def next(self,number = 1):
         self.gdb_process.write("python next('"+ str(number) + "')")
+        mess = (self.gdb_process.readTill("done"))
+        if len(mess)> 0:
+            raise RunTimeError(("\n").join(mess),"RuntimeError")
         self.graph = gdbGraph()
 
     def prev(self,number = 1):
@@ -86,3 +89,8 @@ class GdbAdapter:
                 attributes = code_parser.parseAttributes(edge,5)
                 self.graph.removeChildren(attributes[1],attributes[2],attributes[3],attributes[4],attributes[5])
         return self.graph
+
+class RunTimeError(Exception):
+    def __init__(self, message, errors):
+        super(RunTimeError, self).__init__(message)
+        self.errors = errors

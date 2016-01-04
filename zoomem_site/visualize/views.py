@@ -14,6 +14,11 @@ import json
 from django.utils.safestring import mark_safe
 gdb_adapters = {}
 
+class CompilationError(Exception):
+    def __init__(self, message, errors):
+        super(CompilationError, self).__init__(message)
+        self.errors = errors
+
 # Create your views here.
 def index(request):
     return render(request, 'visualize/index.html',{'code':request.session["code"]})
@@ -34,7 +39,7 @@ def submit(request):
     try:
         gdb_adapters[request.session.session_key] = createNewGdbAdapter(request.POST['code'], request.POST['input'])
     except CompilationError as e:
-        return render(request, 'visualize/error.html',{'error':e.message})
+        return render(request, 'visualize/error.html',{'error':e.message,'error_type':e.errors})
     return index(request)
 
 def update(request):
@@ -61,11 +66,15 @@ def remove_graph_edges(request):
     return update(request)
 
 def next(request):
-    step = request.GET["step"]
-    if(step == ""):
-        step = 1
-    gdb_adapters[request.session.session_key].next(step)
-    return update(request)
+    try:
+        step = request.GET["step"]
+        if(step == ""):
+            step = 1
+        gdb_adapters[request.session.session_key].next(step)
+        return update(request)
+    except Exception as e:
+        gdb_adapters[request.session.session_key] = None
+        return render(request, 'visualize/error.html',{'error':e.message,'error_type':e.errors})
 
 def prev(request):
     step =  request.GET["step"]
@@ -127,10 +136,10 @@ def createFile(txt,exten):
     return 'visualize/static/cpp_files/' + file_name
 
 def compileFile(file_name):
-    proc = Popen("g++ -g -O0 -o " + file_name + " " + file_name + ".cpp",stdin = PIPE, stdout = PIPE, stderr = PIPE, shell = True)
+    proc = Popen("g++ -g -w -O0 -o " + file_name + " " + file_name + ".cpp",stdin = PIPE, stdout = PIPE, stderr = PIPE, shell = True)
     out, err = proc.communicate()
     if len(err) > 0:
-        raise CompilationError(err,"Error Compiling file")
+        raise CompilationError(err,"CompilationError")
 
 def createNewGdbAdapter(code,inpt):
     code_file_name = createFile(code,".cpp")
@@ -148,8 +157,3 @@ def getEdges(g_adapter,var_name):
     data["edges"] = g.getGraphEdges()
     data["cnt"] = g.id_cnt
     return data
-
-class CompilationError(Exception):
-    def __init__(self, message, errors):
-        super(CompilationError, self).__init__(message)
-        self.errors = errors

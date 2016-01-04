@@ -189,9 +189,12 @@ def next(n):
     n = int(n)
     for i in range(0,n):
         if str(getLineNumber()) != (LAST_LINE):
-            executeGdbCommand("n")
+            s = executeGdbCommand("n")
+            if s.find("Program received signal SIGFPE") >= 0:
+                print (s)
         else:
             break
+    print("done")
     gdb.flush()
 
 def initlizeHashes(vars_def_list):

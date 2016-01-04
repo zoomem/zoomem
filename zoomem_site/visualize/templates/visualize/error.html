@@ -10,8 +10,9 @@
     <link href={% static "visualize/css/visualize.css" %} rel="stylesheet" type="text/css">
   </head>
   <body>
+    <span id = {{error_type}}> </span>
     <h1 style="color:#6a778f;">ZoomMEM <small>Helping you understand c++ code!</h1>
-    <h3 style="color:#B71427"> There was a compilation error while trying to compile your code :(<small style="color:#6BB12F"> don't give up you are only one bit away :) </small></h3>
+    <h3 style="color:#B71427"> There was a {{error_type}} while trying to compile your code :(<small style="color:#6BB12F"> don't give up you are only one bit away :) </small></h3>
     <div class="alert alert-danger" role="alert">{{error}}</div>
     <button class = "btn btn-default btn-submit err-btn"> click me to try again!</button>
     <script type="text/javascript" src={% static "visualize/js/visualize.js" %}></script>

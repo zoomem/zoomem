@@ -15,8 +15,17 @@ $("#next").on("click", function() {
     data:data,
     context: document.body,
      success: function(data) {
-      updatePage(data);
-      enable_buttons();
+     if ( $( '#RuntimeError', $('<span/>').html( data ) ).length > 0 )
+     {
+       document.open();
+       document.write(data);
+       document.close();
+     }
+     else {
+       updatePage(data);
+       enable_buttons();
+     }
+
      },
      error: function(){
        enable_buttons();
