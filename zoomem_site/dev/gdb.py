@@ -190,7 +190,7 @@ def next(n):
     for i in range(0,n):
         if str(getLineNumber()) != (LAST_LINE):
             s = executeGdbCommand("n")
-            if s.find("Program received signal SIGFPE") >= 0:
+            if s.find("Program received signal ") >= 0:
                 print (s)
         else:
             break
