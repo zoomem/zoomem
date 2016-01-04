@@ -39,7 +39,7 @@ def submit(request):
     try:
         gdb_adapters[request.session.session_key] = createNewGdbAdapter(request.POST['code'], request.POST['input'])
     except CompilationError as e:
-        return render(request, 'visualize/error.html',{'error':e.message,'error_type':e.errors})
+        return render(request, 'visualize/error.html',{'error':e.message,'error_type':e.errors,'state':'compile'})
     return index(request)
 
 def update(request):
@@ -74,7 +74,7 @@ def next(request):
         return update(request)
     except Exception as e:
         gdb_adapters[request.session.session_key] = None
-        return render(request, 'visualize/error.html',{'error':e.message,'error_type':e.errors})
+        return render(request, 'visualize/error.html',{'error':e.message,'error_type':e.errors,'state':'run'})
 
 def prev(request):
     step =  request.GET["step"]
