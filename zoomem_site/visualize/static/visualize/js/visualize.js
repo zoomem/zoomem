@@ -15,7 +15,7 @@ $("#next").on("click", function() {
     data:data,
     context: document.body,
      success: function(data) {
-     if ( $( '#RuntimeError', $('<span/>').html( data ) ).length > 0 )
+     if ( $( '#RuntimeError', $('<span/>').html( data ) ).length > 0 || $( '#TimeLimitError', $('<span/>').html( data ) ).length > 0)
      {
        document.open();
        document.write(data);

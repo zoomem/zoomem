@@ -7,9 +7,9 @@ class NonBlockingStreamReader:
     def __init__(self, stream):
         self._s = stream
         self._q = Queue()
-
+        self.done = False
         def _populateQueue(stream, queue):
-            while True:
+            while not self.done:
                 line = stream.readline()
                 if line:
                     lastIndex = line.find("(gdb) ")
@@ -18,9 +18,8 @@ class NonBlockingStreamReader:
                     queue.put(line)
                 else:
                     break
-
-        self._t = Thread(target = _populateQueue,
-                args = (self._s, self._q))
+                    
+        self._t = Thread(target = _populateQueue,args = (self._s, self._q))
         self._t.daemon = True
         self._t.start()
 

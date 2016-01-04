@@ -6,12 +6,18 @@ import commands
 import time
 import code_parser
 
+class ProcRunTimeError(Exception):
+    def __init__(self, message, errors):
+        super(ProcRunTimeError, self).__init__(message)
+        self.errors = errors
+
+
 class GdbAdapter:
 
     def __init__(self,code_file_name,input_file_name,output_file_name):
         self.gdb_process = nbsr_process("gdb " + code_file_name + " -q")
         self.output_file_name = output_file_name
-
+        self.current_line = 0
         p = subprocess.Popen(['clang-3.5', '-Xclang' , '-ast-dump' ,'-fsyntax-only',code_file_name +"_parsing.cpp"], stdout=subprocess.PIPE,stderr=subprocess.PIPE)
         out, err = p.communicate()
         self.vars_def_list = code_parser.getVariablesDef(out)
@@ -46,7 +52,7 @@ class GdbAdapter:
         self.gdb_process.write("python next('"+ str(number) + "')")
         mess = (self.gdb_process.readTill("done"))
         if len(mess)> 0:
-            raise RunTimeError(("\n").join(mess),"RuntimeError")
+            raise ProcRunTimeError(("\n").join(mess),"RuntimeError")
         self.graph = gdbGraph()
 
     def prev(self,number = 1):
@@ -67,7 +73,9 @@ class GdbAdapter:
 
     def getCurrnetLine(self):
         self.gdb_process.write("python getCrrentLine()")
-        return int(self.gdb_process.readTill("done")[0])
+        line = int(self.gdb_process.readTill("done")[0])
+        self.current_line = line
+        return line
 
     def bulidGraph(self, grahData):
         for data in grahData:
@@ -89,8 +97,3 @@ class GdbAdapter:
                 attributes = code_parser.parseAttributes(edge,5)
                 self.graph.removeChildren(attributes[1],attributes[2],attributes[3],attributes[4],attributes[5])
         return self.graph
-
-class RunTimeError(Exception):
-    def __init__(self, message, errors):
-        super(RunTimeError, self).__init__(message)
-        self.errors = errors

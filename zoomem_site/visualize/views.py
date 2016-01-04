@@ -3,9 +3,10 @@ from django.template import RequestContext, loader
 from django.shortcuts import render
 import sys
 sys.path.append("visualize/graph_py")
-from gdb_adapter import GdbAdapter
+from gdb_adapter import GdbAdapter,ProcRunTimeError
 from graph import gdbGraph
 from subprocess import Popen, PIPE
+from proc import TimeLimitError
 import random, string
 import os
 import time
@@ -39,7 +40,7 @@ def submit(request):
     try:
         gdb_adapters[request.session.session_key] = createNewGdbAdapter(request.POST['code'], request.POST['input'])
     except CompilationError as e:
-        return render(request, 'visualize/error.html',{'error':e.message,'error_type':e.errors,'state':'compile'})
+        return render(request, 'visualize/error.html',{'error':e.message,'error_type':e.errors,'state' :"compile"})
     return index(request)
 
 def update(request):
@@ -72,9 +73,13 @@ def next(request):
             step = 1
         gdb_adapters[request.session.session_key].next(step)
         return update(request)
-    except Exception as e:
+    except ProcRunTimeError as e:
         gdb_adapters[request.session.session_key] = None
-        return render(request, 'visualize/error.html',{'error':e.message,'error_type':e.errors,'state':'run'})
+        return render(request, 'visualize/error.html',{'error':e.message,'error_type':e.errors,'state':"run"})
+    except TimeLimitError as e:
+        line =  str(gdb_adapters[request.session.session_key].current_line)
+        gdb_adapters[request.session.session_key] = None
+        return render(request, 'visualize/error.html',{'error':"Faild it line " + line, 'error_type':e.errors,'state':'run'})
 
 def prev(request):
     step =  request.GET["step"]
