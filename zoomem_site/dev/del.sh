@@ -1,2 +1,4 @@
-find ~/git_workplace/zoomem/zoomem_site/visualize/static/cpp_files* -type d -ctime +1 -exec rm -rf {} \;
-
+while true; do
+find ~/git_workplace/zoomem/zoomem_site/visualize/static/cpp_files* -type f -mmin +360 -delete
+sleep 300
+done
