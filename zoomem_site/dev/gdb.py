@@ -6,12 +6,7 @@ import time
 
 class BreakReturn(gdb.Command):
     def __init__(self):
-        super().__init__(
-            'break-return',
-            gdb.COMMAND_RUNNING,
-            gdb.COMPLETE_NONE,
-            False
-        )
+        super(BreakReturn,self).__init__("break-return",gdb.COMMAND_USER)
     def invoke(self, arg, from_tty):
         frame = gdb.selected_frame()
         # TODO make this work if there is no debugging information, where .block() fails.
