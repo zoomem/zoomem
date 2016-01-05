@@ -15,11 +15,11 @@ class nbsr_process:
         self.proc = Popen(name,stdin = PIPE, stdout = PIPE, stderr = PIPE, shell = True)
         self.proc_nbsr = non_blocking_stream.NonBlockingStreamReader(self.proc.stdout)
         self.time_limit = 15
+        self.start = time.time()
         def limitExecuting(timeout, proc,proc_nbsr):
-            start = time.time()
             while True:
                 now = time.time()
-                if(now - start >= timeout):
+                if(now - self.start >= timeout):
                     self.exitProc()
                     break
                 time.sleep(0.5)
@@ -56,6 +56,7 @@ class nbsr_process:
             if output == None:
                 time.sleep(0.1)
                 continue;
+            start = time.time()
             idx = output.find("(gdb)")
             if idx != -1:
                 output = output[idx + len("(gdb)"):]

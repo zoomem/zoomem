@@ -36,6 +36,9 @@ class GdbAdapter:
 
         self.graph = gdbGraph()
 
+    def resetTimer(self):
+        self.gdb_process.start = time.time()
+
     def exitProcess(self):
         self.gdb_process.exitProc()
 

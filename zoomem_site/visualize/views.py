@@ -47,6 +47,7 @@ def update(request):
     var_name = ""
     if "var_name" in request.GET:
         var_name = request.GET["var_name"]
+    gdb_adapters[request.session.session_key].resetTimer()
     g_data = getEdges(gdb_adapters[request.session.session_key],var_name)
     data = json.dumps({
         'edges': g_data["edges"],
