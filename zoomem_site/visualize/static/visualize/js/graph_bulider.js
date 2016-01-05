@@ -94,7 +94,7 @@ function getArrayEdges(arrayName,uniqueName){
      });
    }else{
      visArray[uniqueName]=3;
-     disable_buttons()     
+     disable_buttons()
      var data = 'del_name=' + arrayName;
      var edges;
      $.ajax({

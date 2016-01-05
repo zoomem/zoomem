@@ -63,17 +63,24 @@ def isDummyDeclartionLine(line):
         return False
     return True
 
-def isVariableDeclartionStatment(line):
-    index = line.find("DeclStmt")
-    if index == -1:
-        return False
-    return True
+def inValidFound(prefix):
+    return not(prefix == " >" or prefix == " <" or prefix == ", ")
 
-def getVariableDeclartionLine(line):
-    index = line.find("line")
-    left = line.find(":",index)+1
-    right = line.find(":",left)-1
-    return line[left:right + 1]
+def updateCurrentLine(line):
+    # returns empty string if no update for the line number
+    line_number = ""
+    cur_index = 0
+    def_end = line.find('lvalue')
+    if def_end == -1:
+        def_end = len(line)
+    while(cur_index < def_end):
+        begin = line.find("line:",cur_index)
+        if begin < 2 or inValidFound(line[begin-2:begin]):
+            break
+        end = line.find(":",begin+5)
+        line_number = line[begin+5:end]
+        cur_index = end + 1
+    return line_number
 
 def isFunctionDefinision(line):
     if line.find("FunctionDecl") != -1:
@@ -136,36 +143,6 @@ def reformat(txt):
             line = ""
     return lines
 
-def getClassBounds(line):
-    # returns empty string if the line dosen't declare class
-    if line.find("CXXRecordDecl") == -1 or line.find("class") == -1 or line.find("definition") == -1:
-        return ""
-    left = line.find(":")
-    right = line.find(":",left+1)
-    class_start = line[left+1:right]
-    left = line.find(":",right+1)
-    right = line.find(":",left+1)
-    class_end = line[left+1:right]
-    return class_start + " " + class_end
-
-def getClassMemberName(line):
-    # returns empty string if the line dosen't declare a member in class
-    index = line.find("FieldDecl")
-    if index == -1:
-        return ""
-    index = line.find("line:",index)
-    if index == -1:
-        index = line.find("col:")
-    index = line.find("col:",index+1)
-    index = line.find("col:",index+1)
-    left = line.find(" ",index)+1
-    right = line.find(" ",left)-1
-    if line[right+2] != '\'':
-        left = line.find(" ",right)+1
-        right = line.find(" ",left)-1
-    var_name = line[left:right+1]
-    return var_name
-
 def getVariablesDef(txt):
     lines = reformat(txt)
     dummy_var_found = False
@@ -176,15 +153,11 @@ def getVariablesDef(txt):
     for line in lines:
         if dummy_var_found == False:
             dummy_var_found = isDummyDeclartionLine(line)
-            if dummy_var_found == True:
-                continue
-        elif dummy_var_found == True and isVariableDeclartionStatment(line):
-            cur_line = getVariableDeclartionLine(line)
-
-        # still inside library ...
-        if dummy_var_found == False:
             continue
 
+        temp = updateCurrentLine(line)
+        if temp != "":
+            cur_line = temp
         var_info = getVariableLine(line)
         if var_info != "":
             index = var_info.find(" ")
@@ -198,23 +171,11 @@ def getVariablesDef(txt):
                 vars_def_list += var_name +" " + function_start+ " " + function_end + " " + cur_line
             list_empty = False
 
-        #member_name = getClassMemberName(line)
-        #if member_name != "":
-        #    if list_empty == False:
-    #            vars_def_list += '-'
-    #        list_empty = False
-    #        vars_def_list += member_name + " " + class_start + " " + class_end + " " + class_start
-
         bounds = getFunctionBounds(line)
         if bounds != "":
             index = bounds.find(" ")
             function_start = bounds[:index]
             function_end = bounds[index+1:]
 
-    #    bounds = getClassBounds(line)
-    #    if bounds != "":
-    #        index = bounds.find(" ")
-    #        class_start = bounds[:index]
-    #        class_end = bounds[index+1:]
     print(vars_def_list)
     return vars_def_list
