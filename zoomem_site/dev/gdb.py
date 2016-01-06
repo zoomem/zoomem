@@ -4,6 +4,14 @@ import time
 import subprocess
 import time
 
+def removePrefix(text, prefix):
+    return text[text.startswith(prefix) and len(prefix):]
+
+def fixType(var_type):
+    var_type = removePrefix(var_type,"const")
+    var_type = var_type.strip()
+    return var_type
+
 class BreakReturn(gdb.Command):
     def __init__(self):
         super(BreakReturn,self).__init__("break-return",gdb.COMMAND_USER)
@@ -129,6 +137,7 @@ def getAllVariablesNames():
     return definied_vars
 
 def isAPointer(var_type):
+    var_type = fixType(var_type)
     try:
         index = var_type.rfind("*")
         if index == -1:
@@ -140,12 +149,14 @@ def isAPointer(var_type):
         return False
 
 def isAObject(var_type):
+    var_type = fixType(var_type)
     try:
         return var_type[0:var_type.find(" ")].strip() == "class" and not isAPointer(var_type)
     except Exception:
         return False
 
 def isAArray(var_type):
+    var_type = fixType(var_type)
     try:
         close_index = var_type.rfind("]")
         if close_index == -1:
@@ -156,6 +167,7 @@ def isAArray(var_type):
         return False
 
 def isPrimitive(var_type):
+    var_type = fixType(var_type)
     try:
         return var_type[var_type.find("=") + 1:].strip() in PRIMITIVES_TYPES
     except Exception:
