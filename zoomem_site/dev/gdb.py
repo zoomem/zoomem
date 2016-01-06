@@ -120,11 +120,7 @@ global_vars = {}
 def getCurrentClassMembersNames():
     var_names = []
     try :
-        object_varibals = (getVarValue("*this")).split("\n")
-        for member in object_varibals:
-            member_var = (member[0:member.find("=")]).strip()
-            if member_var!= "":
-                var_names.append(member_var)
+        var_names = extractClassMembers("(*this)")
     except Exception:
         error = "exception"
     return var_names
@@ -318,21 +314,27 @@ def parsePointerVar(var_short_name,var_name,root_var):
     except Exception:
         return
 
+def extractClassMembers(var_name):
+    members = []
+    object_value = getVarValue(var_name)
+    next_member_start = object_value.find("{")
+    next_member_end = object_value.find("=")-1
+    while next_member_start >= 0:
+        next_member_start += 1
+        member_name = object_value[next_member_start:next_member_end].strip()
+        member_value_length = len(getVarValue(var_name + "." +member_name))
+        members.append(member_name)
+        next_member_start = object_value.find(",",member_value_length + next_member_end)
+        next_member_end = object_value.find("=",next_member_start+1)-1
+    return members
+
 def parseObjectVar(var_short_name,var_name,root_var):
     addVarCommand(var_short_name,var_name,OBJECT_FLAG)
     if root_var : addChildCommand("$root",var_name)
-    object_value = getVarValue(var_name)
-    next_member_start = object_value.find("{")+1
-    next_member_end = object_value.find("=")-1
-    while True:
-        if next_member_start <= 0:
-            break;
-        member_name = object_value[next_member_start:next_member_end].strip()
-        member_value_length = len(getVarValue(var_name + "." +member_name))
-        analyseVar(member_name,var_name + "." +member_name,False)
-        addChildCommand(var_name,var_name + "." +member_name)
-        next_member_start = object_value.find(",",member_value_length + next_member_end)+1
-        next_member_end = object_value.find("=",next_member_start)-1
+    members = extractClassMembers(var_name)
+    for member in members:
+        analyseVar(member,var_name + "." +member,False)
+        addChildCommand(var_name,var_name + "." +member)
 
 def parsePrimitiveVar(var_short_name,var_name,root_var):
     addVarCommand(var_short_name,var_name,PRIMITIVE_FLAG)
