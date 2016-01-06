@@ -6,9 +6,14 @@ import time
 
 def removePrefix(text, prefix):
     return text[text.startswith(prefix) and len(prefix):]
+def removerSuffix(text,suffix):
+    if text.endswith(suffix):
+        return text[:-len(suffix)]
+    return text
 
 def fixType(var_type):
     var_type = removePrefix(var_type,"const")
+    var_type = removerSuffix(var_type,"const")
     var_type = var_type.strip()
     return var_type
 
