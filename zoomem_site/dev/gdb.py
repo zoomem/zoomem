@@ -204,6 +204,14 @@ def next(n):
     print("done")
     gdb.flush()
 
+
+def prev(n):
+    n = int(n)
+    for i in range(0,n):
+        executeGdbCommand("rn")
+    gdb.flush()
+
+
 def initlizeHashes(vars_def_list):
     global vars_def
     global global_vars

@@ -62,7 +62,7 @@ class GdbAdapter:
         self.graph = gdbGraph()
 
     def prev(self,number = 1):
-        self.gdb_process.write("python executeGdbCommand('rn " + str(number) + "')")
+        self.gdb_process.write("python prev(" + str(number) + ")")
         self.graph = gdbGraph()
 
     def readOutput(self):
