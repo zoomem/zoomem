@@ -6,16 +6,16 @@ import time
 
 def removePrefix(text, prefix):
     return text[text.startswith(prefix) and len(prefix):]
-    
-def removerSuffix(text,suffix):
-    if text.endswith(suffix):
-        return text[:-len(suffix)]
-    return text
+
+def removeSuffix(text, suffix):
+    if not text.endswith(suffix):
+        return text
+    return text[:len(text)-len(suffix)]
 
 def fixType(var_type):
-    var_type = removePrefix(var_type,"const")
-    var_type = removerSuffix(var_type,"const")
-    var_type = var_type.strip()
+    var_type = removePrefix(var_type,"const").strip()
+    var_type = removeSuffix(var_type,"const").strip()
+    return var_type
 
 class BreakReturn(gdb.Command):
     def __init__(self):
