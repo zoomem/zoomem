@@ -23,11 +23,14 @@ class GdbAdapter:
         self.vars_def_list = code_parser.getVariablesDef(out)
 
         defined_functions = code_parser.getFunctionsNames(code_file_name + ".cpp")
+        self.gdb_process.write("python (executeGdbCommand('b main'))")
+        self.gdb_process.write("python (executeGdbCommand('set confirm off'))")
+        self.gdb_process.write("python (executeGdbCommand('run < " + input_file_name + " > " + output_file_name + "'))")
+
         for function in defined_functions:
             self.gdb_process.write("python (executeGdbCommand('b " + function + "'))")
 
-        self.gdb_process.write("python (executeGdbCommand('set confirm off'))")
-        self.gdb_process.write("python (executeGdbCommand('run < " + input_file_name + " > " + output_file_name + "'))")
+
         self.gdb_process.write("python setLastLine()")
 
         self.gdb_process.write("python (executeGdbCommand('target record-full'))")
