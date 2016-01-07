@@ -127,6 +127,7 @@ function inside(x,y,rect){
 }
 Node.prototype.draw=function(calcOnly){
   this.h=37+this.members.length*17;
+  this.w=150;
   if(this.flag!=2)
     this.h+=17;
   else
@@ -219,7 +220,7 @@ Node.prototype.draw=function(calcOnly){
         getArrayEdges(this.fullName,this.address+this.type);
         //alert(this.fullName);
     }
-    ctx.fillText(text,this.x+4,curY);
+    fillText(text,this.x+4,curY,this.w-8);
   }
   this.rect1={x:this.x,y:this.y,w:this.w,h:this.h};
   minX=Math.min(minX,this.x);

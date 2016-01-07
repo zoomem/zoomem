@@ -4,19 +4,6 @@ import time
 import subprocess
 import time
 
-def removePrefix(text, prefix):
-    return text[text.startswith(prefix) and len(prefix):]
-
-def removeSuffix(text, suffix):
-    if not text.endswith(suffix):
-        return text
-    return text[:len(text)-len(suffix)]
-
-def fixType(var_type):
-    var_type = removePrefix(var_type,"const").strip()
-    var_type = removeSuffix(var_type,"const").strip()
-    return var_type
-
 class BreakReturn(gdb.Command):
     def __init__(self):
         super(BreakReturn,self).__init__("break-return",gdb.COMMAND_USER)
@@ -120,7 +107,11 @@ global_vars = {}
 def getCurrentClassMembersNames():
     var_names = []
     try :
-        var_names = extractClassMembers("(*this)")
+        object_varibals = (getVarValue("*this")).split("\n")
+        for member in object_varibals:
+            member_var = (member[0:member.find("=")]).strip()
+            if member_var!= "":
+                var_names.append(member_var)
     except Exception:
         error = "exception"
     return var_names
@@ -138,7 +129,6 @@ def getAllVariablesNames():
     return definied_vars
 
 def isAPointer(var_type):
-    var_type = fixType(var_type)
     try:
         index = var_type.rfind("*")
         if index == -1:
@@ -150,14 +140,12 @@ def isAPointer(var_type):
         return False
 
 def isAObject(var_type):
-    var_type = fixType(var_type)
     try:
         return var_type[0:var_type.find(" ")].strip() == "class" and not isAPointer(var_type)
     except Exception:
         return False
 
 def isAArray(var_type):
-    var_type = fixType(var_type)
     try:
         close_index = var_type.rfind("]")
         if close_index == -1:
@@ -168,7 +156,6 @@ def isAArray(var_type):
         return False
 
 def isPrimitive(var_type):
-    var_type = fixType(var_type)
     try:
         return var_type[var_type.find("=") + 1:].strip() in PRIMITIVES_TYPES
     except Exception:
@@ -204,14 +191,6 @@ def next(n):
             break
     print("done")
     gdb.flush()
-
-
-def prev(n):
-    n = int(n)
-    for i in range(0,n):
-        executeGdbCommand("rn")
-    gdb.flush()
-
 
 def initlizeHashes(vars_def_list):
     global vars_def
@@ -314,27 +293,21 @@ def parsePointerVar(var_short_name,var_name,root_var):
     except Exception:
         return
 
-def extractClassMembers(var_name):
-    members = []
-    object_value = getVarValue(var_name)
-    next_member_start = object_value.find("{")
-    next_member_end = object_value.find("=")-1
-    while next_member_start >= 0:
-        next_member_start += 1
-        member_name = object_value[next_member_start:next_member_end].strip()
-        member_value_length = len(getVarValue(var_name + "." +member_name))
-        members.append(member_name)
-        next_member_start = object_value.find(",",member_value_length + next_member_end)
-        next_member_end = object_value.find("=",next_member_start+1)-1
-    return members
-
 def parseObjectVar(var_short_name,var_name,root_var):
     addVarCommand(var_short_name,var_name,OBJECT_FLAG)
     if root_var : addChildCommand("$root",var_name)
-    members = extractClassMembers(var_name)
-    for member in members:
-        analyseVar(member,var_name + "." +member,False)
-        addChildCommand(var_name,var_name + "." +member)
+    object_value = getVarValue(var_name)
+    next_member_start = object_value.find("{")+1
+    next_member_end = object_value.find("=")-1
+    while True:
+        if next_member_start <= 0:
+            break;
+        member_name = object_value[next_member_start:next_member_end].strip()
+        member_value_length = len(getVarValue(var_name + "." +member_name))
+        analyseVar(member_name,var_name + "." +member_name,False)
+        addChildCommand(var_name,var_name + "." +member_name)
+        next_member_start = object_value.find(",",member_value_length + next_member_end)+1
+        next_member_end = object_value.find("=",next_member_start)-1
 
 def parsePrimitiveVar(var_short_name,var_name,root_var):
     addVarCommand(var_short_name,var_name,PRIMITIVE_FLAG)
@@ -365,7 +338,7 @@ def getVarHash(var_name):
         if var_hash['var_type'] == "char" or var_hash['var_type'] == "signed char" or var_hash['var_type'] == "unsigned char":
             var_hash['var_value'] = var_value[var_value.find("\'")+1:var_value.rfind("\'")]
         else:
-            var_hash['var_value'] = (var_value if isPrimitive(var_hash['var_type']) else  "none")
+            var_hash['var_value'] = (var_value if isPrimitive(var_hash['var_type']) else  "NULL")
     return var_hash
 
 def compileFiles():
