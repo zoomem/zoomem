@@ -29,50 +29,48 @@
     </style>
   </head>
   <body >
-
     <div>
     <h1 style="margin-left:1%;color:#6a778f;">ZoomMEM <small>Helping you understand c++ code! <img style="width:30vh;float:right;" src="{% static "img/sample.png" %}" alt="colors" /></h1>
     </div>
-    <dv>
-      <table style="width:100%;height:100%;">
-        <tr style="width:100%;height:100%;">
-          <td style="width:32%;height:100%;">
-            <div class = ".highlighted_code" style="height:60%;">
+    <div>
+      <table>
+          <td>
+            <div class = ".highlighted_code">
               <textarea id="cpp-code">{{code}}</textarea>
             </div>
             <div style="height:35%;">
               <div id="io">
                 <div class="input-group" style="margin-bottom:2px;">
                   <span class="input-group-btn">
-                      <button class="btn btn-default" type="button" id = "prev">Prev</button>
+                      <button class="btn btn-default btn-xs" type="button" id = "prev">Prev</button>
                   </span>
-                  <input type="text" class="form-control" placeholder="#Steps" id = "step">
+                  <input type="text" class="form-control input-xs" placeholder="#Steps" id = "step">
                   <span class="input-group-btn">
-                      <button class="btn btn-default" type="button" id = "next">Next</button>
+                      <button class="btn btn-default btn-xs" type="button" id = "next">Next</button>
                   </span>
                 </div>
                 <div class="btn-group btn-group-justified" role="group" aria-label="...">
                   <div class="btn-group" role="group">
-                    <button class="btn btn-default" type="button" id = "end_funciton">End function</button>
+                    <button class="btn btn-default btn-xs" type="button" id = "end_funciton">End function</button>
                   </div>
                   <div class="btn-group" role="group">
-                    <button class="btn btn-default" type="button" id = "stack_up">Prev Stack frame</button>
+                    <button class="btn btn-default btn-xs" type="button" id = "stack_up">Prev Stack frame</button>
                   </div>
                   <div class="btn-group" role="group">
-                    <button class="btn btn-default" type="button" id = "stack_down">Next Stack frame</button>
+                    <button class="btn btn-default btn-xs" type="button" id = "stack_down">Next Stack frame</button>
                   </div>
                   <div class="btn-group" role="group">
-                    <button class="btn btn-default" type="button" id = "edit">Edit</button>
+                    <button class="btn btn-default btn-xs" type="button" id = "edit">Edit</button>
                   </div>
                 </div>
               </div>
-              <div style="text-align:center;height:65%">
+              <div style="text-align:center;">
                 <textarea id="output" class = "output" readonly placeholder="code output goes here"> </textarea>
               </div>
             </div>
           </td>
           <td style="width:68%;" id="cvs_cont">
-            <canvas id="cvs" width="900px" height="600px"></canvas>
+            <canvas id="cvs"></canvas>
           </td>
         </tr>
       </table>
