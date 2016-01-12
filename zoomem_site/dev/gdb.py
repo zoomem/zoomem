@@ -198,9 +198,16 @@ def next(n):
             s = executeGdbCommand("n")
             if s.find("Program received signal ") >= 0:
                 print (s)
+                break
         else:
             break
     print("done")
+    gdb.flush()
+
+def prev(n):
+    n = int(n)
+    for i in range(0,n):
+        s = executeGdbCommand("rn")
     gdb.flush()
 
 def initlizeHashes(vars_def_list):

@@ -67,7 +67,6 @@ class GdbAdapter:
     def prev(self,number = 1):
         print "tariq khundakji",number
         self.gdb_process.write("python prev(" + str(number) + ")")
-        self.gdb_process.readError()
         self.graph = gdbGraph()
 
     def readOutput(self):
