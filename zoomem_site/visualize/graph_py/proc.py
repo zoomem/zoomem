@@ -1,5 +1,4 @@
 from subprocess import Popen, PIPE
-import non_blocking_stream
 import time
 import subprocess
 from threading import Thread
@@ -24,7 +23,7 @@ class nbsr_process:
                 time.sleep(0.5)
 
         self._t = Thread(target = limitExecuting,args = (60*60,self.proc))
-        self._t.daemon = True
+        self._t.daemon = False
         self._t.start()
 
     def exitProc(self):
