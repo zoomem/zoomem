@@ -59,12 +59,12 @@ class nbsr_process:
         output_lines = []
         start = time.time()
         while True:
+            output = ""
             now = time.time()
             if now - start > self.time_limit:
                 raise TimeLimitError("","TimeLimitError")
             try :
                 output = self.proc.stderr.readline()
-                print output
             except:
                 time.sleep(0.1)
                 continue
