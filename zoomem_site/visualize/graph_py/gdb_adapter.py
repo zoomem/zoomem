@@ -35,7 +35,7 @@ class GdbAdapter:
 
         self.gdb_process.write("python (executeGdbCommand('target record-full'))")
         self.gdb_process.write("python print('begin')")
-        self.gdb_process.clean()
+        self.gdb_process.readTill("begin")
 
         self.graph = gdbGraph()
 
