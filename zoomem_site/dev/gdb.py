@@ -145,6 +145,17 @@ def isAObject(var_type):
     except Exception:
         return False
 
+def isAReference(var_type):
+    try:
+        index = var_type.rfind("&")
+        if index == -1:
+            return False
+        if index == len(var_type) - 1 or var_type[index+1] == "[":
+            return True
+        return False
+    except Exception:
+        return False
+
 def isAArray(var_type):
     try:
         close_index = var_type.rfind("]")
@@ -257,6 +268,8 @@ def analyseVar(var_short_name,var_name,root_var = False,Type = "",depth = 0):
         parsePointerVar(var_short_name,var_name,root_var)
     elif isAObject(var_type):
         parseObjectVar(var_short_name,var_name,root_var)
+    elif isAReference(var_type):
+        parseReferanceVar(var_short_name,var_name,root_var)
 
 def check_node(var_name,var_type,var_short_name):
     var_address = getVarAddress(var_name)
@@ -287,6 +300,16 @@ def parsePointerVar(var_short_name,var_name,root_var):
     addVarCommand(var_short_name,var_name,POINTER_FLAG)
     if root_var : addChildCommand("$root",var_name)
     child_var_name = "(*" + var_name+ ")"
+    try:
+        analyseVar("$",child_var_name)
+        addChildCommand(var_name,child_var_name)
+    except Exception:
+        return
+
+def parseReferanceVar(var_short_name,var_name,root_var):
+    addVarCommand(var_short_name,var_name,POINTER_FLAG)
+    if root_var : addChildCommand("$root",var_name)
+    child_var_name = "(*(&" + var_name+ "))"
     try:
         analyseVar("$",child_var_name)
         addChildCommand(var_name,child_var_name)
