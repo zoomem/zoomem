@@ -9,13 +9,13 @@
     <link href={% static "bootstrap/css/bootstrap.min.css" %} rel="stylesheet">
     <link href={% static "visualize/css/visualize.css" %} rel="stylesheet" type="text/css">
   </head>
-  <body style = "margin:1%"">
+  <body style = "margin:1%">
     <span id = {{error_type}}> </span>
     <h1 style="margin-left:1%;color:#6a778f;"> <img style="width:30vh;float:left;margin-right:1vh;" src="{% static "img/zoomem.png" %}" alt="colors" /><small>Helping you understand c++ code! <img style="width:30vh;float:right;" src="{% static "img/sample.png" %}" alt="colors" /></h1>
     <h3 style="color:#B71427"> There was a {{error_type}} while trying to {{state}} your code :(</h3>
     <div class="alert alert-danger" role="alert" style="font-size:150%;">{{error}}</div>
     <h3 style="color:#6BB12F;text-align: center;"> don't give up you are only one bit away :) </h3>
-    <button class = "btn btn-default btn-submit err-btn">try again!</button>
+    <button class = "btn btn-default btn-submit err-btn">Try again!</button>
 
     <script type="text/javascript" src={% static "visualize/js/visualize.js" %}></script>
   </body>
