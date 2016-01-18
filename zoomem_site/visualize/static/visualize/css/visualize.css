@@ -4,7 +4,7 @@ html{
 }
 
 td{
-  border:dashed 1px lightgray;
+  border:solid 1px lightgray;
 }
 
 #io{
@@ -14,7 +14,7 @@ td{
   padding-bottom:2px;
   text-align: center;
   margin-top:4px;
-  border:dashed 1px lightgray;
+  border:solid 1px lightgray;
 }
 
 #output{
@@ -40,7 +40,7 @@ td{
 }
 
 .btn {
-  margin-bottom: 5px
+  margin: 5px
   text-align: center;
   margin: auto;
 }
