@@ -103,10 +103,12 @@ def parseInfoLines(info_lines):
             rem = len(full_var_value) - len(var_value) - 1
             if full_var_value == var_value:
                 rem = 0
+            rem = max(rem,0)
         else:
             rem -= len(info_lines[i])
             if rem > 0:
                 rem -= 1
+            rem = max(rem,0)
     return var_names
 
 
