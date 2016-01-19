@@ -73,7 +73,7 @@ function getArrayEdges(arrayName,uniqueName){
     return;
   if(visArray[uniqueName]==0 || visArray[uniqueName] == null ){
     visArray[uniqueName]=2;
-    var data = 'var_name=' + arrayName;
+    var data = 'var_name=' + arrayName +'&session_id=' + session_id;
     var edges;
     cvs.style.cursor="wait";
     disable_buttons()
@@ -95,7 +95,7 @@ function getArrayEdges(arrayName,uniqueName){
    }else{
      visArray[uniqueName]=3;
      disable_buttons()
-     var data = 'del_name=' + arrayName;
+     var data = 'del_name=' + arrayName +'&session_id=' + session_id;
      var edges;
      $.ajax({
        url: "/visualize/remove_graph_edges",

@@ -74,19 +74,25 @@
           </td>
         </tr>
       </table>
-</div>
-  <script type="text/javascript" src={% static "visualize/js/visualize.js" %}></script>
-  <script>
-    $(document).ready(function() {
-
-      $.ajax({
-        url: "/visualize/update",
-        context: document.body,
-         success: function(data) {
-           updatePage(data);
-         }
-       })
-    });
-  </script>
+    </div>
+    <script type="text/javascript" src={% static "visualize/js/visualize.js" %}></script>
+    <script>
+      var session_id = ("{{session_id|safe}}")
+      $(document).ready(function() {
+        if("{{valid}}".trim() != "True")
+        {
+          $("input[type=button],:button").attr("disabled","disabled");
+          $("#edit").removeAttr("disabled")
+        }
+        $.ajax({
+          url: "/visualize/update",
+          data:'session_id=' + session_id,
+          context: document.body,
+           success: function(data) {
+             updatePage(data);
+           }
+         })
+      });
+    </script>
   </body>
 </html>

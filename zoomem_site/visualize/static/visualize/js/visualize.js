@@ -3,7 +3,6 @@ function disable_buttons(){
   cvs.style.cursor="wait";
   $("input[type=button],:button").attr("disabled","disabled");
   $("#edit").removeAttr("disabled")
-
 }
 function enable_buttons()
 {
@@ -13,7 +12,7 @@ function enable_buttons()
 $("#next").on("click", function() {
   disable_buttons()
   var number = $('#step');
-  var data = 'step=' + number.val();
+  var data = 'step=' + number.val() + '&session_id=' + session_id;
   $.ajax({
     url: "/visualize/next",
     data:data,
@@ -40,7 +39,7 @@ $("#next").on("click", function() {
 $("#prev").on("click", function() {
   disable_buttons()
   var number = $('#step');
-  var data = 'step=' + number.val();
+  var data = 'step=' + number.val()+'&session_id=' + session_id;
   $.ajax({
     url: "/visualize/prev",
     data:data,
@@ -56,9 +55,11 @@ $("#prev").on("click", function() {
 });
 
 $("#end_funciton").on("click", function() {
-  disable_buttons()
+  disable_buttons();
+  var data = 'session_id=' + session_id;
   $.ajax({
     url: "/visualize/end_funciton",
+    data:data,
     context: document.body,
      success: function(data) {
        updatePage(data);
@@ -71,9 +72,11 @@ $("#end_funciton").on("click", function() {
 });
 
 $("#stack_up").on("click", function() {
-  disable_buttons()
+  disable_buttons();
+  var data = 'session_id=' + session_id;
   $.ajax({
     url: "/visualize/stack_up",
+    data:data,
     context: document.body,
      success: function(data) {
        updatePage(data);
@@ -87,8 +90,10 @@ $("#stack_up").on("click", function() {
 
 $("#stack_down").on("click", function() {
   disable_buttons()
+  var data = 'session_id=' + session_id;
   $.ajax({
     url: "/visualize/stack_down",
+    data:data,
     context: document.body,
      success: function(data) {
        updatePage(data);
@@ -101,12 +106,12 @@ $("#stack_down").on("click", function() {
 });
 
 $("#edit").on("click", function() {
-  window.location.href = '/?code=True';
+  window.location.href = '/?session_id='+ session_id;
 
 });
 
 $(".err-btn").on("click", function() {
-  window.location.href = '/?code=True';
+  window.location.href = '/?session_id=' + session_id;
 });
 
 var cppEditor = CodeMirror.fromTextArea(document.getElementById("cpp-code"), {

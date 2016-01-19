@@ -16,7 +16,9 @@
     <div class="alert alert-danger" role="alert" style="font-size:150%;">{{error}}</div>
     <h3 style="color:#6BB12F;text-align: center;"> don't give up you are only one bit away :) </h3>
     <button class = "btn btn-default btn-submit err-btn">Try again!</button>
-
+    <script>
+      var session_id = ("{{session_id|safe}}")
+    </script>
     <script type="text/javascript" src={% static "visualize/js/visualize.js" %}></script>
   </body>
 </html>

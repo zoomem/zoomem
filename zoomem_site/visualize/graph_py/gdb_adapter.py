@@ -1,10 +1,6 @@
-import re
 from graph import gdbGraph
 from proc import nbsr_process
-import subprocess
-import commands
-import time
-import code_parser
+import code_parser,os,time,commands,subprocess,re
 
 class ProcRunTimeError(Exception):
     def __init__(self, message, errors):
@@ -14,22 +10,25 @@ class ProcRunTimeError(Exception):
 
 class GdbAdapter:
 
-    def __init__(self,code_file_name,input_file_name,output_file_name):
-        self.gdb_process = nbsr_process("gdb " + code_file_name + " -q")
-        self.output_file_name = output_file_name
+    def __init__(self,code_file_name,input_file_name,output_file_name,id):
+        self.code_data_id = id
         self.current_line = 0
+        self.output_file_name = output_file_name
+
         p = subprocess.Popen(['clang-3.5', '-Xclang' , '-ast-dump' ,'-fsyntax-only',code_file_name +"_parsing.cpp"], stdout=subprocess.PIPE,stderr=subprocess.PIPE)
         out, err = p.communicate()
-        self.vars_def_list = code_parser.getVariablesDef(out)
 
+        self.vars_def_list = code_parser.getVariablesDef(out)
         defined_functions = code_parser.getFunctionsNames(code_file_name + ".cpp")
+        self.gdb_process = nbsr_process("gdb " + code_file_name + " -q")
+        os.remove(code_file_name +"_parsing.cpp")
+        os.remove(code_file_name +".cpp")
+
         self.gdb_process.write("python (executeGdbCommand('b main'))")
         self.gdb_process.write("python (executeGdbCommand('set confirm off'))")
         self.gdb_process.write("python (executeGdbCommand('run < " + input_file_name + " > " + output_file_name + "'))")
-
         for function in defined_functions:
             self.gdb_process.write("python (executeGdbCommand('b " + function + "'))")
-
 
         self.gdb_process.write("python setLastLine()")
 

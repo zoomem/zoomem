@@ -177,5 +177,4 @@ def getVariablesDef(txt):
             function_start = bounds[:index]
             function_end = bounds[index+1:]
 
-    print(vars_def_list)
     return vars_def_list
