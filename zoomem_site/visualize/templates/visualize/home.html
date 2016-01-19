@@ -26,7 +26,7 @@
   </head>
 
   <body >
-    <h1 style="margin-left:1%;color:#6a778f;"> <img style="width:30vh;float:left;margin-right:1vh;" src="{% static "img/zoomem.png" %}" alt="colors" /><small>Helping you understand C++ code! <img style="width:30vh;float:right;" src="{% static "img/sample.png" %}" alt="colors" /></h1>
+    <h1 style="margin-left:1%;color:#6a778f;"> <img style="width:30vh;float:left;margin-right:1vh;" src="{% static "img/zoomem.png" %}" alt="colors" /><small>Helping you understand C++ code! <img style="margin:1vh;width:45vh;height:3vh;float:right;" src="{% static "img/sample.png" %}" alt="colors" /></h1>
       <form method = "post" action =  "/visualize/submit">{% csrf_token %}
         <pre>
           <textarea id="code" name="code" placeholder="Paste your code here">{{code}}</textarea>
