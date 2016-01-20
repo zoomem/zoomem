@@ -27,18 +27,28 @@ def index(request):
 def home(request):
     code = "#include <iostream>\nusing namespace std;\nint main()\n{\n  return 0;\n}"
     inpt = ""
+    session_id = "none"
     if 'session_id' in request.GET:
         code_data = CodeData.objects.get(id=request.GET['session_id'])
         code = code_data.code
         inpt = code_data.code_input
-    return render(request, 'visualize/home.html',{'code':code,'input':inpt})
+        session_id = request.GET["session_id"]
+    return render(request, 'visualize/home.html',{'code':code,'input':inpt,'session_id':session_id})
 
 def submit(request):
     global gdb_adapters
     try:
+        submitted_code_data = None
         if not request.session.exists(request.session.session_key):
             request.session.create()
-        submitted_code_data = CodeData(code=request.POST['code'],code_input=request.POST['input'],code_key=request.session.session_key)
+        if "session_id" in request.POST and request.POST["session_id"] != "none" :
+            session_id = int(request.POST["session_id"])
+            if validEdit(session_id,request):
+                submitted_code_data = CodeData.objects.get(id=session_id)
+                submitted_code_data.code = request.POST['code']
+                submitted_code_data.code_input = request.POST['input']
+        else:
+            submitted_code_data = CodeData(code=request.POST['code'],code_input=request.POST['input'],code_key=request.session.session_key)
         submitted_code_data.save()
         gdb_adapters[submitted_code_data.id] = createNewGdbAdapter(request.POST['code'], request.POST['input'],submitted_code_data.id)
         return HttpResponseRedirect("/visualize/index?session_id=" + str(submitted_code_data.id))

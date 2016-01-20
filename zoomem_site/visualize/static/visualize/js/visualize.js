@@ -107,7 +107,6 @@ $("#stack_down").on("click", function() {
 
 $("#edit").on("click", function() {
   window.location.href = '/?session_id='+ session_id;
-
 });
 
 $(".err-btn").on("click", function() {
