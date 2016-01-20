@@ -43,6 +43,8 @@ PRIMITIVE_FLAG = '4'
 LAST_LINE = '0'
 current_steps = 0
 visted_list = {}
+vars_def = {}
+global_vars = {}
 
 
 def setLastLine():
@@ -118,8 +120,6 @@ def getVariablesNames(info_command, info_empty_response):
         return []
     return parseInfoLines(info_lines)
 
-vars_def = {}
-global_vars = {}
 
 
 def getCurrentClassMembersNames():

@@ -15,6 +15,7 @@ from subprocess import Popen, PIPE
 from proc import TimeLimitError
 from django.http import JsonResponse
 from django.http import HttpResponseRedirect
+from datetime import datetime
 
 gdb_adapters = {}
 
@@ -29,7 +30,7 @@ class CompilationError(Exception):
 
 
 def index(request):
-    session_id = request.GET['session_id']
+    session_id = int(request.GET["session_id"])
     code = CodeData.objects.get(id=session_id).code
     return render(request, 'visualize/index.html', {'code': code, 'session_id': session_id, 'valid': validEdit(session_id, request)})
 
@@ -58,6 +59,8 @@ def submit(request):
                 submitted_code_data = CodeData.objects.get(id=session_id)
                 submitted_code_data.code = request.POST['code']
                 submitted_code_data.code_input = request.POST['input']
+            else:
+                return
         else:
             submitted_code_data = CodeData(code=request.POST['code'], code_input=request.POST[
                                            'input'], code_key=request.session.session_key)
@@ -66,6 +69,7 @@ def submit(request):
             request.POST['code'], request.POST['input'], submitted_code_data.id)
         return HttpResponseRedirect("/visualize/index?session_id=" + str(submitted_code_data.id))
     except CompilationError as e:
+        e.message = e.message.replace("visualize/static/cpp_files/","\n/")
         return render(request, 'visualize/error.html', {'error': e.message, 'error_type': e.errors, 'state': "compile", 'session_id': submitted_code_data.id})
 
 
@@ -75,7 +79,6 @@ def update(request):
     if validEdit(session_id, request):
         if "var_name" in request.GET:
             var_name = request.GET["var_name"]
-        gdb_adapters[session_id].resetTimer()
     g_data = getEdges(gdb_adapters[session_id], var_name)
     data = json.dumps({
         'edges': g_data["edges"],
@@ -85,6 +88,14 @@ def update(request):
     })
     return HttpResponse(data, content_type='application/json')
 
+def new_data(request):
+    session_id = int(request.GET["session_id"])
+    last_seen = 0
+    if 'last_seen' in request.GET: last_seen = datetime.strptime(request.GET['last_seen'],"%a, %d %b %Y %H:%M:%S %Z")
+    print str(last_seen) + " tariq " + str(gdb_adapters[session_id].lastChanged())
+    if last_seen == 0 or gdb_adapters[session_id].lastChanged() > last_seen:
+        return HttpResponse("true")
+    return HttpResponse("false")
 
 def remove_graph_edges(request):
     session_id = int(request.GET["session_id"])
@@ -117,6 +128,23 @@ def next(request):
         gdb_adapters[session_id].exitProcess()
         return render(request, 'visualize/error.html', {'error': "Faild it line " + line, 'error_type': e.errors, 'state': 'run', 'session_id': session_id})
 
+def go_to_line(request):
+    session_id = int(request.GET["session_id"])
+    if not validEdit(session_id, request):
+        return
+    try:
+        step = request.GET["line"]
+        if(step == ""):
+            step = 1
+        gdb_adapters[session_id].goToLine(line)
+        return update(request)
+    except ProcRunTimeError as e:
+        gdb_adapters[session_id].exitProcess()
+        return render(request, 'visualize/error.html', {'error': e.message, 'error_type': e.errors, 'state': "run", 'session_id': session_id})
+    except TimeLimitError as e:
+        line = str(gdb_adapters[session_id].current_line)
+        gdb_adapters[session_id].exitProcess()
+        return render(request, 'visualize/error.html', {'error': "Faild it line " + line, 'error_type': e.errors, 'state': 'run', 'session_id': session_id})
 
 def prev(request):
     session_id = int(request.GET["session_id"])

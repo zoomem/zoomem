@@ -21,6 +21,7 @@ class GdbAdapter:
         self.code_data_id = id
         self.current_line = 0
         self.output_file_name = output_file_name
+        self.current_steps = 0
 
         p = subprocess.Popen(['clang-3.5', '-Xclang', '-ast-dump', '-fsyntax-only',
                               code_file_name + "_parsing.cpp"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -50,8 +51,8 @@ class GdbAdapter:
 
         self.graph = gdbGraph()
 
-    def resetTimer(self):
-        self.gdb_process.start = time.time()
+    def lastChanged(self):
+        return self.gdb_process.last_edit
 
     def exitProcess(self):
         self.gdb_process.exitProc()
@@ -68,11 +69,18 @@ class GdbAdapter:
         self.gdb_process.write("python (executeGdbCommand('down'))")
         self.graph = gdbGraph()
 
+    def getCurrentSteps():
+        self.gdb_process.write("python getCurrentSteps()")
+        current_steps = int(self.gdb_process.readTill("done")[0])
+        self.current_steps = current_steps
+        return current_steps
+
     def next(self, number=1):
         self.gdb_process.write("python next('" + str(number) + "')")
         mess = (self.gdb_process.readTill("done"))
         if len(mess) > 0:
             raise ProcRunTimeError(("\n").join(mess), "RuntimeError")
+        print
         self.graph = gdbGraph()
 
     def prev(self, number=1):

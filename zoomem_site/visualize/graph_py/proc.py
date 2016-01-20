@@ -1,5 +1,5 @@
 from subprocess import Popen, PIPE
-import time
+import datetime,time
 import subprocess
 from threading import Thread
 import fcntl
@@ -19,7 +19,7 @@ class nbsr_process:
         self.proc = Popen(name, stdin=PIPE, stdout=PIPE,
                           stderr=PIPE, shell=True)
         self.time_limit = 15
-        self.start = time.time()
+        self.last_edit = datetime.datetime.utcnow()
 
         fd = self.proc.stdout.fileno()
         fl = fcntl.fcntl(fd, fcntl.F_GETFL)
@@ -27,8 +27,7 @@ class nbsr_process:
 
         def limitExecuting(timeout, proc):
             while True:
-                now = time.time()
-                if(now - self.start >= timeout):
+                if((datetime.datetime.utcnow() - self.last_edit).total_seconds() >= timeout):
                     self.exitProc()
                     break
                 time.sleep(0.5)
@@ -42,10 +41,10 @@ class nbsr_process:
 
     def readTill(self, end=""):
         output_lines = []
-        start = time.time()
+        start = datetime.datetime.utcnow()
         while True:
-            now = time.time()
-            if now - start > self.time_limit:
+            now = datetime.datetime.utcnow()
+            if (datetime.datetime.utcnow() - start).total_seconds() > self.time_limit:
                 raise TimeLimitError("", "TimeLimitError")
             try:
                 output = self.proc.stdout.readline()
@@ -53,7 +52,7 @@ class nbsr_process:
                 time.sleep(0.1)
                 continue
             output = self.removeHeader(output.strip())
-            start = time.time()
+            start = datetime.datetime.utcnow()
             if output == end:
                 break
             output_lines.append(output)
@@ -61,11 +60,10 @@ class nbsr_process:
 
     def readError(self, end=""):
         output_lines = []
-        start = time.time()
+        start = datetime.datetime.utcnow()
         while True:
-            output = ""
-            now = time.time()
-            if now - start > self.time_limit:
+            now = datetime.datetime.utcnow()
+            if (datetime.datetime.utcnow() - start).total_seconds() > self.time_limit:
                 raise TimeLimitError("", "TimeLimitError")
             try:
                 output = self.proc.stderr.readline()
@@ -73,13 +71,14 @@ class nbsr_process:
                 time.sleep(0.1)
                 continue
             output = self.removeHeader(output.strip())
-            start = time.time()
+            start = datetime.datetime.utcnow()
             if output == end:
                 break
             output_lines.append(output)
         return output_lines
 
     def write(self, command):
+        self.last_edit = datetime.datetime.utcnow()
         command += "\n"
         self.proc.stdin.write(command.encode())
 

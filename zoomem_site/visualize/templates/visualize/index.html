@@ -14,7 +14,8 @@
   <link href={% static "codemirror/codemirror.css" %} rel="stylesheet">
   <script type="text/javascript" src={% static "codemirror/codemirror.js" %}></script>
   <script type="text/javascript" src={% static "codemirror/clike.js" %}>
-    < /script < script type = "text/javascript"
+    < /script < script type = "text/javascript
+    "
     src = { % static "codemirror/placeholder.js" %
     } >
   </script>
@@ -82,20 +83,38 @@
   <script type="text/javascript" src={% static "visualize/js/visualize.js" %}></script>
   <script>
     var session_id = ("{{session_id|safe}}")
-    $(document).ready(function() {
-      if ("{{valid}}".trim() != "True") {
-        $("input[type=button],:button").attr("disabled", "disabled");
-        $("#edit").removeAttr("disabled")
-      }
+    var date = new Date();
+    date.setDate(date.getDate() - 1);
+    var last_seen = date;
+    function callUpdate() {
       $.ajax({
         url: "/visualize/update",
         data: 'session_id=' + session_id,
         context: document.body,
         success: function(data) {
           updatePage(data);
+          last_seen = Date()
         }
       })
-    });
+    }
+    function check() {
+      $.ajax({
+        url: "/visualize/new_data",
+        data: 'session_id=' + session_id + "&last_seen="+last_seen.toUTCString(),
+        context: document.body,
+        success: function(data) {
+          alert(data)
+        }
+      })
+    }
+    $(document).ready(function()
+    {
+        if ("{{valid}}".trim() != "True") {
+          $("input[type=button],:button").attr("disabled", "disabled");
+        }
+        callUpdate();
+        check();
+    })
   </script>
 </body>
 
