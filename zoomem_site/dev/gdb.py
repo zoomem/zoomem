@@ -41,7 +41,7 @@ ARRAY_FLAG = '2'
 OBJECT_FLAG = '3'
 PRIMITIVE_FLAG = '4'
 LAST_LINE = '0'
-
+current_steps = 0
 visted_list = {}
 
 
@@ -103,12 +103,12 @@ def parseInfoLines(info_lines):
             rem = len(full_var_value) - len(var_value) - 1
             if full_var_value == var_value:
                 rem = 0
-            rem = max(rem,0)
+            rem = max(rem, 0)
         else:
             rem -= len(info_lines[i])
             if rem > 0:
                 rem -= 1
-            rem = max(rem,0)
+            rem = max(rem, 0)
     return var_names
 
 
@@ -224,10 +224,12 @@ def getCrrentLine():
 
 def next(n):
     global LAST_LINE
+    global current_steps
     n = int(n)
     for i in range(0, n):
         if str(getLineNumber()) != (LAST_LINE):
             s = executeGdbCommand("n")
+            current_steps += 1
             if s.find("Program received signal ") >= 0:
                 print (s)
                 break
@@ -237,8 +239,33 @@ def next(n):
     gdb.flush()
 
 
+def goToLine(line):
+    global LAST_LINE
+    global current_steps
+    line = int(line)
+    while(True):
+        if str(getLineNumber()) != LAST_LINE and int(getLineNumber()) != line:
+            s = executeGdbCommand("n")
+            current_steps += 1
+            if s.find("Program received signal ") >= 0:
+                print (s)
+                break
+        else:
+            break
+    print("done")
+    gdb.flush()
+
+
+def getCurrentSteps():
+    global current_steps
+    print(current_steps)
+    print "done"
+
+
 def prev(n):
     n = int(n)
+    global current_steps
+    current_steps = max(current_steps - n, 0)
     for i in range(0, n):
         s = executeGdbCommand("rn")
     gdb.flush()
