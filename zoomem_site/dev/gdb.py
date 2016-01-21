@@ -79,17 +79,16 @@ def getVarValue(var_name):
         temp = var_val.find(")", start_index)
         if temp != -1:
             start_index = temp + 1
+    if isAReference(getVarType(var_name)):
+        start_index = var_val.find("@")
     return (var_val[start_index:]).strip()
-
 
 def getVarSize(var_name):
     var_size = executeGdbCommand("print sizeof(" + var_name + ")")
     return var_size[var_size.find("=") + 1:].strip()
 
-
 def getNumberOfArrayElements(var_name):
     return int(int(getVarSize(var_name)) / int(getVarSize("(" + var_name + ")[0]")))
-
 
 def parseInfoLines(info_lines):
     var_names = []
