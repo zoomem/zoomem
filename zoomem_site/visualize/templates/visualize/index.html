@@ -86,34 +86,47 @@
     var date = new Date();
     date.setDate(date.getDate() - 1);
     var last_seen = date;
+    var new_data = false;
     function callUpdate() {
       $.ajax({
-        url: "/visualize/update",
+        url: "/visualize/render_graph",
         data: 'session_id=' + session_id,
         context: document.body,
         success: function(data) {
+          last_seen = new Date();
           updatePage(data);
-          last_seen = Date()
         }
       })
     }
-    function check() {
-      $.ajax({
-        url: "/visualize/new_data",
-        data: 'session_id=' + session_id + "&last_seen="+last_seen.toUTCString(),
-        context: document.body,
-        success: function(data) {
-          alert(data)
-        }
-      })
+
+    function updateDataState()
+    {
+      $.ajax(
+        {
+          url: "/visualize/new_data",
+          data: 'session_id=' + session_id + "&last_seen="+last_seen.toUTCString(),
+          context: document.body,
+          success: function(data) {
+            new_data = (data == "true");
+          },
+          error: function(data) {
+            new_data = true;
+          }
+        })
     }
+    
+     window.setInterval(function(){
+       updateDataState();
+       if(new_data)
+         callUpdate()
+     }, 300);
+
     $(document).ready(function()
     {
         if ("{{valid}}".trim() != "True") {
           $("input[type=button],:button").attr("disabled", "disabled");
         }
         callUpdate();
-        check();
     })
   </script>
 </body>

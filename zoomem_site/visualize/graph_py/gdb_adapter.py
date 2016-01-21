@@ -6,6 +6,7 @@ import time
 import commands
 import subprocess
 import re
+import datetime
 
 
 class ProcRunTimeError(Exception):
@@ -22,6 +23,7 @@ class GdbAdapter:
         self.current_line = 0
         self.output_file_name = output_file_name
         self.current_steps = 0
+        self.last_edit = datetime.datetime.utcnow()
 
         p = subprocess.Popen(['clang-3.5', '-Xclang', '-ast-dump', '-fsyntax-only',
                               code_file_name + "_parsing.cpp"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -52,7 +54,7 @@ class GdbAdapter:
         self.graph = gdbGraph()
 
     def lastChanged(self):
-        return self.gdb_process.last_edit
+        return self.last_edit
 
     def exitProcess(self):
         self.gdb_process.exitProc()
@@ -91,7 +93,7 @@ class GdbAdapter:
         self.graph = gdbGraph()
         self.updateGraph()
 
-    def goToLine(self,line):
+    def goToLine(self, line):
         self.gdb_process.write("python goToLine(" + str(number) + ")")
         mess = (self.gdb_process.readTill("done"))
         if len(mess) > 0:
@@ -115,7 +117,7 @@ class GdbAdapter:
         self.vars_def_list = self.vars_def_list
         var_name = "\"" + var_name + "\""
         self.gdb_process.write("python generateGraphData(\"" +
-                               self.vars_def_list + "\"," + var_name + "," + depth + ")")
+                               self.vars_def_list + "\"," + var_name + "," + str(depth) + ")")
         return (self.gdb_process.readTill("done"))
 
     def bulidGraph(self, grahData):
@@ -133,8 +135,8 @@ class GdbAdapter:
         return self.graph
 
     def updateGraph(self):
-        print "FEW"
-        #self.bulidGraph(self.getGraphData())
+        self.last_edit = datetime.datetime.utcnow()
+        self.graph = self.bulidGraph(self.getGraphData())
 
     def removeGraphEdges(self, edges):
         for edge in edges:

@@ -363,6 +363,8 @@ def check_node(var_name, var_type, var_short_name):
         visted_list[ident] = var_short_name
         return False
 
+def getArrayIdent(arr_name):
+    return arr_name + "_"  + getVarAddress(var_name) + "_" + getVarType(var_name)
 
 def parseArrayVar(var_short_name, var_name, root_var, depth):
     addVarCommand(var_short_name, var_name, ARRAY_FLAG)
@@ -370,7 +372,9 @@ def parseArrayVar(var_short_name, var_name, root_var, depth):
         addChildCommand("$root", var_name)
     prev_node = var_name
     child_type = getVarType(var_name + "[0]")
-    if depth > 0:
+    array_ident = getArrayIdent(arr_name)
+
+    if depth > 0 or (array_ident in vis_vars and vis_vars[array_ident] == "1"):
         for i in range(0, getNumberOfArrayElements(var_name)):
             child_var_name = var_name + "[" + str(i) + "]"
             analyseVar(var_short_name + "[" + str(i) + "]",

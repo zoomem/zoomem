@@ -15,4 +15,6 @@ urlpatterns = [
     url(r'^stack_down', views.stack_down, name='stackDown'),
     url(r'^go_to_line', views.go_to_line, name='goToLine'),
     url(r'^new_data', views.new_data, name='newData'),
+    url(r'^render_graph', views.render_graph, name='renderGraph'),
+
 ]

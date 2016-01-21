@@ -78,7 +78,6 @@ class nbsr_process:
         return output_lines
 
     def write(self, command):
-        self.last_edit = datetime.datetime.utcnow()
         command += "\n"
         self.proc.stdin.write(command.encode())
 

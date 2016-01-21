@@ -88,11 +88,20 @@ def update(request):
     })
     return HttpResponse(data, content_type='application/json')
 
+def render_graph(request):
+    session_id = int(request.GET["session_id"])
+    data = json.dumps({
+        'edges': gdb_adapters[session_id].graph.getGraphEdges(),
+        'cnt': gdb_adapters[session_id].graph.id_cnt,
+        'line_num': gdb_adapters[session_id].getCurrnetLine(),
+        'output':  gdb_adapters[session_id].readOutput(),
+    })
+    return HttpResponse(data, content_type='application/json')
+
 def new_data(request):
     session_id = int(request.GET["session_id"])
     last_seen = 0
     if 'last_seen' in request.GET: last_seen = datetime.strptime(request.GET['last_seen'],"%a, %d %b %Y %H:%M:%S %Z")
-    print str(last_seen) + " tariq " + str(gdb_adapters[session_id].lastChanged())
     if last_seen == 0 or gdb_adapters[session_id].lastChanged() > last_seen:
         return HttpResponse("true")
     return HttpResponse("false")
@@ -107,7 +116,7 @@ def remove_graph_edges(request):
     g_adapter = gdb_adapters[session_id]
     edges = g_adapter.getGraphData(var_name, '100')
     g_adapter.removeGraphEdges(edges)
-    return update(request)
+    return render_graph(request)
 
 
 def next(request):
@@ -119,11 +128,12 @@ def next(request):
         if(step == ""):
             step = 1
         gdb_adapters[session_id].next(step)
-        return update(request)
+        return render_graph(request)
     except ProcRunTimeError as e:
         gdb_adapters[session_id].exitProcess()
         return render(request, 'visualize/error.html', {'error': e.message, 'error_type': e.errors, 'state': "run", 'session_id': session_id})
     except TimeLimitError as e:
+        gdb_adapters[session_id].exitProcess()
         line = str(gdb_adapters[session_id].current_line)
         gdb_adapters[session_id].exitProcess()
         return render(request, 'visualize/error.html', {'error': "Faild it line " + line, 'error_type': e.errors, 'state': 'run', 'session_id': session_id})
@@ -137,11 +147,12 @@ def go_to_line(request):
         if(step == ""):
             step = 1
         gdb_adapters[session_id].goToLine(line)
-        return update(request)
+        return render_graph(request)
     except ProcRunTimeError as e:
         gdb_adapters[session_id].exitProcess()
         return render(request, 'visualize/error.html', {'error': e.message, 'error_type': e.errors, 'state': "run", 'session_id': session_id})
     except TimeLimitError as e:
+        gdb_adapters[session_id].exitProcess()
         line = str(gdb_adapters[session_id].current_line)
         gdb_adapters[session_id].exitProcess()
         return render(request, 'visualize/error.html', {'error': "Faild it line " + line, 'error_type': e.errors, 'state': 'run', 'session_id': session_id})
@@ -154,7 +165,7 @@ def prev(request):
     if(step == ""):
         step = 1
     gdb_adapters[session_id].prev(step)
-    return update(request)
+    return render_graph(request)
 
 
 def end_funciton(request):
@@ -162,7 +173,8 @@ def end_funciton(request):
     if not validEdit(session_id, request):
         return
     gdb_adapters[session_id].endFunciton()
-    return update(request)
+    return render_graph(request)
+
 
 
 def stack_up(request):
@@ -170,7 +182,7 @@ def stack_up(request):
     if not validEdit(session_id, request):
         return
     gdb_adapters[session_id].stackUp()
-    return update(request)
+    return render_graph(request)
 
 
 def stack_down(request):
@@ -178,7 +190,8 @@ def stack_down(request):
     if not validEdit(session_id, request):
         return
     gdb_adapters[session_id].stackDown()
-    return update(request)
+    return render_graph(request)
+
 
 
 # anything below this line can't be accessd from urls k ?

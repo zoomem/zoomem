@@ -76,7 +76,8 @@ function getArrayEdges(arrayName, uniqueName) {
     return;
   if (visArray[uniqueName] == 0 || visArray[uniqueName] == null) {
     visArray[uniqueName] = 2;
-    var data = 'var_name=' + arrayName + '&session_id=' + session_id;
+    var array_ident = arrayName + "_" + uniqueName;
+    var data = 'var_name=' + arrayName + '&session_id=' + session_id + "&array_ident="+array_ident;
     var edges;
     cvs.style.cursor = "wait";
     disable_buttons()
@@ -185,7 +186,7 @@ Node.prototype.draw = function(calcOnly) {
       } else {
         mouseOnMembers = true;
         if (nodes[this.members[i]].flag == 1) {
-          getArrayEdges(nodes[this.members[i]].fullName, nodes[this.members[i]].address + nodes[this.members[i]].type);
+          getArrayEdges(nodes[this.members[i]].fullName, nodes[this.members[i]].address + "_"+nodes[this.members[i]].type);
         }
         fillText(nodes[this.members[i]].type, this.x + 6, curY, this.w / 2 - 11);
         var printContent = nodes[this.members[i]].address;
@@ -236,7 +237,7 @@ Node.prototype.draw = function(calcOnly) {
     if (mouseOnMembers == false && mouse.down == true && inside(mouse.x, mouse.y, this.rect1)) {
       text = this.address;
       if (this.flag == 1)
-        getArrayEdges(this.fullName, this.address + this.type);
+        getArrayEdges(this.fullName, this.address + "_" + this.type);
       //alert(this.fullName);
     }
     fillText(text, this.x + 4, curY, this.w - 8);
@@ -407,7 +408,7 @@ function buildMembersLists(edges) {
   for (var i = 0; i < edges.length; ++i) {
     if (nodes[edges[i][0] - 1].flag == 2) {
       nodes[edges[i][0] - 1].members.push(edges[i][1] - 1);
-    } else if (nodes[edges[i][0] - 1].flag == 1 && (visArray[nodes[edges[i][0] - 1].address + nodes[edges[i][0] - 1].type] == 1 || visArray[nodes[edges[i][0] - 1].address + nodes[edges[i][0] - 1].type] == 3))
+    } else if (nodes[edges[i][0] - 1].flag == 1 && (visArray[nodes[edges[i][0] - 1].address + "_" + nodes[edges[i][0] - 1].type] == 1 || visArray[nodes[edges[i][0] - 1].address + "_" + nodes[edges[i][0] - 1].type] == 3))
       nodes[edges[i][0] - 1].members.push(edges[i][1] - 1);
   }
 }
@@ -422,7 +423,7 @@ function calcLevels(edges, n) {
     if (nodes[i].flag == 2 || nodes[i].name == "$") {
       vis[i] = true;
       nodes[i].draw(true);
-    } else if (nodes[i].flag == 1 && (visArray[nodes[i].address + nodes[i].type] == 1 || visArray[nodes[i].address + nodes[i].type] == 3)) {
+    } else if (nodes[i].flag == 1 && (visArray[nodes[i].address +"_"+ nodes[i].type] == 1 || visArray[nodes[i].address + "_"+ nodes[i].type] == 3)) {
     vis[i] = true;
     nodes[i].draw(true);
   }
