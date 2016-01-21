@@ -45,7 +45,13 @@ current_steps = 0
 visted_list = {}
 vars_def = {}
 global_vars = {}
+vis_vars = {}
 
+def makeVarVis(ident):
+    vis_vars[ident] = "1"
+
+def makeVarNotBis(ident):
+    vis_vars[ident] = "0"
 
 def setLastLine():
     command = executeGdbCommand("break-return")
@@ -456,8 +462,3 @@ def getVarHash(var_name):
             var_hash['var_value'] = (var_value if isPrimitive(
                 var_hash['var_type']) else "NULL")
     return var_hash
-
-
-def compileFiles():
-    subprocess.Popen("g++ -g -o test test.cpp", shell=True)
-    subprocess.Popen("g++ -o graph graph.cpp", shell=True)

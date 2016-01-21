@@ -60,14 +60,17 @@ class GdbAdapter:
     def endFunciton(self):
         self.gdb_process.write("python (executeGdbCommand('finish'))")
         self.graph = gdbGraph()
+        self.updateGraph()
 
     def stackUp(self):
         self.gdb_process.write("python (executeGdbCommand('up'))")
         self.graph = gdbGraph()
+        self.updateGraph()
 
     def stackDown(self):
         self.gdb_process.write("python (executeGdbCommand('down'))")
         self.graph = gdbGraph()
+        self.updateGraph()
 
     def getCurrentSteps():
         self.gdb_process.write("python getCurrentSteps()")
@@ -80,12 +83,13 @@ class GdbAdapter:
         mess = (self.gdb_process.readTill("done"))
         if len(mess) > 0:
             raise ProcRunTimeError(("\n").join(mess), "RuntimeError")
-        print
         self.graph = gdbGraph()
+        self.updateGraph()
 
     def prev(self, number=1):
         self.gdb_process.write("python prev(" + str(number) + ")")
         self.graph = gdbGraph()
+        self.updateGraph()
 
     def goToLine(self,line):
         self.gdb_process.write("python goToLine(" + str(number) + ")")
@@ -93,6 +97,7 @@ class GdbAdapter:
         if len(mess) > 0:
             raise ProcRunTimeError(("\n").join(mess), "RuntimeError")
         self.graph = gdbGraph()
+        self.updateGraph()
 
     def readOutput(self):
         content = ""
@@ -100,18 +105,18 @@ class GdbAdapter:
             content = content_file.read()
         return content
 
+    def getCurrnetLine(self):
+        self.gdb_process.write("python getCrrentLine()")
+        line = int(self.gdb_process.readTill("done")[0])
+        self.current_line = line
+        return line
+
     def getGraphData(self, var_name="", depth=0):
         self.vars_def_list = self.vars_def_list
         var_name = "\"" + var_name + "\""
         self.gdb_process.write("python generateGraphData(\"" +
                                self.vars_def_list + "\"," + var_name + "," + depth + ")")
         return (self.gdb_process.readTill("done"))
-
-    def getCurrnetLine(self):
-        self.gdb_process.write("python getCrrentLine()")
-        line = int(self.gdb_process.readTill("done")[0])
-        self.current_line = line
-        return line
 
     def bulidGraph(self, grahData):
         for data in grahData:
@@ -126,6 +131,10 @@ class GdbAdapter:
                 self.graph.addChildren(attributes[1], attributes[2], attributes[
                                        3], attributes[4], attributes[5])
         return self.graph
+
+    def updateGraph(self):
+        print "FEW"
+        #self.bulidGraph(self.getGraphData())
 
     def removeGraphEdges(self, edges):
         for edge in edges:
