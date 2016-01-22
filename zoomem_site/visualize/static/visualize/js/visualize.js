@@ -36,6 +36,31 @@ $("#next").on("click", function() {
   })
 });
 
+$("#goto").on("click", function() {
+  disable_buttons()
+  var number = $('#step');
+  var data = 'line=' + number.val() + '&session_id=' + session_id;
+  $.ajax({
+    url: "/visualize/go_to_line",
+    data: data,
+    context: document.body,
+    success: function(data) {
+      if ($('#RuntimeError', $('<span/>').html(data)).length > 0 || $('#TimeLimitError', $('<span/>').html(data)).length > 0) {
+        document.open();
+        document.write(data);
+        document.close();
+      } else {
+        updatePage(data);
+        enable_buttons();
+      }
+
+    },
+    error: function() {
+      enable_buttons();
+    },
+  })
+});
+
 $("#prev").on("click", function() {
   disable_buttons()
   var number = $('#step');

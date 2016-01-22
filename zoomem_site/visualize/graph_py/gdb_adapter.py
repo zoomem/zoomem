@@ -96,10 +96,11 @@ class GdbAdapter:
         self.updateGraph()
 
     def goToLine(self, line):
-        self.gdb_process.write("python goToLine(" + str(number) + ")")
+        self.gdb_process.write("python goToLine(" + str(line) + ")")
         mess = (self.gdb_process.readTill("done"))
-        if len(mess) > 0:
-            raise ProcRunTimeError(("\n").join(mess), "RuntimeError")
+        for x in mess:
+            if "Program received signa" in x:
+                raise ProcRunTimeError(("\n").join(mess), "RuntimeError")
         self.graph = gdbGraph()
         self.updateGraph()
 
@@ -116,11 +117,11 @@ class GdbAdapter:
         return line
 
     def getGraphData(self, var_name=""):
-        self.vars_def_list = self.vars_def_list
         var_name = "\"" + var_name + "\""
-        print self.vars_def_list
         self.gdb_process.write("python generateGraphData(\"" +self.vars_def_list+"\","+var_name+ ")")
-        return self.gdb_process.readTill("done")
+        data = self.gdb_process.readTill("done")
+        print data
+        return data
 
     def bulidGraph(self, grahData):
         for data in grahData:

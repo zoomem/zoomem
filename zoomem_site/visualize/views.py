@@ -133,9 +133,9 @@ def go_to_line(request):
     if not validEdit(session_id, request):
         return
     try:
-        step = request.GET["line"]
-        if(step == ""):
-            step = 1
+        line = request.GET["line"]
+        if(line == ""):
+            return
         gdb_adapters[session_id].goToLine(line)
         return render_graph(request)
     except ProcRunTimeError as e:

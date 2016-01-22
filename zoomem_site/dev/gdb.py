@@ -228,7 +228,7 @@ def getCrrentLine():
     print ("done")
 
 
-def next(n):
+def next(n,off = True):
     global LAST_LINE
     global current_steps
     n = int(n)
@@ -241,7 +241,8 @@ def next(n):
                 break
         else:
             break
-    print("done")
+    if off:
+        print("done")
     gdb.flush()
 
 
@@ -249,6 +250,7 @@ def goToLine(line):
     global LAST_LINE
     global current_steps
     line = int(line)
+    next(1,False)
     while(True):
         if str(getLineNumber()) != LAST_LINE and int(getLineNumber()) != line:
             s = executeGdbCommand("n")

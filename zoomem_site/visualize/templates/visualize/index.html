@@ -41,12 +41,15 @@
           <div id="io">
             <div class="input-group" style="margin-bottom:2px;">
               <span class="input-group-btn">
-                      <button class="btn btn-default btn-xs" type="button" id = "prev"><- Line</button>
-                  </span>
+                  <button class="btn btn-default btn-xs" type="button" id = "prev"><- Line</button>
+              </span>
               <input type="text" class="form-control input-xs" placeholder="#Steps" id="step">
               <span class="input-group-btn">
-                      <button class="btn btn-default btn-xs" type="button" id = "next"> -> Line</button>
-                  </span>
+                  <button class="btn btn-default btn-xs" type="button" id = "next"> -> Line</button>
+              </span>
+              <span class="input-group-btn">
+                  <button class="btn btn-default btn-xs" type="button" id = "goto">GoTo Line</button>
+              </span>
             </div>
             <div class="btn-group btn-group-justified" role="group" aria-label="...">
               <div class="btn-group" role="group">
@@ -110,10 +113,10 @@
     }
 
     //window.setInterval(function() {
-      //updateDataState();
-      //if (new_data)
+    //updateDataState();
+    //if (new_data)
     //    callUpdate()
-  //  }, 3000);
+    //  }, 3000);
 
     $(document).ready(function() {
       if ("{{valid}}".trim() != "True") {
