@@ -82,7 +82,7 @@ function getArrayEdges(arrayName, uniqueName) {
     cvs.style.cursor = "wait";
     disable_buttons()
     $.ajax({
-      url: "/visualize/update",
+      url: "/visualize/add_graph_edges",
       data: data,
       context: document.body,
       success: function(data) {
@@ -99,7 +99,8 @@ function getArrayEdges(arrayName, uniqueName) {
   } else {
     visArray[uniqueName] = 3;
     disable_buttons()
-    var data = 'del_name=' + arrayName + '&session_id=' + session_id;
+    var array_ident = arrayName + "_" + uniqueName;
+    var data = 'del_name=' + arrayName + '&session_id=' + session_id + "&array_ident="+array_ident;
     var edges;
     $.ajax({
       url: "/visualize/remove_graph_edges",

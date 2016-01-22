@@ -25,6 +25,10 @@ class nbsr_process:
         fl = fcntl.fcntl(fd, fcntl.F_GETFL)
         fcntl.fcntl(fd, fcntl.F_SETFL, fl | os.O_NONBLOCK)
 
+        fd = self.proc.stderr.fileno()
+        fl = fcntl.fcntl(fd, fcntl.F_GETFL)
+        fcntl.fcntl(fd, fcntl.F_SETFL, fl | os.O_NONBLOCK)
+
         def limitExecuting(timeout, proc):
             while True:
                 if((datetime.datetime.utcnow() - self.last_edit).total_seconds() >= timeout):
@@ -55,7 +59,8 @@ class nbsr_process:
             start = datetime.datetime.utcnow()
             if output == end:
                 break
-            output_lines.append(output)
+            if(output):
+                output_lines.append(output)
         return output_lines
 
     def readError(self, end=""):
@@ -63,14 +68,14 @@ class nbsr_process:
         start = datetime.datetime.utcnow()
         while True:
             now = datetime.datetime.utcnow()
-            if (datetime.datetime.utcnow() - start).total_seconds() > self.time_limit:
-                raise TimeLimitError("", "TimeLimitError")
+            if (datetime.datetime.utcnow() - start).total_seconds() > 1:
+                return
             try:
                 output = self.proc.stderr.readline()
             except:
                 time.sleep(0.1)
                 continue
-            output = self.removeHeader(output.strip())
+            print output
             start = datetime.datetime.utcnow()
             if output == end:
                 break

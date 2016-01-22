@@ -48,9 +48,10 @@ global_vars = {}
 vis_vars = {}
 
 def makeVarVis(ident):
+    ident = ident.strip()
     vis_vars[ident] = "1"
 
-def makeVarNotBis(ident):
+def makeVarNotVis(ident):
     vis_vars[ident] = "0"
 
 def setLastLine():
@@ -295,7 +296,7 @@ def initlizeHashes(vars_def_list):
                 vars_def[var[0]].append(var[1] + " " + var[2] + " " + var[3])
 
 
-def generateGraphData(vars_def_list="", var_name="", depth=0):
+def generateGraphData(vars_def_list="", var_name=""):
     start_time = time.time()
     executeGdbCommand("set print pretty on")
     initlizeHashes(vars_def_list)
@@ -305,7 +306,7 @@ def generateGraphData(vars_def_list="", var_name="", depth=0):
         for var_name in var_names:
             analyseVar(var_name, var_name, True)
     else:
-        analyseVar(var_name, var_name, False, "", depth)
+        analyseVar(var_name, var_name, False, "")
     global visted_list
     visted_list = {}
     print("done")
@@ -332,14 +333,14 @@ def isDefined(var_short_name):
     return False
 
 
-def analyseVar(var_short_name, var_name, root_var=False, Type="", depth=0):
+def analyseVar(var_short_name, var_name, root_var=False, Type=""):
     var_type = getVarType(var_name) if Type == "" else Type
     if check_node(var_name, var_type, var_short_name):
         return
     if isPrimitive(var_type):
         parsePrimitiveVar(var_short_name, var_name, root_var)
     elif isAArray(var_type):
-        parseArrayVar(var_short_name, var_name, root_var, depth)
+        parseArrayVar(var_short_name, var_name, root_var)
     elif isAPointer(var_type):
         parsePointerVar(var_short_name, var_name, root_var)
     elif isAObject(var_type):
@@ -363,21 +364,20 @@ def check_node(var_name, var_type, var_short_name):
         return False
 
 def getArrayIdent(arr_name):
-    return arr_name + "_"  + getVarAddress(var_name) + "_" + getVarType(var_name)
+    return (arr_name + "_"  + getVarAddress(arr_name) + "_" + getVarType(arr_name)).strip()
 
-def parseArrayVar(var_short_name, var_name, root_var, depth):
+def parseArrayVar(var_short_name, var_name, root_var):
     addVarCommand(var_short_name, var_name, ARRAY_FLAG)
     if root_var:
         addChildCommand("$root", var_name)
     prev_node = var_name
     child_type = getVarType(var_name + "[0]")
-    array_ident = getArrayIdent(arr_name)
-
-    if depth > 0 or (array_ident in vis_vars and vis_vars[array_ident] == "1"):
+    array_ident = getArrayIdent(var_name)
+    if array_ident in vis_vars and vis_vars[array_ident] == "1":
         for i in range(0, getNumberOfArrayElements(var_name)):
             child_var_name = var_name + "[" + str(i) + "]"
             analyseVar(var_short_name + "[" + str(i) + "]",
-                       child_var_name, False, child_type, depth - 1)
+                       child_var_name, False, child_type)
             addChildCommand(var_name, child_var_name)
 
 

@@ -72,21 +72,26 @@ def submit(request):
         e.message = e.message.replace("visualize/static/cpp_files/","\n/")
         return render(request, 'visualize/error.html', {'error': e.message, 'error_type': e.errors, 'state': "compile", 'session_id': submitted_code_data.id})
 
-
-def update(request):
+def add_graph_edges(request):
     session_id = int(request.GET["session_id"])
-    var_name = ""
-    if validEdit(session_id, request):
-        if "var_name" in request.GET:
-            var_name = request.GET["var_name"]
-    g_data = getEdges(gdb_adapters[session_id], var_name)
-    data = json.dumps({
-        'edges': g_data["edges"],
-        'cnt': g_data["cnt"],
-        'line_num': gdb_adapters[session_id].getCurrnetLine(),
-        'output':  gdb_adapters[session_id].readOutput(),
-    })
-    return HttpResponse(data, content_type='application/json')
+    array_ident = request.GET["array_ident"]
+    var_name = request.GET["var_name"]
+    if not validEdit(session_id, request):
+        return
+    g_adapter = gdb_adapters[session_id]
+    g_adapter.makeVarVis(var_name,array_ident)
+    return render_graph(request)
+
+def remove_graph_edges(request):
+    session_id = int(request.GET["session_id"])
+    array_ident = request.GET["array_ident"]
+    var_name = request.GET["del_name"]
+    if not validEdit(session_id, request):
+        return
+    g_adapter = gdb_adapters[session_id]
+    g_adapter.makeVarNotVis(var_name,array_ident)
+    return render_graph(request)
+
 
 def render_graph(request):
     session_id = int(request.GET["session_id"])
@@ -105,18 +110,6 @@ def new_data(request):
     if last_seen == 0 or gdb_adapters[session_id].lastChanged() > last_seen:
         return HttpResponse("true")
     return HttpResponse("false")
-
-def remove_graph_edges(request):
-    session_id = int(request.GET["session_id"])
-    if not validEdit(session_id, request):
-        return
-    var_name = ""
-    if "del_name" in request.GET:
-        var_name = request.GET["del_name"]
-    g_adapter = gdb_adapters[session_id]
-    edges = g_adapter.getGraphData(var_name, '100')
-    g_adapter.removeGraphEdges(edges)
-    return render_graph(request)
 
 
 def next(request):

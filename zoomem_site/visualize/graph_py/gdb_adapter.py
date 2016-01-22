@@ -83,8 +83,10 @@ class GdbAdapter:
     def next(self, number=1):
         self.gdb_process.write("python next('" + str(number) + "')")
         mess = (self.gdb_process.readTill("done"))
-        if len(mess) > 0:
-            raise ProcRunTimeError(("\n").join(mess), "RuntimeError")
+        print mess
+        for x in mess:
+            if "Program received signa" in x:
+                raise ProcRunTimeError(("\n").join(mess), "RuntimeError")
         self.graph = gdbGraph()
         self.updateGraph()
 
@@ -113,12 +115,12 @@ class GdbAdapter:
         self.current_line = line
         return line
 
-    def getGraphData(self, var_name="", depth=0):
+    def getGraphData(self, var_name=""):
         self.vars_def_list = self.vars_def_list
         var_name = "\"" + var_name + "\""
         self.gdb_process.write("python generateGraphData(\"" +
-                               self.vars_def_list + "\"," + var_name + "," + str(depth) + ")")
-        return (self.gdb_process.readTill("done"))
+                               self.vars_def_list + "\"," + var_name + ")")
+        return self.gdb_process.readTill("done")
 
     def bulidGraph(self, grahData):
         for data in grahData:
@@ -137,6 +139,19 @@ class GdbAdapter:
     def updateGraph(self):
         self.last_edit = datetime.datetime.utcnow()
         self.graph = self.bulidGraph(self.getGraphData())
+
+    def makeVarVis(self,var_name,array_ident = ""):
+        if(array_ident != ""):
+            self.gdb_process.write("python makeVarVis(" + "\"" + array_ident + "\"" + ")")
+        data = self.getGraphData(var_name)
+        self.bulidGraph(data)
+
+    def makeVarNotVis(self,var_name,array_ident = ""):
+        print array_ident
+        data = self.getGraphData(var_name)
+        if(array_ident != ""):
+            self.gdb_process.write("python makeVarNotVis(" + "\"" + array_ident + "\"" + ")")
+        self.removeGraphEdges(data)
 
     def removeGraphEdges(self, edges):
         for edge in edges:

@@ -102,8 +102,8 @@ USE_L10N = True
 USE_TZ = True
 
 PIPELINE_COMPILERS = (
-  'pipeline.compilers.less.LessCompiler',
-  'pipeline.compilers.coffee.CoffeeScriptCompiler',
+    'pipeline.compilers.less.LessCompiler',
+    'pipeline.compilers.coffee.CoffeeScriptCompiler',
 )
 
 # Static files (CSS, JavaScript, Images)
