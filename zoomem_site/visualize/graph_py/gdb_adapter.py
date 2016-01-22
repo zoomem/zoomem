@@ -145,13 +145,16 @@ class GdbAdapter:
             self.gdb_process.write("python makeVarVis(" + "\"" + array_ident + "\"" + ")")
         data = self.getGraphData(var_name)
         self.bulidGraph(data)
+        self.last_edit = datetime.datetime.utcnow()
+
 
     def makeVarNotVis(self,var_name,array_ident = ""):
-        print array_ident
         data = self.getGraphData(var_name)
         if(array_ident != ""):
             self.gdb_process.write("python makeVarNotVis(" + "\"" + array_ident + "\"" + ")")
         self.removeGraphEdges(data)
+        self.last_edit = datetime.datetime.utcnow()
+
 
     def removeGraphEdges(self, edges):
         for edge in edges:

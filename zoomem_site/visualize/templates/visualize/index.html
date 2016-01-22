@@ -11,15 +11,10 @@
 
   <script type="text/javascript" src={% static "jquery/jquery-1.11.3.min.js" %}></script>
 
-  <link href={% static "codemirror/codemirror.css" %} rel="stylesheet">
+  <link href={% static "codemirror/codemirror.css" %} rel="stylesheet"></link>
   <script type="text/javascript" src={% static "codemirror/codemirror.js" %}></script>
-  <script type="text/javascript" src={% static "codemirror/clike.js" %}>
-    < /script < script type = "text/javascript
-    "
-    src = { % static "codemirror/placeholder.js" %
-    } >
-  </script>
-
+  <script type="text/javascript" src={% static "codemirror/clike.js" %}></script>
+  <script type="text/javascript" src={ % static "codemirror/placeholder.js" %}></script>
   <script type="text/javascript" src={% static "bootstrap/js/bootstrap.min.js" %}></script>
   <link href={% static "bootstrap/css/bootstrap.min.css" %} rel="stylesheet">
   <script type="text/javascript" src={% static "visualize/js/graph_bulider.js" %}></script>
@@ -87,6 +82,7 @@
     date.setDate(date.getDate() - 1);
     var last_seen = date;
     var new_data = false;
+
     function callUpdate() {
       $.ajax({
         url: "/visualize/render_graph",
@@ -99,34 +95,31 @@
       })
     }
 
-    function updateDataState()
-    {
-      $.ajax(
-        {
-          url: "/visualize/new_data",
-          data: 'session_id=' + session_id + "&last_seen="+last_seen.toUTCString(),
-          context: document.body,
-          success: function(data) {
-            new_data = (data == "true");
-          },
-          error: function(data) {
-            new_data = true;
-          }
-        })
+    function updateDataState() {
+      $.ajax({
+        url: "/visualize/new_data",
+        data: 'session_id=' + session_id + "&last_seen=" + last_seen.toUTCString(),
+        context: document.body,
+        success: function(data) {
+          new_data = (data == "true");
+        },
+        error: function(data) {
+          new_data = true;
+        }
+      })
     }
 
-    // window.setInterval(function(){
-    //   updateDataState();
-    //   if(new_data)
-  //       callUpdate()
-    // }, 3000);
-
-    $(document).ready(function()
-    {
-        if ("{{valid}}".trim() != "True") {
-          $("input[type=button],:button").attr("disabled", "disabled");
-        }
-        callUpdate();
+    window.setInterval(function() {
+      updateDataState();
+      if (new_data)
+        callUpdate()
+    }, 3000);
+    
+    $(document).ready(function() {
+      if ("{{valid}}".trim() != "True") {
+        $("input[type=button],:button").attr("disabled", "disabled");
+      }
+      callUpdate();
     })
   </script>
 </body>
