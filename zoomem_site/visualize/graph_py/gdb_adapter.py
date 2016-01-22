@@ -84,7 +84,6 @@ class GdbAdapter:
     def next(self, number=1):
         self.gdb_process.write("python next('" + str(number) + "')")
         mess = (self.gdb_process.readTill("done"))
-        print mess
         for x in mess:
             if "Program received signa" in x:
                 raise ProcRunTimeError(("\n").join(mess), "RuntimeError")

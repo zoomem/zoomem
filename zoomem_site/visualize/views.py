@@ -81,8 +81,7 @@ def render_graph(request,session_id = ""):
         'cnt': gdb_adapters[session_id].graph.id_cnt,
         'line_num': gdb_adapters[session_id].getCurrnetLine(),
         'output':  gdb_adapters[session_id].readOutput(),
-        'vis_arrays
-':gdb_adapters[session_id].vis_arrays
+        'vis_arrays':gdb_adapters[session_id].vis_arrays
     })
     return HttpResponse(data, content_type='application/json')
 
