@@ -69,44 +69,30 @@ def submit(request):
             request.POST['code'], request.POST['input'], submitted_code_data.id)
         return HttpResponseRedirect("/visualize/index?session_id=" + str(submitted_code_data.id))
     except CompilationError as e:
-        e.message = e.message.replace("visualize/static/cpp_files/","\n/")
+        e.message = e.message.replace("visualize/static/cpp_files/", "\n/")
         return render(request, 'visualize/error.html', {'error': e.message, 'error_type': e.errors, 'state': "compile", 'session_id': submitted_code_data.id})
 
-def add_graph_edges(request):
-    session_id = int(request.GET["session_id"])
-    array_ident = request.GET["array_ident"]
-    var_name = request.GET["var_name"]
-    if not validEdit(session_id, request):
-        return
-    g_adapter = gdb_adapters[session_id]
-    g_adapter.makeVarVis(var_name,array_ident)
-    return render_graph(request)
 
-def remove_graph_edges(request):
-    session_id = int(request.GET["session_id"])
-    array_ident = request.GET["array_ident"]
-    var_name = request.GET["del_name"]
-    if not validEdit(session_id, request):
-        return
-    g_adapter = gdb_adapters[session_id]
-    g_adapter.makeVarNotVis(var_name,array_ident)
-    return render_graph(request)
-
-
-def render_graph(request):
-    session_id = int(request.GET["session_id"])
+def render_graph(request,session_id = ""):
+    if(session_id == ""):
+        session_id = int(request.GET["session_id"])
     data = json.dumps({
         'edges': gdb_adapters[session_id].graph.getGraphEdges(),
         'cnt': gdb_adapters[session_id].graph.id_cnt,
         'line_num': gdb_adapters[session_id].getCurrnetLine(),
         'output':  gdb_adapters[session_id].readOutput(),
+        'vis_arrays
+':gdb_adapters[session_id].vis_arrays
     })
     return HttpResponse(data, content_type='application/json')
+
 
 def new_data(request):
     session_id = int(request.GET["session_id"])
     last_seen = 0
-    if 'last_seen' in request.GET: last_seen = datetime.strptime(request.GET['last_seen'],"%a, %d %b %Y %H:%M:%S %Z")
+    if 'last_seen' in request.GET:
+        last_seen = datetime.strptime(
+            request.GET['last_seen'], "%a, %d %b %Y %H:%M:%S %Z")
     if last_seen == 0 or gdb_adapters[session_id].lastChanged() > last_seen:
         return HttpResponse("true")
     return HttpResponse("false")
@@ -131,6 +117,18 @@ def next(request):
         gdb_adapters[session_id].exitProcess()
         return render(request, 'visualize/error.html', {'error': "Faild it line " + line, 'error_type': e.errors, 'state': 'run', 'session_id': session_id})
 
+
+def prev(request):
+    session_id = int(request.GET["session_id"])
+    if not validEdit(session_id, request):
+        return
+    step = request.GET["step"]
+    if(step == ""):
+        step = 1
+    gdb_adapters[session_id].prev(step)
+    return render_graph(request)
+
+
 def go_to_line(request):
     session_id = int(request.GET["session_id"])
     if not validEdit(session_id, request):
@@ -150,16 +148,6 @@ def go_to_line(request):
         gdb_adapters[session_id].exitProcess()
         return render(request, 'visualize/error.html', {'error': "Faild it line " + line, 'error_type': e.errors, 'state': 'run', 'session_id': session_id})
 
-def prev(request):
-    session_id = int(request.GET["session_id"])
-    if not validEdit(session_id, request):
-        return
-    step = request.GET["step"]
-    if(step == ""):
-        step = 1
-    gdb_adapters[session_id].prev(step)
-    return render_graph(request)
-
 
 def end_funciton(request):
     session_id = int(request.GET["session_id"])
@@ -167,7 +155,6 @@ def end_funciton(request):
         return
     gdb_adapters[session_id].endFunciton()
     return render_graph(request)
-
 
 
 def stack_up(request):
@@ -186,8 +173,37 @@ def stack_down(request):
     return render_graph(request)
 
 
+def add_graph_edges(request):
+    data = {}
+    for x in request.POST:
+        data = json.loads(x)
+    session_id = int(data.get("session_id",''))
+    if not validEdit(session_id, request):
+        return
+    array_ident = data.get("array_ident",'').strip()
+    var_name =  data.get("var_name",'').strip()
+    g_adapter = gdb_adapters[session_id]
+    g_adapter.makeVarVis(var_name, array_ident)
+    return render_graph(request,session_id)
+
+
+
+def remove_graph_edges(request):
+    data = {}
+    for x in request.POST:
+        data = json.loads(x)
+    session_id = int(data.get("session_id",''))
+    if not validEdit(session_id, request):
+        return
+    array_ident = data.get("array_ident",'').strip()
+    var_name =  data.get("var_name",'').strip()
+    g_adapter = gdb_adapters[session_id]
+    g_adapter.makeVarNotVis(var_name, array_ident)
+    return render_graph(request,session_id)
 
 # anything below this line can't be accessd from urls k ?
+
+
 def validEdit(session_id, request):
     return (CodeData.objects.get(id=session_id).code_key == request.session.session_key)
 

@@ -1,3 +1,6 @@
+// using jQuery
+
+
 function disable_buttons() {
   cvs.style.cursor = "wait";
   $("input[type=button],:button").attr("disabled", "disabled");
@@ -122,6 +125,7 @@ function updatePage(json) {
   var n = d.getTime();
   highlightLine(json.line_num);
   $(".output").html(json.output);
+  visArray = json.vis_arrays
   drawGraph(json.edges, json.cnt, true);
 }
 

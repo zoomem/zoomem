@@ -23,6 +23,7 @@ class GdbAdapter:
         self.current_line = 0
         self.output_file_name = output_file_name
         self.current_steps = 0
+        self.vis_arrays = {}
         self.last_edit = datetime.datetime.utcnow()
 
         p = subprocess.Popen(['clang-3.5', '-Xclang', '-ast-dump', '-fsyntax-only',
@@ -143,6 +144,7 @@ class GdbAdapter:
     def makeVarVis(self,var_name,array_ident = ""):
         if(array_ident != ""):
             self.gdb_process.write("python makeVarVis(" + "\"" + array_ident + "\"" + ")")
+            self.vis_arrays[array_ident] = "1"
         data = self.getGraphData(var_name)
         self.bulidGraph(data)
         self.last_edit = datetime.datetime.utcnow()
@@ -152,6 +154,8 @@ class GdbAdapter:
         data = self.getGraphData(var_name)
         if(array_ident != ""):
             self.gdb_process.write("python makeVarNotVis(" + "\"" + array_ident + "\"" + ")")
+            self.vis_arrays[array_ident] = "0"
+
         self.removeGraphEdges(data)
         self.last_edit = datetime.datetime.utcnow()
 
