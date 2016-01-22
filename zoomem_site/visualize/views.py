@@ -255,7 +255,7 @@ def createFile(txt, exten):
 
 
 def compileFile(file_name):
-    proc = Popen("g++ -g -w -O0 -o " + file_name + " " + file_name +
+    proc = Popen("g++ -std=c++11 -g -w -O0 -o " + file_name + " " + file_name +
                  ".cpp", stdin=PIPE, stdout=PIPE, stderr=PIPE, shell=True)
     out, err = proc.communicate()
     if len(err) > 0:
