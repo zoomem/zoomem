@@ -120,7 +120,6 @@ class GdbAdapter:
         var_name = "\"" + var_name + "\""
         self.gdb_process.write("python generateGraphData(\"" +self.vars_def_list+"\","+var_name+ ")")
         data = self.gdb_process.readTill("done")
-        print data
         return data
 
     def bulidGraph(self, grahData):

@@ -112,11 +112,11 @@
       })
     }
 
-    //window.setInterval(function() {
-    //updateDataState();
-    //if (new_data)
-    //    callUpdate()
-    //  }, 3000);
+    window.setInterval(function() {
+    updateDataState();
+    if (new_data)
+        callUpdate()
+      }, 1000);
 
     $(document).ready(function() {
       if ("{{valid}}".trim() != "True") {
